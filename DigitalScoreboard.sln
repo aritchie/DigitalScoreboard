@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31611.283
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalScoreboard", "DigitalScoreboard\DigitalScoreboard.csproj", "{4EEAFC7A-1562-4D6B-8C58-6A54403BD21A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ABCA1D34-FAFE-40E5-96BC-99C2E5FC4803}"
+	ProjectSection(SolutionItems) = preProject
+		readme.md = readme.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4EEAFC7A-1562-4D6B-8C58-6A54403BD21A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EEAFC7A-1562-4D6B-8C58-6A54403BD21A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EEAFC7A-1562-4D6B-8C58-6A54403BD21A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{4EEAFC7A-1562-4D6B-8C58-6A54403BD21A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EEAFC7A-1562-4D6B-8C58-6A54403BD21A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EEAFC7A-1562-4D6B-8C58-6A54403BD21A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {61F7FB11-1E47-470C-91E2-47F8143E1572}
+	EndGlobalSection
+EndGlobal
