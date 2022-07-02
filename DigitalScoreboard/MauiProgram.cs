@@ -1,6 +1,7 @@
-﻿using Shiny;
+﻿using DigitalScoreboard.Infrastructure;
 
 namespace DigitalScoreboard;
+
 
 public static class MauiProgram
 {
@@ -9,7 +10,7 @@ public static class MauiProgram
 		var builder = MauiApp
 			.CreateBuilder()
 			//.UsePrismApp<App>(
-			//	prism => 
+			//	prism =>
 			//	{
 
 			//	}
@@ -22,6 +23,7 @@ public static class MauiProgram
 				fonts.AddFont("DS-DIGI.TTF", "Digital");
 			});
 
+		builder.Services.AddShinyService<AppSettings>();
 		builder.Services.AddBluetoothLE();
 		builder.Services.AddBluetoothLeHosting();
 

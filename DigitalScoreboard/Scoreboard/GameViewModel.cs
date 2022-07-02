@@ -1,6 +1,4 @@
-﻿using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Shiny.BluetoothLE.Hosting;
+﻿using Shiny.BluetoothLE.Hosting;
 
 namespace DigitalScoreboard.Scoreboard;
 
