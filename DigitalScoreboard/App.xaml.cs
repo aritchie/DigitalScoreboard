@@ -1,11 +1,10 @@
 ﻿namespace DigitalScoreboard;
 
-public partial class App : Application
+
+public partial class App : PrismApplication
 {
 	public App()
 	{
 		this.InitializeComponent();
-
-		this.MainPage = new MainPage();
 	}
 }

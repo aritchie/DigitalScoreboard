@@ -30,51 +30,48 @@
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
 		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
-
 		<MauiFont Include="Resources\Fonts\*" />
 
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
-		<PackageReference Include="Shiny.BluetoothLE">
-			<Version>3.0.0-alpha-0128</Version>
-		</PackageReference>
-		<PackageReference Include="Shiny.BluetoothLE.Hosting">
-			<Version>3.0.0-alpha-0128</Version>
-		</PackageReference>
-		<PackageReference Include="Shiny.Hosting.Maui">
-			<Version>3.0.0-alpha-0128</Version>
-		</PackageReference>
+		<PackageReference Include="Shiny.BluetoothLE" Version="3.0.0-alpha-0128" />
+		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="3.0.0-alpha-0128" />
+		<PackageReference Include="Shiny.Hosting.Maui" Version="3.0.0-alpha-0128" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-ios'">
-		<PackageReference Include="Shiny.BluetoothLE">
-			<Version>3.0.0-alpha-0128</Version>
-		</PackageReference>
-		<PackageReference Include="Shiny.BluetoothLE.Hosting">
-			<Version>3.0.0-alpha-0128</Version>
-		</PackageReference>
-		<PackageReference Include="Shiny.Hosting.Maui">
-			<Version>3.0.0-alpha-0128</Version>
-		</PackageReference>
+		<PackageReference Include="Shiny.BluetoothLE" Version="3.0.0-alpha-0128" />
+		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="3.0.0-alpha-0128" />
+		<PackageReference Include="Shiny.Hosting.Maui" Version="3.0.0-alpha-0128" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">
-		<PackageReference Include="Shiny.BluetoothLE">
-			<Version>3.0.0-alpha-0128</Version>
-		</PackageReference>
-		<PackageReference Include="Shiny.BluetoothLE.Hosting">
-			<Version>3.0.0-alpha-0128</Version>
-		</PackageReference>
-		<PackageReference Include="Shiny.Hosting.Maui">
-			<Version>3.0.0-alpha-0128</Version>
-		</PackageReference>
+		<PackageReference Include="Shiny.BluetoothLE" Version="3.0.0-alpha-0128" />
+		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="3.0.0-alpha-0128" />
+		<PackageReference Include="Shiny.Hosting.Maui" Version="3.0.0-alpha-0128" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Prism.Maui" Version="8.1.228-beta" />
+		<PackageReference Include="ReactiveUI.Fody" Version="18.2.5" />
+		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.228-beta" />
 	</ItemGroup>
-
+	<ItemGroup>
+	  <None Remove="Scoreboard\" />
+	  <None Remove="ReactiveUI.Fody" />
+	  <None Remove="Prism.DryIoc.Maui" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Scoreboard\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <MauiXaml Update="Scoreboard\CreatePage.xaml">
+	    <SubType></SubType>
+	  </MauiXaml>
+	  <MauiXaml Update="Scoreboard\GamePage.xaml">
+	    <SubType></SubType>
+	  </MauiXaml>
+	</ItemGroup>
 </Project>
