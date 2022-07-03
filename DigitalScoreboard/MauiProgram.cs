@@ -23,7 +23,8 @@ public static class MauiProgram
 				fonts.AddFont("DS-DIGI.TTF", "Digital");
 			});
 
-		builder.Services.AddShinyService<AppSettings>();
+        builder.Services.AddSingleton(DeviceDisplay.Current);
+        builder.Services.AddShinyService<AppSettings>();
 		builder.Services.AddBluetoothLE();
 		builder.Services.AddBluetoothLeHosting();
 

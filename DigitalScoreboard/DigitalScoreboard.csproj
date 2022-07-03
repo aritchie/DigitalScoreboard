@@ -58,23 +58,4 @@
 		<PackageReference Include="ReactiveUI.Fody" Version="18.2.5" />
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.228-beta" />
 	</ItemGroup>
-	<ItemGroup>
-	  <None Remove="Scoreboard\" />
-	  <None Remove="ReactiveUI.Fody" />
-	  <None Remove="Prism.DryIoc.Maui" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Scoreboard\" />
-	</ItemGroup>
-	<ItemGroup>
-	  <MauiXaml Update="Scoreboard\CreatePage.xaml">
-	    <SubType></SubType>
-	  </MauiXaml>
-	  <MauiXaml Update="Scoreboard\GamePage.xaml">
-	    <SubType></SubType>
-	  </MauiXaml>
-	  <MauiXaml Update="SettingsPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	</ItemGroup>
 </Project>

@@ -1,8 +1,4 @@
-﻿using System.Windows.Input;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-
-namespace DigitalScoreboard.Referee;
+﻿namespace DigitalScoreboard.Referee;
 
 
 public class GameViewModel : ReactiveObject
