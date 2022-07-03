@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:DigitalScoreboard"
              x:Class="DigitalScoreboard.RefereePage"
              x:DataType="local:RefereeViewModel"
-             NavigationPage.HasNavigationBar="False">
+             Title="Referee">
 
     <ScrollView>
         <VerticalStackLayout>

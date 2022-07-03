@@ -13,24 +13,25 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware
     readonly IDeviceDisplay display;
 
 
-	public ScoreboardViewModel(
-        ILogger<ScoreboardViewModel> logger,
-        AppSettings settings,
-        IBleHostingManager bleManager,
-        IDeviceDisplay display,
-        IDialogService dialogs,
-        INavigationService navigator
-    )
-	{
-        this.logger = logger;
+    //public ScoreboardViewModel(
+    //       ILogger<ScoreboardViewModel> logger,
+    //       AppSettings settings,
+    //       IBleHostingManager bleManager,
+    //       IDeviceDisplay display,
+    //       IPageDialogService dialogs,
+    //       INavigationService navigator
+    //   )
+    //{
+    //       this.logger = logger;
 
-        this.settings = settings;
-        this.bleManager = bleManager;
-        this.display = display;
-	}
+    //       this.settings = settings;
+    //       this.bleManager = bleManager;
+    //       this.display = display;
+    //}
 
 
-    public string Font => this.settings.Font;
+    //public string Font => this.settings.Font;
+    public string Font => "Digital";
     [Reactive] public int Period { get; private set; }
     [Reactive] public int TimeRemaining { get; private set; }
     [Reactive] public int PlayClock { get; set; }
@@ -45,16 +46,16 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware
 
     public void OnNavigatedFrom(INavigationParameters parameters)
     {
-        this.display.KeepScreenOn = false;
+        //this.display.KeepScreenOn = false;
 
         //this.bleManager.StopAdvertising();
         //this.bleManager.RemoveService("");
     }
 
 
-    public async void OnNavigatedTo(INavigationParameters parameters)
+    public void OnNavigatedTo(INavigationParameters parameters)
     {
-        this.display.KeepScreenOn = true;
+        //this.display.KeepScreenOn = true;
 
         try
         {

@@ -16,6 +16,17 @@
                            Text="{Binding Font}" />
             </TableSection>
 
+            <TableSection Title="Teams">
+                <EntryCell Label="Home"
+                           Text="{Binding HomeTeam}" />
+
+                <EntryCell Label="Away"
+                           Text="{Binding AwayTeam}" />
+
+                <TextCell Text="Switch"
+                          Command="{Binding SwitchTeams}" />
+            </TableSection>
+
             <TableSection>
                 <TextCell Text="Save"
                           Command="{Binding Save}" />

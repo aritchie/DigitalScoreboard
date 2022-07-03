@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:DigitalScoreboard"
              x:DataType="local:ScoreboardViewModel"
              x:Class="DigitalScoreboard.ScoreboardPage"
-             Title="GamePage">
+             NavigationPage.HasNavigationBar="False">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -16,6 +16,10 @@
                 <Setter Property="FontFamily" Value="{Binding Font}" />
             </Style>
 
+            <Style x:Key="Score" TargetType="Label">
+                <Setter Property="FontSize" Value="Large" />
+                <Setter Property="FontFamily" Value="{Binding Font}" />
+            </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -23,27 +27,30 @@
           ColumnDefinitions="1*, 1*">
 
         <Frame Grid.Row="0" Grid.Column="0">
-            <Grid>
-                <Label Text="Home" />
-                <Label Text="{Binding HomeTeamName}" />
+            <VerticalStackLayout VerticalOptions="CenterAndExpand">
+                <Label Text="Home" VerticalTextAlignment="Center" />
+                <Label Text="{Binding HomeTeamName}" VerticalTextAlignment="Center" />
 
                 <Label Text="{Binding HomeTeamScore}"
-                       Style="{StaticResource Info}" />
+                       Style="{StaticResource Score}"
+                       VerticalTextAlignment="Center" />
 
-                <Label Text="X" IsVisible="{Binding HomeTeamPosession}" />
-            </Grid>
+                <Label Text="X" IsVisible="{Binding HomeTeamPosession}"
+                       VerticalTextAlignment="Center" />
+            </VerticalStackLayout>
         </Frame>
 
         <Frame Grid.Row="0" Grid.Column="1">
-            <Grid>
+            <VerticalStackLayout>
                 <Label Text="Away" />
                 <Label Text="{Binding AwayTeamName}" />
 
                 <Label Text="{Binding AwayTeamScore}"
-                       Style="{StaticResource Info}" />
+                       Style="{StaticResource Score}"
+                       VerticalTextAlignment="Center" />
 
                 <Label Text="X" IsVisible="{Binding HomeTeamPosession}" />
-            </Grid>
+            </VerticalStackLayout>
         </Frame>
 
         <Frame Grid.Row="1" Grid.ColumnSpan="2">

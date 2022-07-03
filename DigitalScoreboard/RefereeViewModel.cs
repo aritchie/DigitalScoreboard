@@ -10,7 +10,7 @@ public class RefereeViewModel : ReactiveObject, INavigationAware
 	public RefereeViewModel(
 		IBleManager bleManager,
 		IDeviceDisplay display,
-		IDialogService dialogs
+        IPageDialogService dialogs
 	)
 	{
 		this.display = display;
