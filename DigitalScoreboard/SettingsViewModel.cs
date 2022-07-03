@@ -15,7 +15,21 @@ public class SettingsViewModel : ReactiveObject
             {
                 settings.PlayClock = this.PlayClock;
                 settings.Font = this.Font;
-            }
+            },
+            this.WhenAny(
+                x => x.PlayClock,
+                x => x.Font,
+                (pc, font) =>
+                {
+                    if (pc.GetValue() < 10)
+                        return false;
+
+                    if (font.GetValue().IsEmpty())
+                        return false;
+
+                    return true;
+                }
+            )
         );
     }
 

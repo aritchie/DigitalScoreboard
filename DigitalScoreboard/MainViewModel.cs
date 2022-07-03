@@ -1,15 +1,18 @@
-﻿using System.Windows.Input;
+﻿namespace DigitalScoreboard;
 
-namespace DigitalScoreboard;
 
 public class MainViewModel
 {
-	public MainViewModel()
+	public MainViewModel(INavigationService navigator)
 	{
-	}
+		this.Scoreboard = navigator.Command(nameof(ScoreboardPage));
+        this.Scoreboard = navigator.Command(nameof(RefereePage));
+		this.Settings = navigator.Command(nameof(SettingsPage));
+    }
 
 
-	public ICommand CreateGame { get; }
+	public ICommand Scoreboard { get; }
 	public ICommand Referee { get; }
+	public ICommand Settings { get; }
 }
 

@@ -1,10 +1,10 @@
 ﻿namespace DigitalScoreboard;
 
-public partial class MainPage : ContentPage
+
+public partial class RefereePage : ContentPage
 {
-	public MainPage()
+	public RefereePage()
 	{
 		this.InitializeComponent();
 	}
 }
-

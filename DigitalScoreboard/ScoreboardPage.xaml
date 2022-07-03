@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:DigitalScoreboard"
+             x:DataType="local:ScoreboardViewModel"
+             x:Class="DigitalScoreboard.ScoreboardPage"
+             Title="GamePage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <!--<Setter Property="FontFamily" />-->
+            </Style>
+
+            <Style x:Key="Info" TargetType="Label">
+                <Setter Property="FontFamily" Value="{Binding Font}" />
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, Auto, Auto"
+          ColumnDefinitions="1*, 1*">
+
+        <Frame Grid.Row="0" Grid.Column="0">
+            <Grid>
+                <Label Text="Home" />
+                <Label Text="{Binding HomeTeamName}" />
+
+                <Label Text="{Binding HomeTeamScore}"
+                       Style="{StaticResource Info}" />
+
+                <Label Text="X" IsVisible="{Binding HomeTeamPosession}" />
+            </Grid>
+        </Frame>
+
+        <Frame Grid.Row="0" Grid.Column="1">
+            <Grid>
+                <Label Text="Away" />
+                <Label Text="{Binding AwayTeamName}" />
+
+                <Label Text="{Binding AwayTeamScore}"
+                       Style="{StaticResource Info}" />
+
+                <Label Text="X" IsVisible="{Binding HomeTeamPosession}" />
+            </Grid>
+        </Frame>
+
+        <Frame Grid.Row="1" Grid.ColumnSpan="2">
+            <Grid>
+                <Label Text="Quarter" />
+                <Label Text="{Binding Period}"
+                       Style="{StaticResource Info}" />
+
+                <Label Text="Time" />
+                <Label Text="{Binding TimeRemaining}"
+                       Style="{StaticResource Info}" />
+            </Grid>
+        </Frame>
+
+        <Frame Grid.Row="2" Grid.ColumnSpan="2">
+            <Grid>
+                <Label Text="Down" />
+                <Label Text="{Binding Down}"
+                       Style="{StaticResource Info}" />
+
+                <Label Text="Play" />
+                <Label Text="{Binding PlayClock}"
+                       Style="{StaticResource Info}" />
+            </Grid>
+        </Frame>
+
+    </Grid>
+</ContentPage>

@@ -9,12 +9,19 @@ public static class MauiProgram
 	{
 		var builder = MauiApp
 			.CreateBuilder()
-			//.UsePrismApp<App>(
-			//	prism =>
-			//	{
-
-			//	}
-			//)
+            .UsePrismApp<App>(prism => prism
+				.RegisterTypes(registry =>
+				{
+					registry.RegisterForNavigation<NavigationPage>();
+					registry.RegisterForNavigation<MainPage, MainViewModel>();
+                    registry.RegisterForNavigation<SettingsPage, SettingsViewModel>();
+					registry.RegisterForNavigation<RefereePage, RefereeViewModel>();
+                    registry.RegisterForNavigation<ScoreboardPage, ScoreboardViewModel>();
+                })
+				.OnAppStart(
+					async navigator => await navigator.Navigate("NavigationPage/MainPage")
+				)
+            )
             .UseShiny()
             .ConfigureFonts(fonts =>
 			{
