@@ -18,10 +18,10 @@
                          Content="Away"
                          GroupName="Posession" />-->
 
-            <Button Text="Next Down" />
-            <Button Text="Next Quarter" />
-            <Button Text="Toggle Game Clock" />
-            <Button Text="Start Play Clock" />
+            <Button Text="Next Down" Command="{Binding IncrementDown}" />
+            <Button Text="Next Quarter" Command="{Binding IncrementPeriod}" />
+            <Button Text="Toggle Game Clock" Command="{Binding TogglePeriodClock}" />
+            <Button Text="Start Play Clock" Command="{Binding TogglePlayClock}" />
 
             <Button Text="Set Home Score" />
             <Button Text="Set Away Score" />

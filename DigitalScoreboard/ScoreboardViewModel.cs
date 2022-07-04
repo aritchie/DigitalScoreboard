@@ -20,10 +20,10 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
            ILogger<ScoreboardViewModel> logger,
            AppSettings settings,
            IDeviceDisplay display,
-           IPageDialogService dialogs
+           IPageDialogService dialogs,
+           BluetoothConfig btConfig
 #if !MACCATALYST
             , IBleHostingManager bleManager
-            , BluetoothConfig btConfig
 #endif
        )
     {        
@@ -31,9 +31,9 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
         this.settings = settings;
         this.display = display;
         this.dialogs = dialogs;
+        this.btConfig = btConfig;
 #if !MACCATALYST
         this.bleManager = bleManager;
-        this.btConfig = btConfig;
 #endif
 
         this.SetHomeScore = this.SetScore("Home Team Score?", x => this.HomeTeamScore = x);
@@ -124,7 +124,7 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
         if (this.bleManager != null)
         {
             this.bleManager.StopAdvertising();
-            this.bleManager.RemoveService(this.btConfig.ServiceUuid);
+            this.bleManager.RemoveService(this.btConfig!.ServiceUuid);
         }
     }
 
@@ -187,6 +187,12 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
                             case 0x05:
                                 this.TogglePeriodClock.Execute(null);
                                 break;
+
+                            // TODO: reset/start both
+                            //case 0x06:
+                            //    this.TogglePeriodClock.Execute(null);
+                            //    this.TogglePlayClock.Execute(null);
+                            //    break;
                         }
                         return GattState.Success;
                     })
