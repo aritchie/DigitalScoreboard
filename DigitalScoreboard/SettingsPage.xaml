@@ -8,8 +8,20 @@
     <TableView>
         <TableRoot>
             <TableSection Title="Defaults">
-                <EntryCell Label="Play Clock Seconds"
+                <EntryCell Label="Quarter Duration (Minutes)"
+                           Text="{Binding PeriodDuration}"
+                           Keyboard="Numeric" />
+
+                <EntryCell Label="Play Clock (Seconds)"
                            Text="{Binding PlayClock}"
+                           Keyboard="Numeric" />
+
+                <EntryCell Label="Quarters/Periods"
+                           Text="{Binding Periods}"
+                           Keyboard="Numeric" />
+
+                <EntryCell Label="Downs"
+                           Text="{Binding Downs}"
                            Keyboard="Numeric" />
 
                 <EntryCell Label="Font"

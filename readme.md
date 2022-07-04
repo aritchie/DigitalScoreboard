@@ -17,3 +17,7 @@
 				Show connected
 				Reset/Start Play Clock
 				Start/Pause Game Clock
+
+
+* Half time/break fullscreen timer?
+* Full screen play clock?

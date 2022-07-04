@@ -3,11 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:DigitalScoreboard"
              x:DataType="local:ScoreboardViewModel"
-             x:Class="DigitalScoreboard.ScoreboardPage"
-             NavigationPage.HasNavigationBar="False">
+             x:Class="DigitalScoreboard.ScoreboardPage">
 
     <ContentPage.Resources>
         <ResourceDictionary>
+            <Style TargetType="Frame">
+                <Setter Property="BorderColor" Value="White" />
+                <Setter Property="CornerRadius" Value="10" />
+            </Style>
+
             <Style TargetType="Label">
                 <!--<Setter Property="FontFamily" />-->
             </Style>
@@ -27,7 +31,11 @@
           ColumnDefinitions="1*, 1*">
 
         <Frame Grid.Row="0" Grid.Column="0">
-            <VerticalStackLayout VerticalOptions="CenterAndExpand">
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding SetScore}" CommandParameter="True" />
+            </Frame.GestureRecognizers>
+
+            <VerticalStackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
                 <Label Text="Home" VerticalTextAlignment="Center" />
                 <Label Text="{Binding HomeTeamName}" VerticalTextAlignment="Center" />
 
@@ -41,6 +49,10 @@
         </Frame>
 
         <Frame Grid.Row="0" Grid.Column="1">
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding SetScore}" CommandParameter="False" />
+            </Frame.GestureRecognizers>
+
             <VerticalStackLayout>
                 <Label Text="Away" />
                 <Label Text="{Binding AwayTeamName}" />
@@ -54,26 +66,38 @@
         </Frame>
 
         <Frame Grid.Row="1" Grid.ColumnSpan="2">
-            <Grid>
-                <Label Text="Quarter" />
-                <Label Text="{Binding Period}"
-                       Style="{StaticResource Info}" />
+            <Grid ColumnDefinitions="1*, 1*">
+                <HorizontalStackLayout Grid.Column="0">
+                    <Label Text="Quarter" />
+                    <Label Text="{Binding Period}"
+                           Style="{StaticResource Info}" />
+                </HorizontalStackLayout>
 
-                <Label Text="Time" />
-                <Label Text="{Binding TimeRemaining}"
-                       Style="{StaticResource Info}" />
+                <HorizontalStackLayout Grid.Column="1">
+                    <Label Text="Time Remaining" />
+                    <Label Text="{Binding TimeRemaining}"
+                           Style="{StaticResource Info}" />
+                </HorizontalStackLayout>
             </Grid>
         </Frame>
 
         <Frame Grid.Row="2" Grid.ColumnSpan="2">
-            <Grid>
-                <Label Text="Down" />
-                <Label Text="{Binding Down}"
-                       Style="{StaticResource Info}" />
+            <Grid ColumnDefinitions="1*, 1*">
+                <HorizontalStackLayout Grid.Column="0">
+                    <Label Text="Down" />
+                    <Label Text="{Binding Down}"
+                           Style="{StaticResource Info}" />
+                </HorizontalStackLayout>
 
-                <Label Text="Play" />
-                <Label Text="{Binding PlayClock}"
-                       Style="{StaticResource Info}" />
+                <HorizontalStackLayout Grid.Column="1">
+                    <HorizontalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding TogglePlayClock}" />
+                    </HorizontalStackLayout.GestureRecognizers>
+
+                    <Label Text="Play" />
+                    <Label Text="{Binding PlayClock}"
+                           Style="{StaticResource Info}" />
+                </HorizontalStackLayout>
             </Grid>
         </Frame>
 
