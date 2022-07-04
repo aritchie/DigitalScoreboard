@@ -1,4 +1,5 @@
 ﻿using DigitalScoreboard.Infrastructure;
+using Microsoft.Extensions.Configuration;
 
 namespace DigitalScoreboard;
 
@@ -30,6 +31,9 @@ public static class MauiProgram
 				fonts.AddFont("DS-DIGI.TTF", "Digital");
 				fonts.AddFont("electron.ttf", "electron");
 			});
+
+		builder.Configuration.AddJsonPlatformBundle(optional: false);
+		builder.Services.AddSingleton(builder.Configuration.GetSection("Bluetooth").Get<BluetoothConfig>());
 
         builder.Services.AddSingleton(DeviceDisplay.Current);
         builder.Services.AddShinyService<AppSettings>();

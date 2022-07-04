@@ -15,18 +15,11 @@ public class RefereeViewModel : ReactiveObject, INavigationAware
 	{
 		this.display = display;
 
-		this.Downs = new[]
-		{
-			CreateDown("1st Down", 1),
-            CreateDown("2nd Down", 2),
-            CreateDown("3rd Down", 3),
-            CreateDown("4th Down", 4),
-            CreateDown("5th Down", 5)
-        };
 	}
 
 
-    public CommandItem[] Downs { get; }
+    public ICommand Connect { get; }
+
     public bool IsConnected { get; private set; }
     [Reactive] public bool HomePosession { get; set; }
 
@@ -41,17 +34,35 @@ public class RefereeViewModel : ReactiveObject, INavigationAware
     {
         this.display.KeepScreenOn = true;
     }
-
-
-    CommandItem CreateDown(string text, int down) => new CommandItem(
-		text,
-		ReactiveCommand.CreateFromTask(async () =>
-        {
-
-        })
-	);
 }
+//                            case 0x01:
+//                                var homeTeam = request.Data[1] == 0x01;
+//var score = BitConverter.ToInt16(request.Data, 2);
+//                                if (homeTeam)
+//                                {
+//                                    this.HomeTeamScore = score;
+//}
+//                                else
+//                                {
+//                                    this.AwayTeamScore = score;
+//}
+//                                break;
 
+//                            case 0x02:
+//                                this.IncrementDown.Execute(null);
+//                                break;
+
+//                            case 0x03:
+//                                this.Reset();
+//                                break;
+
+//                            case 0x04:
+//                                this.TogglePlayClock.Execute(null);
+//                                break;
+
+//                            case 0x05:
+//                                this.TogglePeriodClock.Execute(null);
+//                                break;
 
 //RadioButton IsChecked = "{Binding HomePosession}"
 //                         Value="1"

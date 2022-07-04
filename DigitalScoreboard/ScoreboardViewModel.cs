@@ -11,6 +11,7 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
     readonly IPageDialogService dialogs;
     readonly IDeviceDisplay display;
     readonly IBleHostingManager? bleManager;
+    readonly BluetoothConfig? btConfig;
     IDisposable? gameClockSub;
     IDisposable? playClockSub;
 
@@ -22,6 +23,7 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
            IPageDialogService dialogs
 #if !MACCATALYST
             , IBleHostingManager bleManager
+            , BluetoothConfig btConfig
 #endif
        )
     {        
@@ -31,11 +33,13 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
         this.dialogs = dialogs;
 #if !MACCATALYST
         this.bleManager = bleManager;
+        this.btConfig = btConfig;
 #endif
 
         this.SetHomeScore = this.SetScore("Home Team Score?", x => this.HomeTeamScore = x);
         this.SetAwayScore = this.SetScore("Away Team Score?", x => this.AwayTeamScore = x);
 
+        // TODO: posession change should also cause a Reset() without period update
         this.TogglePlayClock = ReactiveCommand.Create(() =>
         {
             if (this.playClockSub == null)
@@ -55,7 +59,6 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
 
         this.TogglePeriodClock = ReactiveCommand.Create(() =>
         {
-            // pause/resume game clock - changing period resets
             if (this.gameClockSub == null)
             {
                 this.gameClockSub = Observable
@@ -121,12 +124,12 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
         if (this.bleManager != null)
         {
             this.bleManager.StopAdvertising();
-            //this.bleManager.RemoveService("");
+            this.bleManager.RemoveService(this.btConfig.ServiceUuid);
         }
     }
 
 
-    public void OnNavigatedTo(INavigationParameters parameters)
+    public async void OnNavigatedTo(INavigationParameters parameters)
     {
         this.display.KeepScreenOn = true;
         if (this.bleManager == null)
@@ -134,16 +137,66 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
 
         try
         {
-            //await this.bleManager.StartAdvertising(new AdvertisementOptions
-            //{
-            //    UseGattServiceUuids = true
-            //});
-            //manager.AddService("", true, sb => sb
-            //    .AddCharacteristic("", cb =>
-            //    {
+            // byte 0 intent
+            // byte 1 sub-intent
+            // byte 2+ - data
 
-            //    })
-            //);
+            // read packet
+            // 0-1 home score
+            // 2-3 away score
+            // 4 period
+            // 5-8 period remaining in seconds
+            // 9 - down
+            // TODO: team names, play clock, notify of direct scoreboard changes?, play clock expired
+
+            this.bleManager.AddService(this.btConfig!.ServiceUuid, true, sb => sb
+                .AddCharacteristic(this.btConfig.CharacteristicUuid, cb => cb.
+                    SetRead(request =>
+                    {
+                        return ReadResult.Error(GattState.Success);
+                    })
+                    .SetWrite(request =>
+                    {
+                        switch (request.Data[0])
+                        {
+                            case 0x01:
+                                var homeTeam = request.Data[1] == 0x01;
+                                var score = BitConverter.ToInt16(request.Data, 2);
+                                if (homeTeam)
+                                {
+                                    this.HomeTeamScore = score;
+                                }
+                                else
+                                {
+                                    this.AwayTeamScore = score;
+                                }
+                                break;
+
+                            case 0x02:
+                                this.IncrementDown.Execute(null);
+                                break;
+
+                            case 0x03:
+                                this.Reset();
+                                break;
+
+                            case 0x04:
+                                this.TogglePlayClock.Execute(null);
+                                break;
+
+                            case 0x05:
+                                this.TogglePeriodClock.Execute(null);
+                                break;
+                        }
+                        return GattState.Success;
+                    })
+                )
+            );
+
+            await this.bleManager.StartAdvertising(new AdvertisementOptions
+            {
+                UseGattServiceUuids = true
+            });
         }
         catch (Exception ex)
         {
@@ -164,7 +217,7 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
     {
         this.Down = 1;
         this.Period++;
-        if (this.Period > settings.Periods)
+        if (this.Period > this.settings.Periods)
             this.Period = 1; // TODO: or end of game?
 
         this.KillPeriodClock(true);

@@ -8,7 +8,7 @@
 
     <ScrollView>
         <VerticalStackLayout>
-            <RadioButton IsChecked="{Binding HomePosession}"
+            <!--<RadioButton IsChecked="{Binding HomePosession}"
                          Value="1"
                          Content="Home"
                          GroupName="Posession" />
@@ -16,30 +16,15 @@
             <RadioButton IsChecked="{Binding HomePosession}"
                          Value="2"
                          Content="Away"
-                         GroupName="Posession" />
+                         GroupName="Posession" />-->
 
-            <Frame BorderColor="Black"
-                   CornerRadius="5"
-                   Padding="8">
-                <!--<VerticalStackLayout BindableLayout.ItemsSource="{Binding Downs}">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate x:DataType="local:CommandItem">
-                            <Button Text="{Binding Text}" Command="{Binding Command}" />
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </VerticalStackLayout>-->
-            </Frame>
-
-            <Button Text="Start and Reset Play Clock" />
-            <Button Text="Reset Play Clock" />
+            <Button Text="Next Down" />
+            <Button Text="Next Quarter" />
+            <Button Text="Toggle Game Clock" />
+            <Button Text="Start Play Clock" />
 
             <Button Text="Set Home Score" />
             <Button Text="Set Away Score" />
-
-            <Button Text="Pause Game Clock" />
-            <Button Text="Resume Play Clock" />
-            <Button Text="Set Period" />
-            <Button Text="Set Game Clock" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
