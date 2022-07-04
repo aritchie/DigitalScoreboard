@@ -28,6 +28,7 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 				fonts.AddFont("DS-DIGI.TTF", "Digital");
+				fonts.AddFont("electron.ttf", "electron");
 			});
 
         builder.Services.AddSingleton(DeviceDisplay.Current);

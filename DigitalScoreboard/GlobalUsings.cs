@@ -2,5 +2,8 @@
 global using ReactiveUI.Fody.Helpers;
 global using Shiny;
 global using System.Windows.Input;
+global using System.Reactive;
+global using System.Reactive.Linq;
 global using Prism.Navigation;
 global using Prism.Services.Dialogs;
+global using Microsoft.Extensions.Logging;

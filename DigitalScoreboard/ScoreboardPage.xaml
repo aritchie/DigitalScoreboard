@@ -7,6 +7,10 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
+            <Style TargetType="ContentPage">
+                <Setter Property="BackgroundColor" Value="Black" />
+            </Style>
+
             <Style TargetType="Frame">
                 <Setter Property="BorderColor" Value="White" />
                 <Setter Property="CornerRadius" Value="10" />
@@ -17,11 +21,13 @@
             </Style>
 
             <Style x:Key="Info" TargetType="Label">
+                <Setter Property="TextColor" Value="Yellow" />
                 <Setter Property="FontFamily" Value="{Binding Font}" />
             </Style>
 
             <Style x:Key="Score" TargetType="Label">
-                <Setter Property="FontSize" Value="Large" />
+                <Setter Property="FontSize" Value="Title" />
+                <Setter Property="TextColor" Value="Yellow" />
                 <Setter Property="FontFamily" Value="{Binding Font}" />
             </Style>
         </ResourceDictionary>
@@ -32,7 +38,7 @@
 
         <Frame Grid.Row="0" Grid.Column="0">
             <Frame.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding SetScore}" CommandParameter="True" />
+                <TapGestureRecognizer Command="{Binding SetHomeScore}" />
             </Frame.GestureRecognizers>
 
             <VerticalStackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
@@ -43,14 +49,15 @@
                        Style="{StaticResource Score}"
                        VerticalTextAlignment="Center" />
 
-                <Label Text="X" IsVisible="{Binding HomeTeamPosession}"
+                <Label Text="X"
+                       IsVisible="{Binding HomeTeamPosession}"
                        VerticalTextAlignment="Center" />
             </VerticalStackLayout>
         </Frame>
 
         <Frame Grid.Row="0" Grid.Column="1">
             <Frame.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding SetScore}" CommandParameter="False" />
+                <TapGestureRecognizer Command="{Binding SetAwayScore}" />
             </Frame.GestureRecognizers>
 
             <VerticalStackLayout>
@@ -78,11 +85,11 @@
 
                 <HorizontalStackLayout Grid.Column="1">
                     <HorizontalStackLayout.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleGameClock}" />
+                        <TapGestureRecognizer Command="{Binding TogglePeriodClock}" />
                     </HorizontalStackLayout.GestureRecognizers>
 
                     <Label Text="Time Remaining" />
-                    <Label Text="{Binding TimeRemaining}"
+                    <Label Text="{Binding PeriodClock, StringFormat='{0:c}'}"
                            Style="{StaticResource Info}" />
                 </HorizontalStackLayout>
             </Grid>

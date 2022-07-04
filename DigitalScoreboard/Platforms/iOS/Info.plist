@@ -28,5 +28,14 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+	</array>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app allows the referee to control the scoreboard through bluetooth</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app allows the referee to control the scoreboard through bluetooth</string>
 </dict>
 </plist>
