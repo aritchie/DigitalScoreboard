@@ -68,12 +68,19 @@
         <Frame Grid.Row="1" Grid.ColumnSpan="2">
             <Grid ColumnDefinitions="1*, 1*">
                 <HorizontalStackLayout Grid.Column="0">
+                    <HorizontalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding IncrementPeriod}" />
+                    </HorizontalStackLayout.GestureRecognizers>
                     <Label Text="Quarter" />
                     <Label Text="{Binding Period}"
                            Style="{StaticResource Info}" />
                 </HorizontalStackLayout>
 
                 <HorizontalStackLayout Grid.Column="1">
+                    <HorizontalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleGameClock}" />
+                    </HorizontalStackLayout.GestureRecognizers>
+
                     <Label Text="Time Remaining" />
                     <Label Text="{Binding TimeRemaining}"
                            Style="{StaticResource Info}" />
@@ -84,6 +91,10 @@
         <Frame Grid.Row="2" Grid.ColumnSpan="2">
             <Grid ColumnDefinitions="1*, 1*">
                 <HorizontalStackLayout Grid.Column="0">
+                    <HorizontalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding IncrementDown}" />
+                    </HorizontalStackLayout.GestureRecognizers>
+
                     <Label Text="Down" />
                     <Label Text="{Binding Down}"
                            Style="{StaticResource Info}" />
