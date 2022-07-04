@@ -140,21 +140,9 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
             // byte 0 intent
             // byte 1 sub-intent
             // byte 2+ - data
-
-            // read packet
-            // 0-1 home score
-            // 2-3 away score
-            // 4 period
-            // 5-8 period remaining in seconds
-            // 9 - down
-            // TODO: team names, play clock, notify of direct scoreboard changes?, play clock expired
-
             this.bleManager.AddService(this.btConfig!.ServiceUuid, true, sb => sb
-                .AddCharacteristic(this.btConfig.CharacteristicUuid, cb => cb.
-                    SetRead(request =>
-                    {
-                        return ReadResult.Error(GattState.Success);
-                    })
+                .AddCharacteristic(this.btConfig.CharacteristicUuid, cb => cb
+                    .SetRead(request => ReadResult.Success(this.GetReadData()))
                     .SetWrite(request =>
                     {
                         switch (request.Data[0])
@@ -208,6 +196,25 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
         {
             this.logger.LogError(ex, "Failed to start BLE functions");
         }
+    }
+
+
+    byte[] GetReadData()
+    {
+        // read packet
+        // 0 home score
+        // 1 away score
+        // 2 period
+        // 3-4 period remaining in seconds
+        // 9 - down
+        // TODO: team names, play clock, notify of direct scoreboard changes?, play clock expired
+        var bytes = new List<byte>();
+        bytes.Add(Convert.ToByte(this.HomeTeamScore));
+        bytes.Add(Convert.ToByte(this.AwayTeamScore));
+        bytes.Add(Convert.ToByte(this.Period));
+        //bytes.AddRange(BitConverter.ToInt16(Convert.ToUInt16(this.PeriodClock.TotalSeconds)));
+        bytes.Add(Convert.ToByte(this.Down));
+        return bytes.ToArray();
     }
 
 
