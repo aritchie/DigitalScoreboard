@@ -189,7 +189,10 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
 
             await this.bleManager.StartAdvertising(new AdvertisementOptions
             {
-                UseGattServiceUuids = true
+                ServiceUuids =
+                {
+                    this.btConfig.ServiceUuid
+                }
             });
         }
         catch (Exception ex)
