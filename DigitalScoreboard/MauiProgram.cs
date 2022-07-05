@@ -1,4 +1,5 @@
-﻿using DigitalScoreboard.Infrastructure;
+﻿using CommunityToolkit.Maui;
+using DigitalScoreboard.Infrastructure;
 using Microsoft.Extensions.Configuration;
 
 namespace DigitalScoreboard;
@@ -23,6 +24,7 @@ public static class MauiProgram
 					async navigator => await navigator.Navigate("NavigationPage/MainPage")
 				)
             )
+			.UseMauiCommunityToolkit()
             .UseShiny()
             .ConfigureFonts(fonts =>
 			{

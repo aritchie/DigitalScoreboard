@@ -2,7 +2,8 @@
 
 	<PropertyGroup>
 		<!--<TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>-->
-		<TargetFrameworks>net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
+		<!--<TargetFrameworks>net6.0-ios;net6.0-maccatalyst</TargetFrameworks>-->
+		<TargetFrameworks>net6.0-ios</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>DigitalScoreboard</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -23,6 +24,20 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+	</PropertyGroup>
+
+	<!--
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		<CodesignKey>iPhone Distribution: </CodesignKey>
+		<CodesignProvision>MyMauiApp</CodesignProvision>
+		<ArchiveOnBuild>true</ArchiveOnBuild>
+		<TcpPort>58181</TcpPort>
+	</PropertyGroup>
+	-->
 
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -57,10 +72,12 @@
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.228-beta" />
 		<PackageReference Include="ReactiveUI.Fody" Version="18.2.5" />
 		<PackageReference Include="Shiny.Extensions.Configuration" Version="$(ShinyVersion)" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="1.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Remove="Resources\Raw\" />
+		<None Remove="CommunityToolkit.Maui" />
 	</ItemGroup>
 
 	<ItemGroup>
