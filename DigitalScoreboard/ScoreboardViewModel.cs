@@ -223,7 +223,14 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
 
     ICommand SetScore(string question, Action<int> action) => ReactiveCommand.CreateFromTask(async () =>
     {
-        var value = await this.dialogs.DisplayPromptAsync(question, "OK", keyboardType: KeyboardType.Numeric);
+        var value = await this.dialogs.DisplayPromptAsync(
+            "Score",
+            question,
+            "Set",
+            "Cancel",
+            maxLength: 2,
+            keyboardType: KeyboardType.Numeric
+        );
         if (Int32.TryParse(value, out var score))
             action(score);
     });
