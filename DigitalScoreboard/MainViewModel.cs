@@ -5,9 +5,9 @@ public class MainViewModel
 {
 	public MainViewModel(INavigationService navigator)
 	{
-		this.Scoreboard = navigator.Command(nameof(ScoreboardPage));
-        this.Referee = navigator.Command(nameof(RefereePage));
-		this.Settings = navigator.Command(nameof(SettingsPage));
+		this.Scoreboard = navigator.NavigateCommand(nameof(ScoreboardPage));
+        this.Referee = navigator.NavigateCommand(nameof(RefereePage));
+		this.Settings = navigator.NavigateCommand(nameof(SettingsPage));
     }
 
 

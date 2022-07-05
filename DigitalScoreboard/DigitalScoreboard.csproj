@@ -46,41 +46,15 @@
 
 		<MauiImage Include="Resources\Images\*" />
 		<MauiFont Include="Resources\Fonts\*" />
-
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
-		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
-		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
-		<PackageReference Include="Shiny.Hosting.Maui" Version="$(ShinyVersion)" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-ios'">
-		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
-		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
-		<PackageReference Include="Shiny.Hosting.Maui" Version="$(ShinyVersion)" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">
-		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
-		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
-		<PackageReference Include="Shiny.Hosting.Maui" Version="$(ShinyVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Prism.Maui" Version="8.1.228-beta" />
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.228-beta" />
 		<PackageReference Include="ReactiveUI.Fody" Version="18.2.5" />
-		<PackageReference Include="Shiny.Extensions.Configuration" Version="$(ShinyVersion)" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="1.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Remove="Resources\Raw\" />
-		<None Remove="CommunityToolkit.Maui" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Resources\Raw\" />
+		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0002" />
+		<PackageReference Include="Shiny.Extensions.Configuration" Version="$(ShinyVersion)" />
+		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
+		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
 	</ItemGroup>
 </Project>

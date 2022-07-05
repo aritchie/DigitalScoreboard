@@ -123,8 +123,15 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
 
         if (this.bleManager != null)
         {
-            this.bleManager.StopAdvertising();
-            this.bleManager.RemoveService(this.btConfig!.ServiceUuid);
+            try
+            {
+                this.bleManager.StopAdvertising();
+                this.bleManager.RemoveService(this.btConfig!.ServiceUuid);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Error cleaning up BLE server");
+            }
         }
     }
 
