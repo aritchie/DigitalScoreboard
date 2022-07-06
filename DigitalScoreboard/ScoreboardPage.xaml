@@ -7,7 +7,7 @@
              BackgroundColor="Black"
              Padding="10">
 
-    <ContentPage.Resources>
+     <ContentPage.Resources>
         <ResourceDictionary>
             <Style TargetType="VerticalStackLayout">
                 <Setter Property="VerticalOptions" Value="FillAndExpand" />

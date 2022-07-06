@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net6.0-ios</TargetFrameworks>
 		<!--<TargetFrameworks>$(TargetFrameworks);net6.0-maccatalyst</TargetFrameworks>-->
-		<TargetFrameworks>$(TargetFrameworks);net6.0-android</TargetFrameworks>
+		<!--<TargetFrameworks>$(TargetFrameworks);net6.0-android</TargetFrameworks>-->
 		<OutputType>Exe</OutputType>
 		<RootNamespace>DigitalScoreboard</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -25,9 +25,9 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
+<!--	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-	</PropertyGroup>
+	</PropertyGroup>-->
 
 	<!--
 	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
@@ -52,7 +52,7 @@
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.228-beta" />
 		<PackageReference Include="ReactiveUI.Fody" Version="18.2.5" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="1.0.0" />
-		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0002" />
+		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0005" />
 		<PackageReference Include="Shiny.Extensions.Configuration" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
