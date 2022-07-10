@@ -4,7 +4,7 @@ using Shiny.BluetoothLE.Hosting;
 namespace DigitalScoreboard;
 
 
-public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNavigationAsync
+public class ScoreboardViewModel : ViewModel
 {
     readonly ILogger logger;
     readonly AppSettings settings;
@@ -26,7 +26,7 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
             , IBleHostingManager bleManager
 #endif
        )
-    {        
+    {
         this.logger = logger;
         this.settings = settings;
         this.display = display;
@@ -113,11 +113,11 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
     [Reactive] public int AwayTeamScore { get; set; }
 
 
-    public Task<bool> CanNavigateAsync(INavigationParameters parameters)
+    public override Task<bool> CanNavigateAsync(INavigationParameters parameters)
         => this.dialogs.DisplayAlertAsync("Confirm", "Are you sure you wish to exit the scoreboard?", "Yes", "No");
 
 
-    public void OnNavigatedFrom(INavigationParameters parameters)
+    public override void OnNavigatedFrom(INavigationParameters parameters)
     {
         this.display.KeepScreenOn = false;
 
@@ -136,7 +136,7 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
     }
 
 
-    public async void OnNavigatedTo(INavigationParameters parameters)
+    public override async void OnNavigatedTo(INavigationParameters parameters)
     {
         this.display.KeepScreenOn = true;
         if (this.bleManager == null)
@@ -183,6 +183,9 @@ public class ScoreboardViewModel : ReactiveObject, INavigationAware, IConfirmNav
                                 this.TogglePeriodClock.Execute(null);
                                 break;
 
+                            case 0x06:
+                                // TODO: TIMEOUTS
+                                break;
                             // TODO: reset/start both
                             //case 0x06:
                             //    this.TogglePeriodClock.Execute(null);

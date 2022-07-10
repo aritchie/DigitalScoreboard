@@ -1,5 +1,34 @@
 # Digital Scoreboard
 
+A football scoreboard that can be controlled through Bluetooth.  Great for little league games.
+
+## Features
+* Referee "client" screen that allows you to control the scoreboard remotely
+* Customized Team Names
+* Customized Game & Play Clock Timers
+* Screen Properties
+    * Timeouts Remaining (TODO)
+    * Current quarter/period
+    * Ball Posession (TODO)
+    * Current Down
+    * Play Clock
+    * Game Clock
+
+## The "Stack"
+* .NET MAUI
+* Prism
+* ReactiveUI
+* Shiny (BluetoothLE & BluetoothLE Hosting)
+* Shiny.Framework (brings together Shiny, Prism, & ReactiveUI in a tidy little bundle)
+
+## Scoreboard
+This screen is meant for tablets in landscape view.  It sets up a bluetooth LE host using Shiny.BluetoothLE.Hosting that can allow connections to control the scoreboard clocks and scores
+
+You can also control most settings, pause/resume of clocks, etc by tapping on the screen.  This is a good option if you don't have a tablet and a phone to remote control with or if bluetooth distance is a problem.
+
+## Referee
+Uses Shiny.BluetoothLE to connect to the scoreboard host.
+
 
 ## TODO
 
@@ -11,7 +40,7 @@
 
 ## Ideas
 
-* Half time/break fullscreen timer?
+* Half time/break fullscreen timer?  General purpose full screen timer?
 * Full Screen
     * Play Clock
     * Game Clock

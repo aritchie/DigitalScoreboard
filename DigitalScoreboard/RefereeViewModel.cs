@@ -5,7 +5,7 @@ using Shiny.BluetoothLE.Managed;
 namespace DigitalScoreboard;
 
 
-public class RefereeViewModel : ReactiveObject, INavigationAware
+public class RefereeViewModel : ViewModel
 {
     readonly ILogger logger;
     readonly IBleManager bleManager;
@@ -39,8 +39,12 @@ public class RefereeViewModel : ReactiveObject, INavigationAware
         this.TogglePlayClock = this.SendCommand(0x04);
         this.TogglePeriodClock = this.SendCommand(0x05);
 
+        // TODO: command parameters seem to be having issues on reactiveui, hence the split commands
         this.SetHomeScore = this.CreateScoreCommand(true);
         this.SetAwayScore = this.CreateScoreCommand(false);
+
+        this.SetHomeScore = this.CreateTimeoutCommand(true);
+        this.SetAwayTimeouts = this.CreateTimeoutCommand(false);
     }
 
 
@@ -48,7 +52,9 @@ public class RefereeViewModel : ReactiveObject, INavigationAware
     //[Reactive] public bool HomePosession { get; set; }
 
     public ICommand SetHomeScore { get; }
+    public ICommand SetHomeTimeouts { get; }
     public ICommand SetAwayScore { get; }
+    public ICommand SetAwayTimeouts { get; }
     public ICommand IncrementDown { get; }
     public ICommand IncrementPeriod { get; }
     public ICommand TogglePlayClock { get; }
@@ -78,6 +84,34 @@ public class RefereeViewModel : ReactiveObject, INavigationAware
         )
         .ToTask()
     );
+
+
+    ICommand CreateTimeoutCommand(bool homeTeam) => ReactiveCommand.CreateFromTask(async () =>
+    {
+        var team = homeTeam ? "Home" : "Away";
+        var value = await this.dialogs.DisplayPromptAsync("Score", $"Set the {team} timeouts remaining", "Set", "Cancel", maxLength: 1, keyboardType: KeyboardType.Numeric);
+        if (Int32.TryParse(value, out var result))
+        {
+            await this.Connect();
+
+            var teamByte = homeTeam ? (byte)0x01 : (byte)0x02;
+            var timeOutBytes = BitConverter.GetBytes(result);
+            var list = new List<byte>();
+            list.Add(0x06); // command
+            list.Add(teamByte); // team
+            list.AddRange(timeOutBytes);
+
+            await this.peripheral!
+                .Write(
+                    this.config.ServiceUuid,
+                    this.config.CharacteristicUuid,
+                    list.ToArray(),
+                    true
+                )
+                .Timeout(TimeSpan.FromSeconds(20))
+                .ToTask();
+        }
+    });
 
 
     ICommand CreateScoreCommand(bool homeTeam) => ReactiveCommand.CreateFromTask(async () =>

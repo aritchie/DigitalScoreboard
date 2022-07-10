@@ -24,6 +24,10 @@
                            Text="{Binding Downs}"
                            Keyboard="Numeric" />
 
+                <EntryCell Label="Max Timeouts"
+                           Text="{Binding MaxTimeouts}"
+                           Keyboard="Numeric" />
+
                 <EntryCell Label="Font"
                            Text="{Binding Font}" />
             </TableSection>
