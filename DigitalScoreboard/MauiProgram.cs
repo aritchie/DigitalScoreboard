@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Maui;
 using DigitalScoreboard.Infrastructure;
-using Microsoft.Extensions.Configuration;
 using Prism.DryIoc;
 
 namespace DigitalScoreboard;
@@ -23,6 +22,7 @@ public static class MauiProgram
                         registry.RegisterForNavigation<SettingsPage, SettingsViewModel>();
                         registry.RegisterForNavigation<RefereePage, RefereeViewModel>();
                         registry.RegisterForNavigation<ScoreboardPage, ScoreboardViewModel>();
+                        registry.RegisterForNavigation<FullTimerPage, FullTimerViewModel>();
                     })
                     .OnAppStart(
                         async navigator => await navigator.Navigate("NavigationPage/MainPage")

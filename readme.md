@@ -35,7 +35,6 @@ Uses Shiny.BluetoothLE to connect to the scoreboard host.
 * Online Error Log - AppCenter, Firebase, Sentry, etc
 * Yards-to-go for 1st down
 * Timeouts Remaining
-* Game Clock needs "total minutes:seconds"
 * Better design
 
 ## Ideas

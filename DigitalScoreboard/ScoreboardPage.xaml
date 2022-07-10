@@ -117,7 +117,7 @@
                 <Label Text="Time Remaining"
                        Style="{StaticResource Title}" />
 
-                <Label Text="{Binding PeriodClock, StringFormat='{0:c}'}"
+                <Label Text="{Binding PeriodClock, Converter={StaticResource TimeSpan}}"
                        Style="{StaticResource Info}" />
             </VerticalStackLayout>
         </Frame>
