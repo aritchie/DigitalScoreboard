@@ -4,151 +4,145 @@
              xmlns:local="clr-namespace:DigitalScoreboard"
              x:DataType="local:ScoreboardViewModel"
              x:Class="DigitalScoreboard.ScoreboardPage"
-             BackgroundColor="Black"
-             Padding="10">
+             BackgroundColor="Black">
 
      <ContentPage.Resources>
         <ResourceDictionary>
-            <Style TargetType="VerticalStackLayout">
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-            </Style>
-
-            <Style TargetType="Frame">
-                <Setter Property="BackgroundColor" Value="Black" />
-                <Setter Property="BorderColor" Value="White" />
-                <Setter Property="CornerRadius" Value="10" />
+            <Style x:Key="Team" TargetType="Label">
+                <Setter Property="TextColor" Value="White" />
             </Style>
 
             <Style x:Key="Title" TargetType="Label">
                 <Setter Property="TextColor" Value="White" />
-                <Setter Property="FontSize" Value="40" />
-                <Setter Property="FontAttributes" Value="Bold" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
             </Style>
 
             <Style x:Key="Info" TargetType="Label">
-                <Setter Property="FontSize" Value="58" />
-                <Setter Property="TextColor" Value="Yellow" />
                 <Setter Property="FontFamily" Value="{Binding Font}" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
-            </Style>
-
-            <Style x:Key="Team" TargetType="Label">
-                <Setter Property="FontSize" Value="35" />
-                <Setter Property="TextColor" Value="White" />
-                <Setter Property="FontAttributes" Value="Italic" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
-            </Style>
-
-            <Style x:Key="Score" TargetType="Label">
-                <Setter Property="FontSize" Value="88" />
                 <Setter Property="TextColor" Value="Yellow" />
-                <Setter Property="FontFamily" Value="{Binding Font}" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto, Auto, Auto"
-          ColumnDefinitions="1*, 1*"
-          ColumnSpacing="10"
-          RowSpacing="10">
-
-        <Frame Grid.Row="0" Grid.Column="0">
-            <Frame.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding SetHomeScore}" />
-            </Frame.GestureRecognizers>
-
-            <VerticalStackLayout>
-                <Label Text="Home"
-                       Style="{StaticResource Title}" />
-
+    <ContentPage.Content>
+        <Grid RowDefinitions="Auto, Auto, Auto"
+              ColumnDefinitions="1*, 2*, 1*">
+            <VerticalStackLayout Grid.Column="0"
+                                 Grid.Row="0">
                 <Label Text="{Binding HomeTeamName}"
                        Style="{StaticResource Team}" />
 
                 <Label Text="{Binding HomeTeamScore}"
-                       Style="{StaticResource Score}" />
+                       Style="{StaticResource Info}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SetHomeScore}" />
+                    </Label.GestureRecognizers>
+                </Label>
 
-                <Label Text="X"
-                       IsVisible="{Binding HomeTeamPosession}" />
+                <Label Text="{Binding HomeTeamTimeouts}"
+                       Style="{StaticResource Info}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding DecrementHomeTimeout}" />
+                    </Label.GestureRecognizers>
+                </Label>
             </VerticalStackLayout>
-        </Frame>
 
-        <Frame Grid.Row="0" Grid.Column="1">
-            <Frame.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding SetAwayScore}" />
-            </Frame.GestureRecognizers>
+            <Frame BorderColor="White"
+                   BackgroundColor="Black"
+                   Grid.Column="1"
+                   Grid.Row="0">
+                <Label Text="{Binding PeriodClock, Converter={StaticResource TimeSpan}}"
+                       Style="{StaticResource Info}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding TogglePeriodClock}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Frame>
 
-            <VerticalStackLayout>
-                <Label Text="Away"
-                       Style="{StaticResource Title}" />
-
+            <VerticalStackLayout Grid.Column="2"
+                                 Grid.Row="0">
                 <Label Text="{Binding AwayTeamName}"
-                       Style="{StaticResource Team}"/>
+                       Style="{StaticResource Team}" />
 
                 <Label Text="{Binding AwayTeamScore}"
-                       Style="{StaticResource Score}" />
+                       Style="{StaticResource Info}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SetAwayScore}" />
+                    </Label.GestureRecognizers>
+                </Label>
 
-                <Label Text="X" IsVisible="{Binding HomeTeamPosession}" />
+                <Label Text="{Binding AwayTeamTimeouts}"
+                       Style="{StaticResource Info}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding DecrementAwayTimeout}" />
+                    </Label.GestureRecognizers>
+                </Label>
             </VerticalStackLayout>
-        </Frame>
 
-        <Frame Grid.Row="1" Grid.Column="0">
-            <VerticalStackLayout>
-                <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding IncrementPeriod}" />
-                </VerticalStackLayout.GestureRecognizers>
 
-                <Label Text="Quarter"
-                       Style="{StaticResource Title}" />
-
-                <Label Text="{Binding Period}"
-                       Style="{StaticResource Info}" />
-            </VerticalStackLayout>
-        </Frame>
-
-        <Frame Grid.Row="1" Grid.Column="1">
-            <VerticalStackLayout>
-                <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding TogglePeriodClock}" />
-                </VerticalStackLayout.GestureRecognizers>
-
-                <Label Text="Time Remaining"
-                       Style="{StaticResource Title}" />
-
-                <Label Text="{Binding PeriodClock, Converter={StaticResource TimeSpan}}"
-                       Style="{StaticResource Info}" />
-            </VerticalStackLayout>
-        </Frame>
-
-        <Frame Grid.Row="2" Grid.Column="0">
-            <VerticalStackLayout>
-                <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding IncrementDown}" />
-                </VerticalStackLayout.GestureRecognizers>
-
-                <Label Text="Down"
-                       Style="{StaticResource Title}" />
-
-                <Label Text="{Binding Down}"
-                       Style="{StaticResource Info}" />
-            </VerticalStackLayout>
-        </Frame>
-
-        <Frame Grid.Row="2" Grid.Column="1">
-            <VerticalStackLayout>
-                <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding TogglePlayClock}" />
-                </VerticalStackLayout.GestureRecognizers>
-
-                <Label Text="Play"
-                       Style="{StaticResource Title}" />
+            <HorizontalStackLayout Grid.ColumnSpan="3"
+                                   Grid.Row="1">
+                <Label Text="&lt;"
+                       IsVisible="{Binding HomeTeamPossession}"
+                       Style="{StaticResource Info}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding TogglePossession}" />
+                    </Label.GestureRecognizers>
+                </Label>
 
                 <Label Text="{Binding PlayClock}"
-                       Style="{StaticResource Info}" />
-            </VerticalStackLayout>
-        </Frame>
+                       Style="{StaticResource Info}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding TogglePlayClock}" />
+                    </Label.GestureRecognizers>
+                </Label>
 
-    </Grid>
+                <Label Text="&gt;"
+                       IsVisible="{Binding HomeTeamPossession, Converter={StaticResource Not}}"
+                       Style="{StaticResource Info}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding TogglePossession}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Grid.ColumnSpan="3"
+                                   Grid.Row="2">
+                <VerticalStackLayout>
+                    <Label Text="QTR"
+                           Style="{StaticResource Title}" />
+
+                    <Label Text="{Binding Period}"
+                           Style="{StaticResource Info}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding IncrementPeriod}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout>
+                    <Label Text="DOWN"
+                           Style="{StaticResource Title}" />
+
+                    <Label Text="{Binding Down}"
+                           Style="{StaticResource Info}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding IncrementDown}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout>
+                    <Label Text="YTG"
+                           Style="{StaticResource Title}" />
+
+                    <Label Text="{Binding YardsToGo}"
+                           Style="{StaticResource Info}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SetYardsToGo}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </VerticalStackLayout>
+            </HorizontalStackLayout>
+        </Grid>
+    </ContentPage.Content>
 </ContentPage>

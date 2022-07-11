@@ -36,10 +36,13 @@ public class ScoreboardViewModel : ViewModel
         this.bleManager = bleManager;
 #endif
 
+        this.HomeTeamTimeouts = settings.MaxTimeouts;
+        this.AwayTeamTimeouts = settings.MaxTimeouts;
+        this.PeriodClock = TimeSpan.FromMinutes(this.settings.PeriodDurationMins);
+
         this.SetHomeScore = this.SetScore("Home Team Score?", x => this.HomeTeamScore = x);
         this.SetAwayScore = this.SetScore("Away Team Score?", x => this.AwayTeamScore = x);
 
-        // TODO: posession change should also cause a Reset() without period update
         this.TogglePlayClock = ReactiveCommand.Create(() =>
         {
             if (this.playClockSub == null)
@@ -74,43 +77,81 @@ public class ScoreboardViewModel : ViewModel
             }
         });
 
+        this.TogglePossession = ReactiveCommand.Create(() =>
+        {
+            this.HomeTeamPossession = !this.HomeTeamPossession;
+            this.Reset(false);
+        });
+
+        this.SetYardsToGo = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var result = await this.dialogs.DisplayPromptAsync("YTD", "Enter yards-to-go", "Set", "Cancel", maxLength: 2, keyboardType: KeyboardType.Numeric);
+            if (Int32.TryParse(result, out var ytg) && ytg > 0 && ytg < 100)
+                this.YardsToGo = ytg;
+        });
+
         this.IncrementDown = ReactiveCommand.Create(() =>
         {
             this.Down++;
             if (this.Down > settings.Downs)
+            { 
                 this.Down = 1;
-
+                this.YardsToGo = this.settings.DefaultYardsToGo;
+            }
             this.KillPlayClock();
+        });
+
+        this.DecrementHomeTimeout = ReactiveCommand.Create(() =>
+        {
+            var to = this.HomeTeamTimeouts - 1;
+            if (to < 0)
+                to = this.settings.MaxTimeouts;
+            this.HomeTeamTimeouts = to;
+        });
+
+        this.DecrementAwayTimeout = ReactiveCommand.Create(() =>
+        {
+            var to = this.AwayTeamTimeouts - 1;
+            if (to < 0)
+                to = this.settings.MaxTimeouts;
+            this.AwayTeamTimeouts = to;
         });
 
         this.IncrementPeriod = ReactiveCommand.Create(async () =>
         {
             var result = await this.dialogs.DisplayAlertAsync("Next", "Increment Quarter?", "Yes", "No");
             if (result)
-                this.Reset();
+                this.Reset(true);
         });
-        this.Reset();
+        this.Reset(false);
     }
 
     public ICommand SetHomeScore { get; }
     public ICommand SetAwayScore { get; }
+    public ICommand SetYardsToGo { get; }
     public ICommand IncrementPeriod { get; }
     public ICommand IncrementDown { get; }
+    public ICommand DecrementHomeTimeout { get; }
+    public ICommand DecrementAwayTimeout { get; }
+    public ICommand TogglePossession { get; }
     public ICommand TogglePlayClock { get; }
     public ICommand TogglePeriodClock { get; }
 
     public string Font => this.settings.Font;
     [Reactive] public int Period { get; private set; }
-    [Reactive] public int PlayClock { get; set; }
-    [Reactive] public TimeSpan PeriodClock { get; set; }
-    [Reactive] public int Down { get; set; }
-    [Reactive] public bool HomeTeamPosession { get; set; }
+    [Reactive] public int PlayClock { get; private set; }
+    [Reactive] public TimeSpan PeriodClock { get; private set; }
+    [Reactive] public int Down { get; private set; }
+    [Reactive] public int YardsToGo { get; private set; }
 
     public string HomeTeamName => this.settings.HomeTeam;
-    [Reactive] public int HomeTeamScore { get; set; }
+    [Reactive] public int HomeTeamScore { get; private set; }
+    [Reactive] public bool HomeTeamPossession { get; private set; }
+    [Reactive] public int HomeTeamTimeouts { get; private set; }
 
     public string AwayTeamName => this.settings.AwayTeam;
-    [Reactive] public int AwayTeamScore { get; set; }
+    [Reactive] public int AwayTeamScore { get; private set; }
+    [Reactive] public int AwayTeamTimeouts { get; private set; }
 
 
     public override Task<bool> CanNavigateAsync(INavigationParameters parameters)
@@ -172,7 +213,7 @@ public class ScoreboardViewModel : ViewModel
                                 break;
 
                             case 0x03:
-                                this.Reset();
+                                this.Reset(true);
                                 break;
 
                             case 0x04:
@@ -246,14 +287,23 @@ public class ScoreboardViewModel : ViewModel
     });
 
 
-    void Reset()
+    void Reset(bool incrementPeriod)
     {
         this.Down = 1;
-        this.Period++;
-        if (this.Period > this.settings.Periods)
-            this.Period = 1; // TODO: or end of game?
+        this.YardsToGo = this.settings.DefaultYardsToGo;
 
-        this.KillPeriodClock(true);
+        if (this.Period == 0)
+            this.Period = 1;
+
+        if (incrementPeriod)
+        {
+            this.Period++;
+
+            // TODO: when moving past the half, timeouts should reset for both teams
+            if (this.Period > this.settings.Periods)
+                this.Period = 1; // TODO: or end of game? 
+        }
+        this.KillPeriodClock(incrementPeriod);
         this.KillPlayClock();
     }
 

@@ -12,6 +12,9 @@ A football scoreboard that can be controlled through Bluetooth.  Great for littl
     * Current Down
     * Play Clock
     * Game Clock
+    * Timeouts Remaining
+    * Ball Possession
+    * Yards-To-Go
 
 ## The "Stack"
 * .NET MAUI
@@ -40,11 +43,7 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 <img src="settings.png" />
 
 ## TODO
-
-* Timeouts Remaining on Scoreboard
-* Ball Possession on Scoreboard
 * Online Error Log - AppCenter, Firebase, Sentry, etc
-* Yards-to-go for 1st down
-* Timeouts Remaining
 * Remember Game per session (start new or resume)
+* Ball On Yard
 * Better scoreboard design

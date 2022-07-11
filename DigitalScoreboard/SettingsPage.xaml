@@ -32,6 +32,10 @@
                            Text="{Binding BreakTimeMins}"
                            Keyboard="Numeric" />
 
+                <EntryCell Label="Default Yards To Go"
+                           Text="{Binding DefaultYardsToGo}"
+                           Keyboard="Numeric" />
+
                 <EntryCell Label="Font"
                            Text="{Binding Font}" />
             </TableSection>
