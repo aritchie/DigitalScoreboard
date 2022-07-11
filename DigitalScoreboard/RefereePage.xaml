@@ -24,27 +24,18 @@
                            TextColor="White" />
                 </Frame>
 
-
-                <!--<RadioButton IsChecked="{Binding HomePosession}"
-                             Value="1"
-                             Content="Home"
-                             GroupName="Posession" />
-
-                <RadioButton IsChecked="{Binding HomePosession}"
-                             Value="2"
-                             Content="Away"
-                             GroupName="Posession" />-->
-
                 <Button Text="Next Down" Command="{Binding IncrementDown}" />
                 <Button Text="Next Quarter" Command="{Binding IncrementPeriod}" />
                 <Button Text="Resume/Pause Game Clock" Command="{Binding TogglePeriodClock}" />
                 <Button Text="Reset/Start Play Clock" Command="{Binding TogglePlayClock}" />
 
+
+                <Button Text="Toggle Possession" Command="{Binding TogglePossession}" />
                 <Button Text="Set Home Score" Command="{Binding SetHomeScore}" />
                 <Button Text="Set Away Score" Command="{Binding SetAwayScore}" />
 
-                <!--<Button Text="Set Home Timeouts" Command="{Binding SetHomeTimeouts}" />
-                <Button Text="Set Away Timeouts" Command="{Binding SetAwayTimeouts}" />-->
+                <Button Text="Set Home Timeouts" Command="{Binding SetHomeTimeouts}" />
+                <Button Text="Set Away Timeouts" Command="{Binding SetAwayTimeouts}" />
             </VerticalStackLayout>
         </ScrollView>
     </ContentPage.Content>

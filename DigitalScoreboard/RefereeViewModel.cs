@@ -34,10 +34,11 @@ public class RefereeViewModel : ViewModel
         // TODO: posession
         // TODO: 0x01 + team (0x01 for home) + score in ushort
         // TODO: team names
-        this.IncrementDown = this.SendCommand(0x02);
-        this.IncrementPeriod = this.SendCommand(0x03);
-        this.TogglePlayClock = this.SendCommand(0x04);
-        this.TogglePeriodClock = this.SendCommand(0x05);
+        this.IncrementDown = this.SendCommand(Constants.BleIntents.IncrementDown);
+        this.IncrementPeriod = this.SendCommand(Constants.BleIntents.IncrementPeriod);
+        this.TogglePlayClock = this.SendCommand(Constants.BleIntents.TogglePlayClock);
+        this.TogglePeriodClock = this.SendCommand(Constants.BleIntents.TogglePeriodClock);
+        this.TogglePossession = this.SendCommand(Constants.BleIntents.TogglePossession);
 
         // TODO: command parameters seem to be having issues on reactiveui, hence the split commands
         this.SetHomeScore = this.CreateScoreCommand(true);
@@ -49,7 +50,7 @@ public class RefereeViewModel : ViewModel
 
 
     [ObservableAsProperty] public bool IsConnected { get; }
-    //[Reactive] public bool HomePosession { get; set; }
+    //[Reactive] public bool HomePossession { get; set; }
 
     public ICommand SetHomeScore { get; }
     public ICommand SetHomeTimeouts { get; }
@@ -59,6 +60,7 @@ public class RefereeViewModel : ViewModel
     public ICommand IncrementPeriod { get; }
     public ICommand TogglePlayClock { get; }
     public ICommand TogglePeriodClock { get; }
+    public ICommand TogglePossession { get; }
 
 
     public void OnNavigatedFrom(INavigationParameters parameters)
@@ -94,10 +96,10 @@ public class RefereeViewModel : ViewModel
         {
             await this.Connect();
 
-            var teamByte = homeTeam ? (byte)0x01 : (byte)0x02;
+            var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
             var timeOutBytes = BitConverter.GetBytes(result);
             var list = new List<byte>();
-            list.Add(0x06); // command
+            list.Add(Constants.BleIntents.DecrementTimeout); // command
             list.Add(teamByte); // team
             list.AddRange(timeOutBytes);
 
@@ -122,10 +124,10 @@ public class RefereeViewModel : ViewModel
         {
             await this.Connect();
 
-            var teamByte = homeTeam ? (byte)0x01 : (byte)0x02;
+            var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
             var scoreBytes = BitConverter.GetBytes(result);
             var list = new List<byte>();
-            list.Add(0x01); // command
+            list.Add(Constants.BleIntents.Score); // command
             list.Add(teamByte); // team
             list.AddRange(scoreBytes);
 

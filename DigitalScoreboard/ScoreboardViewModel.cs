@@ -281,10 +281,9 @@ public class ScoreboardViewModel : ViewModel
                     {
                         switch (request.Data[0])
                         {
-                            case 0x01:
-                                var homeTeam = request.Data[1] == 0x01;
+                            case Constants.BleIntents.Score:
                                 var score = BitConverter.ToInt16(request.Data, 2);
-                                if (homeTeam)
+                                if (request.Data[1] == Constants.BleIntents.HomeTeam)
                                 {
                                     this.HomeTeamScore = score;
                                 }
@@ -294,30 +293,32 @@ public class ScoreboardViewModel : ViewModel
                                 }
                                 break;
 
-                            case 0x02:
+                            case Constants.BleIntents.IncrementDown:
                                 this.IncrementDown.Execute(null);
                                 break;
 
-                            case 0x03:
+                            case Constants.BleIntents.IncrementPeriod:
                                 this.Reset(true);
                                 break;
 
-                            case 0x04:
+                            case Constants.BleIntents.TogglePlayClock:
                                 this.TogglePlayClock.Execute(null);
                                 break;
 
-                            case 0x05:
+                            case Constants.BleIntents.TogglePeriodClock:
                                 this.TogglePeriodClock.Execute(null);
                                 break;
 
-                            case 0x06:
-                                // TODO: TIMEOUTS
+                            case Constants.BleIntents.DecrementTimeout:
+                                if (request.Data[1] == Constants.BleIntents.HomeTeam)
+                                    this.DecrementHomeTimeout.Execute(null);
+                                else
+                                    this.DecrementAwayTimeout.Execute(null);
                                 break;
-                                // TODO: reset/start both
-                                //case 0x06:
-                                //    this.TogglePeriodClock.Execute(null);
-                                //    this.TogglePlayClock.Execute(null);
-                                //    break;
+
+                            case Constants.BleIntents.TogglePossession:
+                                this.TogglePossession.Execute(null);
+                                break;
                         }
                         return GattState.Success;
                     })
