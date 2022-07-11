@@ -101,21 +101,15 @@ public class ScoreboardViewModel : ViewModel
             this.KillPlayClock();
         });
 
-        this.DecrementHomeTimeout = ReactiveCommand.Create(() =>
-        {
-            var to = this.HomeTeamTimeouts - 1;
-            if (to < 0)
-                to = this.settings.MaxTimeouts;
-            this.HomeTeamTimeouts = to;
-        });
+        this.DecrementHomeTimeout = this.SetTimeouts(
+            () => this.HomeTeamTimeouts,
+            x => this.HomeTeamTimeouts = x
+        );
 
-        this.DecrementAwayTimeout = ReactiveCommand.Create(() =>
-        {
-            var to = this.AwayTeamTimeouts - 1;
-            if (to < 0)
-                to = this.settings.MaxTimeouts;
-            this.AwayTeamTimeouts = to;
-        });
+        this.DecrementAwayTimeout = this.SetTimeouts(
+            () => this.AwayTeamTimeouts,
+            x => this.AwayTeamTimeouts = x
+        );
 
         this.IncrementPeriod = ReactiveCommand.Create(async () =>
         {
@@ -181,75 +175,9 @@ public class ScoreboardViewModel : ViewModel
     {
         this.display.KeepScreenOn = true;
         if (this.bleManager == null)
-            return; // TODO: warn if BLE hosting is not available?
-
-        try
-        {
-            // byte 0 intent
-            // byte 1 sub-intent
-            // byte 2+ - data
-            this.bleManager.AddService(this.btConfig!.ServiceUuid, true, sb => sb
-                .AddCharacteristic(this.btConfig.CharacteristicUuid, cb => cb
-                    .SetRead(request => ReadResult.Success(this.GetReadData()))
-                    .SetWrite(request =>
-                    {
-                        switch (request.Data[0])
-                        {
-                            case 0x01:
-                                var homeTeam = request.Data[1] == 0x01;
-                                var score = BitConverter.ToInt16(request.Data, 2);
-                                if (homeTeam)
-                                {
-                                    this.HomeTeamScore = score;
-                                }
-                                else
-                                {
-                                    this.AwayTeamScore = score;
-                                }
-                                break;
-
-                            case 0x02:
-                                this.IncrementDown.Execute(null);
-                                break;
-
-                            case 0x03:
-                                this.Reset(true);
-                                break;
-
-                            case 0x04:
-                                this.TogglePlayClock.Execute(null);
-                                break;
-
-                            case 0x05:
-                                this.TogglePeriodClock.Execute(null);
-                                break;
-
-                            case 0x06:
-                                // TODO: TIMEOUTS
-                                break;
-                            // TODO: reset/start both
-                            //case 0x06:
-                            //    this.TogglePeriodClock.Execute(null);
-                            //    this.TogglePlayClock.Execute(null);
-                            //    break;
-                        }
-                        return GattState.Success;
-                    })
-                )
-            );
-
-            await this.bleManager.StartAdvertising(new AdvertisementOptions
-            {
-                ServiceUuids =
-                {
-                    this.btConfig.ServiceUuid
-                }
-            });
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, "Failed to start BLE functions");
-        }
+            await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
+        else
+            await this.StartBle();
     }
 
 
@@ -270,6 +198,19 @@ public class ScoreboardViewModel : ViewModel
         bytes.Add(Convert.ToByte(this.Down));
         return bytes.ToArray();
     }
+
+
+    ICommand SetTimeouts(Func<int> getCurrentTo, Action<int> setter) => ReactiveCommand.Create(() =>
+    {
+        this.KillPeriodClock(false);
+        this.KillPlayClock();
+
+        var to = getCurrentTo() - 1;
+        if (to < 0)
+            to = this.settings.MaxTimeouts;
+
+        setter(to);
+    });
 
 
     ICommand SetScore(string question, Action<int> action) => ReactiveCommand.CreateFromTask(async () =>
@@ -323,5 +264,77 @@ public class ScoreboardViewModel : ViewModel
         this.PlayClock = this.settings.PlayClock;
         this.playClockSub?.Dispose();
         this.playClockSub = null;
+    }
+
+
+    async Task StartBle()
+    {
+        try
+        {
+            // byte 0 intent
+            // byte 1 sub-intent
+            // byte 2+ - data
+            await this.bleManager!.AddService(this.btConfig!.ServiceUuid, true, sb => sb
+                .AddCharacteristic(this.btConfig.CharacteristicUuid, cb => cb
+                    .SetRead(request => ReadResult.Success(this.GetReadData()))
+                    .SetWrite(request =>
+                    {
+                        switch (request.Data[0])
+                        {
+                            case 0x01:
+                                var homeTeam = request.Data[1] == 0x01;
+                                var score = BitConverter.ToInt16(request.Data, 2);
+                                if (homeTeam)
+                                {
+                                    this.HomeTeamScore = score;
+                                }
+                                else
+                                {
+                                    this.AwayTeamScore = score;
+                                }
+                                break;
+
+                            case 0x02:
+                                this.IncrementDown.Execute(null);
+                                break;
+
+                            case 0x03:
+                                this.Reset(true);
+                                break;
+
+                            case 0x04:
+                                this.TogglePlayClock.Execute(null);
+                                break;
+
+                            case 0x05:
+                                this.TogglePeriodClock.Execute(null);
+                                break;
+
+                            case 0x06:
+                                // TODO: TIMEOUTS
+                                break;
+                                // TODO: reset/start both
+                                //case 0x06:
+                                //    this.TogglePeriodClock.Execute(null);
+                                //    this.TogglePlayClock.Execute(null);
+                                //    break;
+                        }
+                        return GattState.Success;
+                    })
+                )
+            );
+
+            await this.bleManager!.StartAdvertising(new AdvertisementOptions
+            {
+                ServiceUuids =
+                {
+                    this.btConfig.ServiceUuid
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Failed to start BLE functions");
+        }
     }
 }
