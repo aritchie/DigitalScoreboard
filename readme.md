@@ -6,6 +6,7 @@ A football scoreboard that can be controlled through Bluetooth.  Great for littl
 * Referee "client" screen that allows you to control the scoreboard remotely
 * Customized Team Names
 * Customized Game & Play Clock Timers
+* Full Screen Clock for Half Time or Play Clock
 * Screen Properties
     * Timeouts Remaining (TODO)
     * Current quarter/period
@@ -35,15 +36,8 @@ Uses Shiny.BluetoothLE to connect to the scoreboard host.
 * Online Error Log - AppCenter, Firebase, Sentry, etc
 * Yards-to-go for 1st down
 * Timeouts Remaining
+* Remember Game per session (start new or resume)
 * Better design
-
-## Ideas
-
-* Half time/break fullscreen timer?  General purpose full screen timer?
-* Full Screen
-    * Play Clock
-    * Game Clock
-    * Score
 
 
 <ContentPage.Resources>

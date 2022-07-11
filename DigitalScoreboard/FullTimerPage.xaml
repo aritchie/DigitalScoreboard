@@ -4,13 +4,22 @@
              xmlns:local="clr-namespace:DigitalScoreboard"
              x:Class="DigitalScoreboard.FullTimerPage"
              x:DataType="local:FullTimerViewModel"
-             Title="FullTimerPage">
+             BackgroundColor="Black">
 
-    <VerticalStackLayout>
-        <Label Text="{Binding TimeRemaining, Converter={StaticResource TimeSpan}}"
+    <VerticalStackLayout HorizontalOptions="FillAndExpand"
+                         VerticalOptions="FillAndExpand">
+
+        <VerticalStackLayout.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding Toggle}" />
+        </VerticalStackLayout.GestureRecognizers>
+
+        <Label Text="{Binding TimeRemaining}"
                FontFamily="{Binding Font}"
+               TextColor="Yellow"
                FontSize="150"
-               VerticalOptions="FillAndExpand" 
-               HorizontalOptions="FillAndExpand" />
+               VerticalOptions="FillAndExpand"
+               VerticalTextAlignment="Center"
+               HorizontalOptions="FillAndExpand"
+               HorizontalTextAlignment="Center" />
     </VerticalStackLayout>
 </ContentPage>

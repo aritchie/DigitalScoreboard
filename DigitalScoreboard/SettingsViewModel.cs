@@ -15,6 +15,7 @@ public class SettingsViewModel : ReactiveObject
         this.Periods = settings.Periods;
         this.Downs = settings.Downs;
         this.MaxTimeouts = settings.MaxTimeouts;
+        this.BreakTimeMins = settings.BreakTimeMins;
 
         this.SwitchTeams = ReactiveCommand.Create(() =>
         {
@@ -34,6 +35,7 @@ public class SettingsViewModel : ReactiveObject
                 settings.Periods = this.Periods;
                 settings.Downs = this.Downs;
                 settings.MaxTimeouts = this.MaxTimeouts;
+                settings.BreakTimeMins = this.BreakTimeMins;
             },
             this.WhenAny(
                 x => x.PlayClock,
@@ -44,7 +46,8 @@ public class SettingsViewModel : ReactiveObject
                 x => x.Periods,
                 x => x.Downs,
                 x => x.MaxTimeouts,
-                (pc, font, ht, at, pd, p, downs, to) =>
+                x => x.BreakTimeMins,
+                (pc, font, ht, at, pd, p, downs, to, bt) =>
                 {
                     if (pc.GetValue() < 10 || pc.GetValue() > 120)
                         return false;
@@ -73,6 +76,9 @@ public class SettingsViewModel : ReactiveObject
                     if (to.GetValue() < 1 || to.GetValue() > 9)
                         return false;
 
+                    if (bt.GetValue() < 1 || bt.GetValue() > 99)
+                        return false;
+
                     return true;
                 }
             )
@@ -82,6 +88,7 @@ public class SettingsViewModel : ReactiveObject
 
     public ICommand Save { get; }
     public ICommand SwitchTeams { get; set; }
+    [Reactive] public int BreakTimeMins { get; set; }
     [Reactive] public int PlayClock { get; set; }
     [Reactive] public int PeriodDuration { get; set; }
     [Reactive] public int Periods { get; set; }

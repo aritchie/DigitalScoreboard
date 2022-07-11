@@ -28,6 +28,10 @@
                            Text="{Binding MaxTimeouts}"
                            Keyboard="Numeric" />
 
+                <EntryCell Label="Break Time (Minutes)"
+                           Text="{Binding BreakTimeMins}"
+                           Keyboard="Numeric" />
+
                 <EntryCell Label="Font"
                            Text="{Binding Font}" />
             </TableSection>

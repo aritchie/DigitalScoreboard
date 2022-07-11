@@ -3,6 +3,7 @@
 public class AppSettings : ReactiveObject
 {
     [Reactive] public int PeriodDurationMins { get; set; } = 15;
+    [Reactive] public int BreakTimeMins { get; set; } = 10;
     [Reactive] public int MaxTimeouts { get; set; } = 3;
 
     [Reactive] public string HomeTeam { get; set; } = "Home";

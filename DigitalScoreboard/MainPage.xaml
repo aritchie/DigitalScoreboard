@@ -15,6 +15,8 @@
             <Button Text="Scoreboard" Command="{Binding Scoreboard}" />
             <Button Text="Referee" Command="{Binding Referee}" />
             <Button Text="Settings" Command="{Binding Settings}" />
+
+            <Button Text="Half Time Coutndown" Command="{Binding HalfTime}" />
         </VerticalStackLayout>
     </ScrollView>
  
