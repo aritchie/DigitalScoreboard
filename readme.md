@@ -8,7 +8,6 @@ A football scoreboard that can be controlled through Bluetooth.  Great for littl
 * Customized Game & Play Clock Timers
 * Full Screen Clock for Half Time or Play Clock
 * Screen Properties
-
     * Current quarter/period
     * Current Down
     * Play Clock
