@@ -29,11 +29,6 @@ public class RefereeViewModel : ViewModel
         this.dialogs = dialogs;
         this.config = config;
 
-        // TODO: check permissions for ble client
-
-        // TODO: posession
-        // TODO: 0x01 + team (0x01 for home) + score in ushort
-        // TODO: team names
         this.IncrementDown = this.SendCommand(Constants.BleIntents.IncrementDown);
         this.IncrementPeriod = this.SendCommand(Constants.BleIntents.IncrementPeriod);
         this.TogglePlayClock = this.SendCommand(Constants.BleIntents.TogglePlayClock);
@@ -50,7 +45,6 @@ public class RefereeViewModel : ViewModel
 
 
     [ObservableAsProperty] public bool IsConnected { get; }
-    //[Reactive] public bool HomePossession { get; set; }
 
     public ICommand SetHomeScore { get; }
     public ICommand SetHomeTimeouts { get; }
@@ -62,18 +56,35 @@ public class RefereeViewModel : ViewModel
     public ICommand TogglePeriodClock { get; }
     public ICommand TogglePossession { get; }
 
+    [Reactive] public int Down { get; private set; } = 0;
+    [Reactive] public int Period { get; private set; } = 0;
+    [Reactive] public bool HomePossession { get; private set; }
+    [Reactive] public int HomeScore { get; private set; }
+    [Reactive] public int HomeTimeouts { get; private set; }
+    [Reactive] public int AwayScore { get; private set; }
+    [Reactive] public int AwayTimeouts { get; private set; }
+    // TODO: game & play clocks
 
-    public void OnNavigatedFrom(INavigationParameters parameters)
+    public override async void OnAppearing()
     {
-        this.display.KeepScreenOn = false;
-        this.peripheral?.CancelConnection();
+        base.OnAppearing();
+        try
+        {
+            this.display.KeepScreenOn = true;
+            await this.Connect();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning("Failed initial connection", ex);
+        }
     }
 
 
-    public async void OnNavigatedTo(INavigationParameters parameters)
+    public override void OnDisappearing()
     {
-        this.display.KeepScreenOn = true;
-        await this.Connect();
+        base.OnDisappearing();
+        this.display.KeepScreenOn = false;
+        this.peripheral?.CancelConnection();
     }
 
 
@@ -163,6 +174,27 @@ public class RefereeViewModel : ViewModel
                 ))
                 .Select(x => x.Peripheral.CreateManaged(RxApp.MainThreadScheduler))
                 .FirstAsync();
+
+            this.peripheral
+                .WhenNotificationReceived(
+                    this.config.ServiceUuid,
+                    this.config.CharacteristicUuid
+                )
+                .Select(x => x.ToGameInfo())
+                .SubOnMainThread(x =>
+                {
+                    this.HomeScore = x.HomeScore;
+                    this.HomeTimeouts = x.HomeTimeouts;
+                    this.HomePossession = x.HomePossession;
+                    this.AwayScore = x.AwayScore;
+                    this.AwayTimeouts = x.AwayTimeouts;
+
+                    this.Down = x.Down;
+                    this.Period = x.Period;
+
+                    // TODO: yards to go
+                })
+                .DisposedBy(this.DestroyWith);
         }
         this.peripheral
             .Peripheral

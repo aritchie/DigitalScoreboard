@@ -6,5 +6,7 @@ public partial class App : PrismApplication
 	public App()
 	{
 		this.InitializeComponent();
+
+		FillLabel.Wireup();
 	}
 }

@@ -13,13 +13,12 @@
             <TapGestureRecognizer Command="{Binding Toggle}" />
         </VerticalStackLayout.GestureRecognizers>
 
-        <Label Text="{Binding TimeRemaining}"
-               FontFamily="{Binding Font}"
-               TextColor="Yellow"
-               FontSize="150"
-               VerticalOptions="FillAndExpand"
-               VerticalTextAlignment="Center"
-               HorizontalOptions="FillAndExpand"
-               HorizontalTextAlignment="Center" />
+        <local:FillLabel Text="{Binding TimeRemaining}"
+                         FontFamily="{Binding Font}"
+                         TextColor="Yellow"
+                         VerticalOptions="FillAndExpand"
+                         VerticalTextAlignment="Center"
+                         HorizontalOptions="FillAndExpand"
+                         HorizontalTextAlignment="Center" />
     </VerticalStackLayout>
 </ContentPage>

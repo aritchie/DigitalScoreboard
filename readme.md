@@ -45,5 +45,5 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 ## TODO
 * Online Error Log - AppCenter, Firebase, Sentry, etc
 * Remember Game per session (start new or resume)
+* Set Yards-to-go from referee
 * Ball On Yard
-* Better scoreboard design

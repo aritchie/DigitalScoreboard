@@ -152,8 +152,10 @@ public class ScoreboardViewModel : ViewModel
         => this.dialogs.DisplayAlertAsync("Confirm", "Are you sure you wish to exit the scoreboard?", "Yes", "No");
 
 
-    public override void OnNavigatedFrom(INavigationParameters parameters)
+    public override void OnDisappearing()
     {
+        base.OnDisappearing();
+
         this.display.KeepScreenOn = false;
 
         if (this.bleManager != null)
@@ -171,32 +173,15 @@ public class ScoreboardViewModel : ViewModel
     }
 
 
-    public override async void OnNavigatedTo(INavigationParameters parameters)
+    public override async void OnAppearing()
     {
+        base.OnAppearing();
+
         this.display.KeepScreenOn = true;
         if (this.bleManager == null)
             await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
         else
             await this.StartBle();
-    }
-
-
-    byte[] GetReadData()
-    {
-        // read packet
-        // 0 home score
-        // 1 away score
-        // 2 period
-        // 3-4 period remaining in seconds
-        // 9 - down
-        // TODO: team names, play clock, notify of direct scoreboard changes?, play clock expired
-        var bytes = new List<byte>();
-        bytes.Add(Convert.ToByte(this.HomeTeamScore));
-        bytes.Add(Convert.ToByte(this.AwayTeamScore));
-        bytes.Add(Convert.ToByte(this.Period));
-        //bytes.AddRange(BitConverter.ToInt16(Convert.ToUInt16(this.PeriodClock.TotalSeconds)));
-        bytes.Add(Convert.ToByte(this.Down));
-        return bytes.ToArray();
     }
 
 
@@ -269,14 +254,16 @@ public class ScoreboardViewModel : ViewModel
 
     async Task StartBle()
     {
+        IGattCharacteristic notifier = null!;
         try
         {
             // byte 0 intent
             // byte 1 sub-intent
             // byte 2+ - data
-            await this.bleManager!.AddService(this.btConfig!.ServiceUuid, true, sb => sb
-                .AddCharacteristic(this.btConfig.CharacteristicUuid, cb => cb
-                    .SetRead(request => ReadResult.Success(this.GetReadData()))
+            await this.bleManager!.AddService(this.btConfig!.ServiceUuid, true, sb =>
+            {
+                notifier = sb.AddCharacteristic(this.btConfig.CharacteristicUuid, cb => cb
+                    .SetNotification()
                     .SetWrite(request =>
                     {
                         switch (request.Data[0])
@@ -322,8 +309,8 @@ public class ScoreboardViewModel : ViewModel
                         }
                         return GattState.Success;
                     })
-                )
-            );
+                );
+            });
 
             await this.bleManager!.StartAdvertising(new AdvertisementOptions
             {
@@ -332,6 +319,35 @@ public class ScoreboardViewModel : ViewModel
                     this.btConfig.ServiceUuid
                 }
             });
+
+            Observable
+                .Interval(TimeSpan.FromSeconds(3))
+                .Where(x => notifier.SubscribedCentrals.Count > 0)
+                .SubscribeAsync(async _ =>
+                {
+                    try
+                    {
+                        var info = new GameInfo(
+                            this.HomeTeamScore,
+                            this.HomeTeamTimeouts,
+                            this.AwayTeamScore,
+                            this.AwayTeamTimeouts,
+                            this.HomeTeamPossession,
+                            this.Period,
+                            this.Down,
+                            this.YardsToGo,
+                            this.PlayClock,
+                            Convert.ToInt32(Math.Floor(this.PeriodClock.TotalSeconds))
+                        );
+                        var bytes = info.ToBytes();
+                        await notifier.Notify(bytes);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogWarning("Failed to notify updates", ex);
+                    }
+                })
+                .DisposedBy(this.DeactivateWith);
         }
         catch (Exception ex)
         {
