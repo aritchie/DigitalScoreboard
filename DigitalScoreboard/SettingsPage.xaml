@@ -7,14 +7,18 @@
              Title="Settings">
     <TableView>
         <TableRoot>
-            <TableSection Title="Defaults">
-                <EntryCell Label="Quarter Duration (Minutes)"
-                           Text="{Binding PeriodDuration}"
-                           Keyboard="Numeric" />
+            <TableSection Title="Teams">
+                <EntryCell Label="Home"
+                           Text="{Binding HomeTeam}" />
 
-                <EntryCell Label="Play Clock (Seconds)"
-                           Text="{Binding PlayClock}"
-                           Keyboard="Numeric" />
+                <EntryCell Label="Away"
+                           Text="{Binding AwayTeam}" />
+
+                <TextCell Text="Switch"
+                          Command="{Binding SwitchTeams}" />
+            </TableSection>
+
+            <TableSection Title="Game Settings">
 
                 <EntryCell Label="Quarters/Periods"
                            Text="{Binding Periods}"
@@ -28,27 +32,28 @@
                            Text="{Binding MaxTimeouts}"
                            Keyboard="Numeric" />
 
-                <EntryCell Label="Break Time (Minutes)"
-                           Text="{Binding BreakTimeMins}"
-                           Keyboard="Numeric" />
-
                 <EntryCell Label="Default Yards To Go"
                            Text="{Binding DefaultYardsToGo}"
                            Keyboard="Numeric" />
-
-                <EntryCell Label="Font"
-                           Text="{Binding Font}" />
             </TableSection>
 
-            <TableSection Title="Teams">
-                <EntryCell Label="Home"
-                           Text="{Binding HomeTeam}" />
+            <TableSection Title="Game Clocks">
+                <EntryCell Label="Quarter Duration (Minutes)"
+                           Text="{Binding PeriodDuration}"
+                           Keyboard="Numeric" />
 
-                <EntryCell Label="Away"
-                           Text="{Binding AwayTeam}" />
+                <EntryCell Label="Play Clock (Seconds)"
+                           Text="{Binding PlayClock}"
+                           Keyboard="Numeric" />
 
-                <TextCell Text="Switch"
-                          Command="{Binding SwitchTeams}" />
+                <EntryCell Label="Break Time (Minutes)"
+                           Text="{Binding BreakTimeMins}"
+                           Keyboard="Numeric" />
+            </TableSection>
+
+            <TableSection>
+                <EntryCell Label="Font"
+                           Text="{Binding Font}" />
             </TableSection>
 
             <TableSection>
