@@ -25,8 +25,9 @@
                            TextColor="White" />
                 </Frame>
 
-               <Grid ColumnDefinitions="1*, 1*">
-                   <VerticalStackLayout Grid.Column="0">
+               <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="1*, 1*">                   
+
+                   <VerticalStackLayout Grid.Row="0" Grid.Column="0">
                        <VerticalStackLayout.GestureRecognizers>
                            <TapGestureRecognizer Command="{Binding SetHomeScore}" />
                        </VerticalStackLayout.GestureRecognizers>
@@ -35,13 +36,31 @@
                        <Label Text="{Binding HomeScore}" />                       
                    </VerticalStackLayout>
 
-                   <VerticalStackLayout Grid.Column="1">
+                   <VerticalStackLayout Grid.Row="0" Grid.Column="1">
                        <VerticalStackLayout.GestureRecognizers>
                            <TapGestureRecognizer Command="{Binding SetAwayScore}" />
                        </VerticalStackLayout.GestureRecognizers>
 
                        <Label Text="Away" />
                        <Label Text="{Binding AwayScore}" />
+                   </VerticalStackLayout>
+
+                   <VerticalStackLayout Grid.Row="1" Grid.Column="0">
+                       <VerticalStackLayout.GestureRecognizers>
+                           <TapGestureRecognizer Command="{Binding DecrementHomeTimeouts}" />
+                       </VerticalStackLayout.GestureRecognizers>
+
+                       <Label Text="T.O" />
+                       <Label Text="{Binding HomeTimeouts}" />
+                   </VerticalStackLayout>
+
+                   <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                       <VerticalStackLayout.GestureRecognizers>
+                           <TapGestureRecognizer Command="{Binding DecrementAwayTimeouts}" />
+                       </VerticalStackLayout.GestureRecognizers>
+
+                       <Label Text="T.O" />
+                       <Label Text="{Binding AwayTimeouts}" />
                    </VerticalStackLayout>
                </Grid>
 
@@ -50,12 +69,7 @@
                 <Button Text="Resume/Pause Game Clock" Command="{Binding TogglePeriodClock}" />
                 <Button Text="Reset/Start Play Clock" Command="{Binding TogglePlayClock}" />
 
-                <Button Text="Toggle Possession" Command="{Binding TogglePossession}" />
-                
-                <Button Text="Set Away Score" Command="{Binding SetAwayScore}" />
-
-                <Button Text="-1 Home Timeout" Command="{Binding SetHomeTimeouts}" />
-                <Button Text="-1 Away Timeout" Command="{Binding SetAwayTimeouts}" />
+                <Button Text="Toggle Possession" Command="{Binding TogglePossession}" />                                
             </VerticalStackLayout>
         </ScrollView>
     </ContentPage.Content>

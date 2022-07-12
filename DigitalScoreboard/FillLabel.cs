@@ -9,9 +9,9 @@ public class FillLabel : Label
             if (view is not FillLabel)
                 return;
 #if ANDROID
-                handler.PlatformView.SetAutoSizeTextTypeWithDefaults(AutoSizeTextType.Uniform);
-#elif iOS
-                handler.PlatformView.AdjustsFontSizeToFit = true;
+            handler.PlatformView.SetAutoSizeTextTypeWithDefaults(Android.Widget.AutoSizeTextType.Uniform);
+#elif IOS
+            handler.PlatformView.AdjustsFontSizeToFitWidth = true;
 #endif
         });
     }

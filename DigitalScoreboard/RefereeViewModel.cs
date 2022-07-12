@@ -39,17 +39,17 @@ public class RefereeViewModel : ViewModel
         this.SetHomeScore = this.CreateScoreCommand(true);
         this.SetAwayScore = this.CreateScoreCommand(false);
 
-        this.SetHomeScore = this.CreateTimeoutCommand(true);
-        this.SetAwayTimeouts = this.CreateTimeoutCommand(false);
+        this.DecrementHomeTimeouts = this.CreateTimeoutCommand(true);
+        this.DecrementAwayTimeouts = this.CreateTimeoutCommand(false);
     }
 
 
     [ObservableAsProperty] public bool IsConnected { get; }
 
     public ICommand SetHomeScore { get; }
-    public ICommand SetHomeTimeouts { get; }
     public ICommand SetAwayScore { get; }
-    public ICommand SetAwayTimeouts { get; }
+    public ICommand DecrementHomeTimeouts { get; }
+    public ICommand DecrementAwayTimeouts { get; }
     public ICommand IncrementDown { get; }
     public ICommand IncrementPeriod { get; }
     public ICommand TogglePlayClock { get; }
