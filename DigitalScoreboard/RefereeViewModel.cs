@@ -83,8 +83,15 @@ public class RefereeViewModel : ViewModel
     public override void OnDisappearing()
     {
         base.OnDisappearing();
-        this.display.KeepScreenOn = false;
-        this.peripheral?.CancelConnection();
+        try
+        {
+            this.display.KeepScreenOn = false;
+            this.peripheral?.CancelConnection();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning("Error cleaning up", ex);
+        }
     }
 
 
@@ -175,26 +182,32 @@ public class RefereeViewModel : ViewModel
                 .Select(x => x.Peripheral.CreateManaged(RxApp.MainThreadScheduler))
                 .FirstAsync();
 
-            this.peripheral
-                .WhenNotificationReceived(
-                    this.config.ServiceUuid,
-                    this.config.CharacteristicUuid
-                )
-                .Select(x => x.ToGameInfo())
-                .SubOnMainThread(x =>
-                {
-                    this.HomeScore = x.HomeScore;
-                    this.HomeTimeouts = x.HomeTimeouts;
-                    this.HomePossession = x.HomePossession;
-                    this.AwayScore = x.AwayScore;
-                    this.AwayTimeouts = x.AwayTimeouts;
+            //this.peripheral
+            //    .WhenNotificationReceived(
+            //        this.config.ServiceUuid,
+            //        this.config.CharacteristicUuid
+            //    )
+            //    .Select(x => x.ToGameInfo())
+            //    .SubOnMainThread(
+            //        x =>
+            //        {
+            //            this.HomeScore = x.HomeScore;
+            //            this.HomeTimeouts = x.HomeTimeouts;
+            //            this.HomePossession = x.HomePossession;
+            //            this.AwayScore = x.AwayScore;
+            //            this.AwayTimeouts = x.AwayTimeouts;
 
-                    this.Down = x.Down;
-                    this.Period = x.Period;
+            //            this.Down = x.Down;
+            //            this.Period = x.Period;
 
-                    // TODO: yards to go
-                })
-                .DisposedBy(this.DestroyWith);
+            //            // TODO: yards to go
+            //        },
+            //        ex =>
+            //        {
+            //            Console.WriteLine(ex);
+            //        }
+            //    )
+            //    .DisposedBy(this.DestroyWith);
         }
         this.peripheral
             .Peripheral

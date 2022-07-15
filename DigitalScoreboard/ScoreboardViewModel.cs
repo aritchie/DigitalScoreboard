@@ -94,7 +94,7 @@ public class ScoreboardViewModel : ViewModel
         {
             this.Down++;
             if (this.Down > settings.Downs)
-            { 
+            {
                 this.Down = 1;
                 this.YardsToGo = this.settings.DefaultYardsToGo;
             }
@@ -156,19 +156,20 @@ public class ScoreboardViewModel : ViewModel
     {
         base.OnDisappearing();
 
-        this.display.KeepScreenOn = false;
-
-        if (this.bleManager != null)
+        try
         {
-            try
+            this.display.KeepScreenOn = false;
+
+            if (this.bleManager != null)
             {
                 this.bleManager.StopAdvertising();
-                this.bleManager.RemoveService(this.btConfig!.ServiceUuid);
+                this.bleManager.ClearServices();
             }
-            catch (Exception ex)
-            {
-                this.logger.LogWarning(ex, "Error cleaning up BLE server");
-            }
+
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning(ex, "Error cleaning up");
         }
     }
 
@@ -177,11 +178,18 @@ public class ScoreboardViewModel : ViewModel
     {
         base.OnAppearing();
 
-        this.display.KeepScreenOn = true;
-        if (this.bleManager == null)
-            await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
-        else
-            await this.StartBle();
+        try
+        {
+            this.display.KeepScreenOn = true;
+            if (this.bleManager == null)
+                await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
+            else
+                await this.StartBle();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning("Failed to startup", ex);
+        }
     }
 
 
@@ -255,103 +263,97 @@ public class ScoreboardViewModel : ViewModel
     async Task StartBle()
     {
         IGattCharacteristic notifier = null!;
-        try
+        var serviceUuid = this.btConfig!.ServiceUuid;
+        var charUuid = this.btConfig!.CharacteristicUuid;
+
+        await this.bleManager!.AddService(serviceUuid, true, sb =>
         {
-            // byte 0 intent
-            // byte 1 sub-intent
-            // byte 2+ - data
-            await this.bleManager!.AddService(this.btConfig!.ServiceUuid, true, sb =>
-            {
-                notifier = sb.AddCharacteristic(this.btConfig.CharacteristicUuid, cb => cb
-                    .SetNotification()
-                    .SetWrite(request =>
-                    {
-                        switch (request.Data[0])
-                        {
-                            case Constants.BleIntents.Score:
-                                var score = BitConverter.ToInt16(request.Data, 2);
-                                if (request.Data[1] == Constants.BleIntents.HomeTeam)
-                                {
-                                    this.HomeTeamScore = score;
-                                }
-                                else
-                                {
-                                    this.AwayTeamScore = score;
-                                }
-                                break;
-
-                            case Constants.BleIntents.IncrementDown:
-                                this.IncrementDown.Execute(null);
-                                break;
-
-                            case Constants.BleIntents.IncrementPeriod:
-                                this.Reset(true);
-                                break;
-
-                            case Constants.BleIntents.TogglePlayClock:
-                                this.TogglePlayClock.Execute(null);
-                                break;
-
-                            case Constants.BleIntents.TogglePeriodClock:
-                                this.TogglePeriodClock.Execute(null);
-                                break;
-
-                            case Constants.BleIntents.DecrementTimeout:
-                                if (request.Data[1] == Constants.BleIntents.HomeTeam)
-                                    this.DecrementHomeTimeout.Execute(null);
-                                else
-                                    this.DecrementAwayTimeout.Execute(null);
-                                break;
-
-                            case Constants.BleIntents.TogglePossession:
-                                this.TogglePossession.Execute(null);
-                                break;
-                        }
-                        return GattState.Success;
-                    })
-                );
-            });
-
-            await this.bleManager!.StartAdvertising(new AdvertisementOptions
-            {
-                ServiceUuids =
+            notifier = sb.AddCharacteristic(charUuid, cb => cb
+                //.SetNotification()
+                .SetRead(read => ReadResult.Success(new byte[] { 0x01 }))
+                .SetWrite(request =>
                 {
-                    this.btConfig.ServiceUuid
-                }
-            });
+                    switch (request.Data[0])
+                    {
+                        case Constants.BleIntents.Score:
+                            var score = BitConverter.ToInt16(request.Data, 2);
+                            if (request.Data[1] == Constants.BleIntents.HomeTeam)
+                            {
+                                this.HomeTeamScore = score;
+                            }
+                            else
+                            {
+                                this.AwayTeamScore = score;
+                            }
+                            break;
 
-            Observable
-                .Interval(TimeSpan.FromSeconds(3))
-                .Where(x => notifier.SubscribedCentrals.Count > 0)
-                .SubscribeAsync(async _ =>
-                {
-                    try
-                    {
-                        var info = new GameInfo(
-                            this.HomeTeamScore,
-                            this.HomeTeamTimeouts,
-                            this.AwayTeamScore,
-                            this.AwayTeamTimeouts,
-                            this.HomeTeamPossession,
-                            this.Period,
-                            this.Down,
-                            this.YardsToGo,
-                            this.PlayClock,
-                            Convert.ToInt32(Math.Floor(this.PeriodClock.TotalSeconds))
-                        );
-                        var bytes = info.ToBytes();
-                        await notifier.Notify(bytes);
+                        case Constants.BleIntents.IncrementDown:
+                            this.IncrementDown.Execute(null);
+                            break;
+
+                        case Constants.BleIntents.IncrementPeriod:
+                            this.Reset(true);
+                            break;
+
+                        case Constants.BleIntents.TogglePlayClock:
+                            this.TogglePlayClock.Execute(null);
+                            break;
+
+                        case Constants.BleIntents.TogglePeriodClock:
+                            this.TogglePeriodClock.Execute(null);
+                            break;
+
+                        case Constants.BleIntents.DecrementTimeout:
+                            if (request.Data[1] == Constants.BleIntents.HomeTeam)
+                                this.DecrementHomeTimeout.Execute(null);
+                            else
+                                this.DecrementAwayTimeout.Execute(null);
+                            break;
+
+                        case Constants.BleIntents.TogglePossession:
+                            this.TogglePossession.Execute(null);
+                            break;
                     }
-                    catch (Exception ex)
-                    {
-                        this.logger.LogWarning("Failed to notify updates", ex);
-                    }
-                })
-                .DisposedBy(this.DeactivateWith);
-        }
-        catch (Exception ex)
+                    return GattState.Success;
+                }));            
+        });
+          
+
+        await this.bleManager!.StartAdvertising(new AdvertisementOptions
         {
-            this.logger.LogError(ex, "Failed to start BLE functions");
-        }
+            ServiceUuids =
+            {
+                this.btConfig.ServiceUuid
+            }
+        });
+
+        //Observable
+        //    .Interval(TimeSpan.FromSeconds(3))
+        //    .Where(x => notifier.SubscribedCentrals.Count > 0)
+        //    .SubscribeAsync(async _ =>
+        //    {
+        //        try
+        //        {
+        //            var info = new GameInfo(
+        //                this.HomeTeamScore,
+        //                this.HomeTeamTimeouts,
+        //                this.AwayTeamScore,
+        //                this.AwayTeamTimeouts,
+        //                this.HomeTeamPossession,
+        //                this.Period,
+        //                this.Down,
+        //                this.YardsToGo,
+        //                this.PlayClock,
+        //                Convert.ToInt32(Math.Floor(this.PeriodClock.TotalSeconds))
+        //            );
+        //            var bytes = info.ToBytes();
+        //            await notifier.Notify(bytes);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            this.logger.LogWarning("Failed to notify updates", ex);
+        //        }
+        //    })
+        //    .DisposedBy(this.DeactivateWith);
     }
 }
