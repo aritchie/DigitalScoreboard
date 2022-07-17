@@ -5,9 +5,28 @@ namespace DigitalScoreboard;
 
 public class MainViewModel
 {
-	public MainViewModel(INavigationService navigator, AppSettings appSettings)
+	public MainViewModel(
+		INavigationService navigator,
+		IDialogs dialogs,
+		AppSettings appSettings
+	)
 	{
-		this.Scoreboard = navigator.NavigateCommand(nameof(ScoreboardPage));
+		this.Scoreboard = ReactiveCommand.CreateFromTask(async () =>
+		{
+			if (appSettings.CurrentGame == null)
+            {
+				appSettings.NewGame();
+            }
+			else
+            {
+				var g = appSettings.CurrentGame;
+				var details = $"QTR: {g.Period} ({g.Period:c}) - {g.HomeTeamName}: {g.HomeTeamScore} / {g.AwayTeamName}: {g.AwayTeamScore}";
+				var result = await dialogs.Confirm("Do you wish to resume your current game? " + details, "Resume Game?");
+				if (!result)
+					appSettings.NewGame();
+            }
+			navigator.NavigateCommand(nameof(ScoreboardPage));
+		});
         this.Referee = navigator.NavigateCommand(nameof(RefereePage));
 		this.Settings = navigator.NavigateCommand(nameof(SettingsPage));
 
