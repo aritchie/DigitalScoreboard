@@ -220,7 +220,6 @@ public class ScoreboardViewModel : ViewModel
         if (to < 0)
             to = this.settings.MaxTimeouts;
 
-
         setter(to);
     });
 
@@ -340,7 +339,6 @@ public class ScoreboardViewModel : ViewModel
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Bad Write: " + ex);
                         this.logger.LogError("Bad write data", ex);
                         return GattState.Failure;
                     }

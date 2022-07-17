@@ -36,8 +36,12 @@ public static class MauiProgram
 				fonts.AddFont("electron.ttf", "electron");
 			});
 
-		//builder.Configuration.AddJsonPlatformBundle(optional: false);
-		//builder.Services.AddSingleton(builder.Configuration.GetSection("Bluetooth").Get<BluetoothConfig>());
+#if DEBUG
+        builder.Logging.AddDebug();
+#endif
+        
+        //builder.Configuration.AddJsonPlatformBundle(optional: false);
+        //builder.Services.AddSingleton(builder.Configuration.GetSection("Bluetooth").Get<BluetoothConfig>());
         builder.Services.AddSingleton(new BluetoothConfig
         {
             ServiceUuid = "144340bf-3566-425e-98ff-e57aab8c6360",

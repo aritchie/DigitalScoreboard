@@ -17,6 +17,7 @@ A football scoreboard that can be controlled through Bluetooth.  Great for littl
     * Yards-To-Go
 
 ## The "Stack"
+
 * .NET MAUI
 * Prism
 * ReactiveUI
@@ -43,7 +44,10 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 <img src="settings.png" />
 
 ## TODO
+
+* Full Screen Label Font
+* Load/Save Rulesets in settings
 * Online Error Log - AppCenter, Firebase, Sentry, etc
-* Remember Game per session (start new or resume)
 * Set Yards-to-go from referee
 * Ball On Yard
+* Phone Size Scoreboard (with no bluetooth)

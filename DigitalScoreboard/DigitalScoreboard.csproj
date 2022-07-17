@@ -25,11 +25,11 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-<!--	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-	</PropertyGroup>-->
-
 	<!--
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+	</PropertyGroup>
+
 	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 		<CodesignKey>iPhone Distribution: </CodesignKey>
@@ -56,5 +56,6 @@
 		<PackageReference Include="Shiny.Extensions.Configuration" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
 	</ItemGroup>
 </Project>
