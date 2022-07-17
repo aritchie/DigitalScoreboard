@@ -19,7 +19,7 @@ public class FullTimerViewModel : ViewModel
     IDisposable? timerSub;
 
 
-	public FullTimerViewModel(AppSettings settings)
+	public FullTimerViewModel(BaseServices services, AppSettings settings) : base(services)
 	{
         this.settings = settings;
 

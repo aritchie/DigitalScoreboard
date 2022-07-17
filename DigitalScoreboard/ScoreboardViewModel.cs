@@ -17,6 +17,7 @@ public class ScoreboardViewModel : ViewModel
 
 
     public ScoreboardViewModel(
+           BaseServices services,
            ILogger<ScoreboardViewModel> logger,
            AppSettings settings,
            IDeviceDisplay display,
@@ -25,7 +26,8 @@ public class ScoreboardViewModel : ViewModel
 #if !MACCATALYST
             , IBleHostingManager bleManager
 #endif
-       )
+    )
+    : base(services)
     {
         this.logger = logger;
         this.settings = settings;

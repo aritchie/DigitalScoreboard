@@ -16,12 +16,14 @@ public class RefereeViewModel : ViewModel
 
 
 	public RefereeViewModel(
+        BaseServices services,
         ILogger<RefereeViewModel> logger,
 		IBleManager bleManager,
 		IDeviceDisplay display,
         IPageDialogService dialogs,
         BluetoothConfig config
 	)
+    : base(services)
 	{
         this.logger = logger;
         this.bleManager = bleManager;

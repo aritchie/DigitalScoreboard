@@ -15,6 +15,10 @@ public class MainViewModel
 			("Type", TimerType.Clock),
 			("Time", appSettings.BreakTimeMins)
 		));
+		this.PlayClock = navigator.NavigateCommand(nameof(FullTimerPage), p => p.AddRange(
+            ("Type", TimerType.Countdown),
+            ("Time", appSettings.PlayClock)
+        ));
     }
 
 
@@ -22,5 +26,6 @@ public class MainViewModel
 	public ICommand Referee { get; }
 	public ICommand Settings { get; }
 	public ICommand HalfTime { get; }
+	public ICommand PlayClock { get; }
 }
 

@@ -4,7 +4,8 @@
              xmlns:local="clr-namespace:DigitalScoreboard"
              x:Class="DigitalScoreboard.FullTimerPage"
              x:DataType="local:FullTimerViewModel"
-             BackgroundColor="Black">
+             BackgroundColor="Black"
+             Padding="0">
 
     <VerticalStackLayout HorizontalOptions="FillAndExpand"
                          VerticalOptions="FillAndExpand">
