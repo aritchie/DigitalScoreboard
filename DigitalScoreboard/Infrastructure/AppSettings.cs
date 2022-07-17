@@ -14,7 +14,8 @@ public class AppSettings : RuleSet // TODO: rulesets
             PeriodClock = TimeSpan.FromMinutes(this.PeriodDurationMins),
             YardsToGo = this.DefaultYardsToGo,
             AwayTeamTimeouts = this.MaxTimeouts,
-            HomeTeamTimeouts = this.MaxTimeouts
+            HomeTeamTimeouts = this.MaxTimeouts,
+            HomeTeamPossession = true
         };
     }
 

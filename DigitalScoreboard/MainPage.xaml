@@ -12,7 +12,11 @@
             Padding="30,0" 
             VerticalOptions="Center">
 
-            <Button Text="Scoreboard" Command="{Binding Scoreboard}" />
+            <Button Text="Continue Game"
+                    Command="{Binding ContinueGame}"
+                    IsVisible="{Binding IsGameInProgress}" />
+
+            <Button Text="Start New Game" Command="{Binding NewGame}" />
             <Button Text="Referee" Command="{Binding Referee}" />
             <Button Text="Settings" Command="{Binding Settings}" />
 

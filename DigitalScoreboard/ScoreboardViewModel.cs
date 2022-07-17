@@ -24,7 +24,7 @@ public class ScoreboardViewModel : ViewModel
            IPageDialogService dialogs,
            BluetoothConfig btConfig
 #if !MACCATALYST
-            , IBleHostingManager bleManager
+           , IBleHostingManager bleManager
 #endif
     )
     : base(services)
@@ -38,9 +38,16 @@ public class ScoreboardViewModel : ViewModel
         this.bleManager = bleManager;
 #endif
 
-        this.HomeTeamTimeouts = settings.MaxTimeouts;
-        this.AwayTeamTimeouts = settings.MaxTimeouts;
-        this.PeriodClock = TimeSpan.FromMinutes(this.settings.PeriodDurationMins);
+        this.HomeTeamScore = settings.CurrentGame!.HomeTeamScore;
+        this.HomeTeamTimeouts = settings.CurrentGame!.HomeTeamTimeouts;
+        this.AwayTeamScore = settings.CurrentGame!.AwayTeamScore;
+        this.AwayTeamTimeouts = settings.CurrentGame!.AwayTeamTimeouts;
+        this.PeriodClock = settings.CurrentGame!.PeriodClock;
+        this.Period = settings.CurrentGame!.Period;
+        this.Down = settings.CurrentGame!.Down;
+        this.YardsToGo = settings.CurrentGame!.YardsToGo;
+        this.HomeTeamPossession = settings.CurrentGame!.HomeTeamPossession;
+        this.PlayClock = settings.PlayClock;
 
         this.SetHomeScore = this.SetScore("Home Team Score?", x => this.HomeTeamScore = x);
         this.SetAwayScore = this.SetScore("Away Team Score?", x => this.AwayTeamScore = x);
@@ -119,7 +126,7 @@ public class ScoreboardViewModel : ViewModel
             if (result)
                 this.Reset(true);
         });
-        this.Reset(false);
+        //this.Reset(false);
     }
 
     public ICommand SetHomeScore { get; }
@@ -160,6 +167,16 @@ public class ScoreboardViewModel : ViewModel
 
         try
         {
+            settings.CurrentGame!.HomeTeamScore = this.HomeTeamScore;
+            settings.CurrentGame!.HomeTeamTimeouts = this.HomeTeamTimeouts;
+            settings.CurrentGame!.HomeTeamPossession = this.HomeTeamPossession;
+            settings.CurrentGame!.AwayTeamScore = this.AwayTeamScore;
+            settings.CurrentGame!.AwayTeamTimeouts = this.AwayTeamTimeouts;
+            settings.CurrentGame!.PeriodClock = this.PeriodClock;
+            settings.CurrentGame!.Period = this.Period;
+            settings.CurrentGame!.Down = this.Down;
+            settings.CurrentGame!.YardsToGo = this.YardsToGo;
+
             this.display.KeepScreenOn = false;
 
             if (this.bleManager != null)
@@ -182,11 +199,11 @@ public class ScoreboardViewModel : ViewModel
 
         try
         {
-            this.display.KeepScreenOn = true;
-            if (this.bleManager == null)
-                await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
-            else
-                await this.StartBle();
+            //this.display.KeepScreenOn = true;
+            //if (this.bleManager == null)
+            //    await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
+            //else
+            //    await this.StartBle();
         }
         catch (Exception ex)
         {
@@ -203,6 +220,7 @@ public class ScoreboardViewModel : ViewModel
         var to = getCurrentTo() - 1;
         if (to < 0)
             to = this.settings.MaxTimeouts;
+
 
         setter(to);
     });
