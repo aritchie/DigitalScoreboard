@@ -126,7 +126,6 @@ public class ScoreboardViewModel : ViewModel
             if (result)
                 this.Reset(true);
         });
-        //this.Reset(false);
     }
 
     public ICommand SetHomeScore { get; }
@@ -199,11 +198,11 @@ public class ScoreboardViewModel : ViewModel
 
         try
         {
-            //this.display.KeepScreenOn = true;
-            //if (this.bleManager == null)
-            //    await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
-            //else
-            //    await this.StartBle();
+            this.display.KeepScreenOn = true;
+            if (this.bleManager == null)
+                await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
+            else
+                await this.StartBle();
         }
         catch (Exception ex)
         {
@@ -286,61 +285,73 @@ public class ScoreboardViewModel : ViewModel
         var serviceUuid = this.btConfig!.ServiceUuid;
         var charUuid = this.btConfig!.CharacteristicUuid;
 
+        this.bleManager!.ClearServices();
         await this.bleManager!.AddService(serviceUuid, true, sb =>
         {
             notifier = sb.AddCharacteristic(charUuid, cb => cb
-                //.SetNotification()
-                .SetRead(read => ReadResult.Success(new byte[] { 0x01 }))
+                .SetNotification()
+                //.SetRead(read => ReadResult.Success(new byte[] { 0x01 }))
                 .SetWrite(request =>
                 {
-                    switch (request.Data[0])
+                    try
                     {
-                        case Constants.BleIntents.Score:
-                            var score = BitConverter.ToInt16(request.Data, 2);
-                            if (request.Data[1] == Constants.BleIntents.HomeTeam)
-                            {
-                                this.HomeTeamScore = score;
-                            }
-                            else
-                            {
-                                this.AwayTeamScore = score;
-                            }
-                            break;
+                        switch (request.Data[0])
+                        {
+                            case Constants.BleIntents.Score:
+                                var score = BitConverter.ToInt16(request.Data, 2);
+                                if (request.Data[1] == Constants.BleIntents.HomeTeam)
+                                {
+                                    this.HomeTeamScore = score;
+                                }
+                                else
+                                {
+                                    this.AwayTeamScore = score;
+                                }
+                                break;
 
-                        case Constants.BleIntents.IncrementDown:
-                            this.IncrementDown.Execute(null);
-                            break;
+                            case Constants.BleIntents.IncrementDown:
+                                this.IncrementDown.Execute(null);
+                                break;
 
-                        case Constants.BleIntents.IncrementPeriod:
-                            this.Reset(true);
-                            break;
+                            case Constants.BleIntents.IncrementPeriod:
+                                this.Reset(true);
+                                break;
 
-                        case Constants.BleIntents.TogglePlayClock:
-                            this.TogglePlayClock.Execute(null);
-                            break;
+                            case Constants.BleIntents.TogglePlayClock:
+                                this.TogglePlayClock.Execute(null);
+                                break;
 
-                        case Constants.BleIntents.TogglePeriodClock:
-                            this.TogglePeriodClock.Execute(null);
-                            break;
+                            case Constants.BleIntents.TogglePeriodClock:
+                                this.TogglePeriodClock.Execute(null);
+                                break;
 
-                        case Constants.BleIntents.DecrementTimeout:
-                            if (request.Data[1] == Constants.BleIntents.HomeTeam)
-                                this.DecrementHomeTimeout.Execute(null);
-                            else
-                                this.DecrementAwayTimeout.Execute(null);
-                            break;
+                            case Constants.BleIntents.DecrementTimeout:
+                                if (request.Data[1] == Constants.BleIntents.HomeTeam)
+                                    this.DecrementHomeTimeout.Execute(null);
+                                else
+                                    this.DecrementAwayTimeout.Execute(null);
+                                break;
 
-                        case Constants.BleIntents.TogglePossession:
-                            this.TogglePossession.Execute(null);
-                            break;
+                            case Constants.BleIntents.TogglePossession:
+                                this.TogglePossession.Execute(null);
+                                break;
+                        }
+                        return GattState.Success;
                     }
-                    return GattState.Success;
-                }));            
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Bad Write: " + ex);
+                        this.logger.LogError("Bad write data", ex);
+                        return GattState.Failure;
+                    }
+                }));
         });
           
 
         await this.bleManager!.StartAdvertising(new AdvertisementOptions
         {
+            AndroidIncludeDeviceName = true,
+            LocalName = "Scoreboard",
             ServiceUuids =
             {
                 this.btConfig.ServiceUuid
