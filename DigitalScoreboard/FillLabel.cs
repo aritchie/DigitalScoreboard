@@ -1,4 +1,9 @@
-﻿namespace DigitalScoreboard;
+﻿using DynamicData.Aggregation;
+using Microsoft.Maui.Controls;
+using System;
+using UIKit;
+
+namespace DigitalScoreboard;
 
 
 public class FillLabel : Label
@@ -25,24 +30,80 @@ public class FillLabel : Label
             v.BaselineAdjustment = UIKit.UIBaselineAdjustment.AlignCenters;
             v.LineBreakMode = UIKit.UILineBreakMode.Clip;
 
-            //v.Font = v.Font.WithSize(v.Frame.Height * 2 / 3);
-            //v.Lines = 0;
-            //v.MinimumFontSize = 10;
 
-            //v.MinimumScaleFactor = new System.Runtime.InteropServices.NFloat(0.2);
-            //v.AdjustsFontSizeToFitWidth = true;
-            //v.AdjustsFontForContentSizeCategory = true;
-            //v.LineBreakMode = UIKit.UILineBreakMode.Clip;
-            //v.MinimumScaleFactor = new System.Runtime.InteropServices.NFloat(0.1);
-            //v.Lines = 0;
-            //var lbl = new UIKit.UILabel();
-            //v.AdjustsFontSizeToFitWidth = true;
-            //v.AdjustsFontForContentSizeCategory = true;
-            //v.MinimumScaleFactor = new System.Runtime.InteropServices.NFloat(0.2);
-            //v.Lines = 0;
-
-            //v.NumberOfLines = 0;
 #endif
         });
     }
 }
+
+
+/*
+ Designed with single-line UILabels in mind, this subclass 'resizes' the label's text (it changes the label's font size)
+ everytime its size (frame) is changed. This 'fits' the text to the new height, avoiding undesired text cropping.
+ Kudos to this Stack Overflow thread: bit.ly/setFontSizeToFillUILabelHeight
+*/
+
+//import Foundation
+//import UIKit
+
+//class LabelWithAdaptiveTextHeight : UILabel
+//{
+
+//    override func layoutSubviews()
+//    {
+//        super.layoutSubviews()
+//        font = fontToFitHeight()
+//    }
+
+//    // Returns an UIFont that fits the new label's height.
+//    private func fontToFitHeight() -> UIFont {
+
+//        var minFontSize: CGFloat = DISPLAY_FONT_MINIMUM // CGFloat 18
+//        var maxFontSize: CGFloat = DISPLAY_FONT_BIG     // CGFloat 67
+//        var fontSizeAverage: CGFloat = 0
+//        var textAndLabelHeightDiff: CGFloat = 0
+
+//        while (minFontSize <= maxFontSize) {
+
+//            fontSizeAverage = minFontSize + (maxFontSize - minFontSize) / 2
+
+//            // Abort if text happens to be nil
+//            guard text?.characters.count > 0 else {
+//              break
+//            }
+
+//            if let labelText: NSString = text {
+//                let labelHeight = frame.size.height
+
+//                let testStringHeight = labelText.sizeWithAttributes(
+//                    [NSFontAttributeName: font.fontWithSize(fontSizeAverage)]
+//                ).height
+
+//                textAndLabelHeightDiff = labelHeight - testStringHeight
+
+//                if (fontSizeAverage == minFontSize || fontSizeAverage == maxFontSize) {
+//                    if (textAndLabelHeightDiff< 0) {
+//                        return font.fontWithSize(fontSizeAverage - 1)
+//                    }
+//                    return font.fontWithSize(fontSizeAverage)
+//                }
+
+//                if (textAndLabelHeightDiff < 0)
+//{
+//    maxFontSize = fontSizeAverage - 1
+
+//                }
+//else if (textAndLabelHeightDiff > 0)
+//{
+//    minFontSize = fontSizeAverage + 1
+
+//                }
+//else
+//{
+//    return font.fontWithSize(fontSizeAverage)
+//                }
+//            }
+//        }
+//        return font.fontWithSize(fontSizeAverage)
+//    }
+//}
