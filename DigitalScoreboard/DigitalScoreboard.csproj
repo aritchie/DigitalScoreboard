@@ -1,16 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0-ios</TargetFrameworks>
-		<!--<TargetFrameworks>$(TargetFrameworks);net6.0-maccatalyst</TargetFrameworks>-->
-		<TargetFrameworks>$(TargetFrameworks);net6.0-android</TargetFrameworks>
+		<TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>DigitalScoreboard</RootNamespace>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<ShinyVersion>3.0.0-alpha-0156</ShinyVersion>
+		<ShinyVersion>3.0.0-alpha-0167</ShinyVersion>
 
 		<ApplicationTitle>Scoreboard</ApplicationTitle>
 
@@ -46,13 +44,14 @@
 
 		<MauiImage Include="Resources\Images\*" />
 		<MauiFont Include="Resources\Fonts\*" />
+		<MauiAsset Include="appsettings.json" LogicalName="appsettings.json" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.254-beta" />
 		<PackageReference Include="ReactiveUI.Fody" Version="18.2.9" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="1.1.0" />
-		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0013" />
+		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0014" />
 		<PackageReference Include="Shiny.Extensions.Configuration" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />

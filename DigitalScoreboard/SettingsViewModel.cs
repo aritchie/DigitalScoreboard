@@ -18,6 +18,56 @@ public class SettingsViewModel : ReactiveObject
         this.BreakTimeMins = settings.BreakTimeMins;
         this.DefaultYardsToGo = settings.DefaultYardsToGo;
 
+        var valid = this.WhenAny(
+            x => x.PlayClock,
+            x => x.Font,
+            x => x.HomeTeam,
+            x => x.AwayTeam,
+            x => x.PeriodDuration,
+            x => x.Periods,
+            x => x.Downs,
+            x => x.MaxTimeouts,
+            x => x.BreakTimeMins,
+            x => x.DefaultYardsToGo,
+            (pc, font, ht, at, pd, p, downs, to, bt, ytg) =>
+            {
+                if (pc.GetValue() < 10 || pc.GetValue() > 120)
+                    return false;
+
+                if (font.GetValue().IsEmpty())
+                    return false;
+
+                if (ht.GetValue().IsEmpty())
+                    return false;
+
+                if (at.GetValue().IsEmpty())
+                    return false;
+
+                if (at.GetValue().Equals(ht.GetValue(), StringComparison.InvariantCultureIgnoreCase))
+                    return false;
+
+                if (pd.GetValue() < 2 || pd.GetValue() > 120)
+                    return false;
+
+                if (p.GetValue() < 1 || p.GetValue() > 9)
+                    return false;
+
+                if (downs.GetValue() < 1 || downs.GetValue() > 20)
+                    return false;
+
+                if (to.GetValue() < 1 || to.GetValue() > 9)
+                    return false;
+
+                if (bt.GetValue() < 1 || bt.GetValue() > 99)
+                    return false;
+
+                if (ytg.GetValue() < 10 || ytg.GetValue() > 100)
+                    return false;
+
+                return true;
+            }
+        );
+
         this.SwitchTeams = ReactiveCommand.Create(() =>
         {
             var ht = this.HomeTeam;
@@ -39,61 +89,22 @@ public class SettingsViewModel : ReactiveObject
                 settings.BreakTimeMins = this.BreakTimeMins;
                 settings.DefaultYardsToGo = this.DefaultYardsToGo;
             },
-            this.WhenAny(
-                x => x.PlayClock,
-                x => x.Font,
-                x => x.HomeTeam,
-                x => x.AwayTeam,
-                x => x.PeriodDuration,
-                x => x.Periods,
-                x => x.Downs,
-                x => x.MaxTimeouts,
-                x => x.BreakTimeMins,
-                x => x.DefaultYardsToGo,
-                (pc, font, ht, at, pd, p, downs, to, bt, ytg) =>
-                {
-                    if (pc.GetValue() < 10 || pc.GetValue() > 120)
-                        return false;
+            valid
+        );
 
-                    if (font.GetValue().IsEmpty())
-                        return false;
-
-                    if (ht.GetValue().IsEmpty())
-                        return false;
-
-                    if (at.GetValue().IsEmpty())
-                        return false;
-
-                    if (at.GetValue().Equals(ht.GetValue(), StringComparison.InvariantCultureIgnoreCase))
-                        return false;
-
-                    if (pd.GetValue() < 2 || pd.GetValue() > 120)
-                        return false;
-
-                    if (p.GetValue() < 1 || p.GetValue() > 9)
-                        return false;
-
-                    if (downs.GetValue() < 1 || downs.GetValue() > 20)
-                        return false;
-
-                    if (to.GetValue() < 1 || to.GetValue() > 9)
-                        return false;
-
-                    if (bt.GetValue() < 1 || bt.GetValue() > 99)
-                        return false;
-
-                    if (ytg.GetValue() < 10 || ytg.GetValue() > 100)
-                        return false;
-
-                    return true;
-                }
-            )
+        // TODO: load skillset
+        this.SaveRuleSet = ReactiveCommand.Create(
+            () => settings.SaveCurrentRuleSet(this.RuleSetName!),
+            valid.Select(x => !this.RuleSetName.IsEmpty())
         );
     }
 
 
     public ICommand Save { get; }
-    public ICommand SwitchTeams { get; set; }
+    public ICommand SwitchTeams { get; }
+    public ICommand SaveRuleSet { get; }
+
+    [Reactive] public string RuleSetName { get; set; }
     [Reactive] public int DefaultYardsToGo { get; set; }
     [Reactive] public int BreakTimeMins { get; set; }
     [Reactive] public int PlayClock { get; set; }

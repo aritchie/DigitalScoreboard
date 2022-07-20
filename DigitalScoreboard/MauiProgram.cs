@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using DigitalScoreboard.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Prism.DryIoc;
 
 namespace DigitalScoreboard;
@@ -24,14 +25,10 @@ public static class MauiProgram
                         registry.RegisterForNavigation<ScoreboardPage, ScoreboardViewModel>();
                         registry.RegisterForNavigation<FullTimerPage, FullTimerViewModel>();
                     })
-                    .OnAppStart(
-                        async navigator => await navigator.Navigate("NavigationPage/MainPage")
-                    )
+                    .OnAppStart("NavigationPage/MainPage")
             )
             .ConfigureFonts(fonts =>
 			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 				fonts.AddFont("DS-DIGI.TTF", "Digital");
 				fonts.AddFont("electron.ttf", "electron");
 			});
@@ -39,14 +36,10 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        
-        //builder.Configuration.AddJsonPlatformBundle(optional: false);
-        //builder.Services.AddSingleton(builder.Configuration.GetSection("Bluetooth").Get<BluetoothConfig>());
-        builder.Services.AddSingleton(new BluetoothConfig
-        {
-            ServiceUuid = "144340bf-3566-425e-98ff-e57aab8c6360",
-            CharacteristicUuid = "144340bf-3566-425e-98ff-e57aab8c6361"
-        });
+
+        builder.Configuration.AddJsonPlatformBundle(optional: false);
+        builder.Services.AddSingleton(builder.Configuration.GetSection("Bluetooth").Get<BluetoothConfig>());
+
         builder.Services.AddSingleton(DeviceDisplay.Current);
         builder.Services.AddShinyService<AppSettings>();
 

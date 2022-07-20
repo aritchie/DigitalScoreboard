@@ -22,10 +22,8 @@ public class ScoreboardViewModel : ViewModel
            AppSettings settings,
            IDeviceDisplay display,
            IPageDialogService dialogs,
-           BluetoothConfig btConfig
-#if !MACCATALYST
-           , IBleHostingManager bleManager
-#endif
+           BluetoothConfig btConfig,
+           IBleHostingManager? bleManager = null
     )
     : base(services)
     {
@@ -34,9 +32,7 @@ public class ScoreboardViewModel : ViewModel
         this.display = display;
         this.dialogs = dialogs;
         this.btConfig = btConfig;
-#if !MACCATALYST
         this.bleManager = bleManager;
-#endif
 
         this.HomeTeamScore = settings.CurrentGame!.HomeTeamScore;
         this.HomeTeamTimeouts = settings.CurrentGame!.HomeTeamTimeouts;
@@ -344,7 +340,6 @@ public class ScoreboardViewModel : ViewModel
                     }
                 }));
         });
-          
 
         await this.bleManager!.StartAdvertising(new AdvertisementOptions
         {
