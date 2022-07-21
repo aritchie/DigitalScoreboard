@@ -1,9 +1,4 @@
-﻿using DynamicData.Aggregation;
-using Microsoft.Maui.Controls;
-using System;
-using UIKit;
-
-namespace DigitalScoreboard;
+﻿namespace DigitalScoreboard;
 
 
 public class FillLabel : Label

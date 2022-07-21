@@ -5,8 +5,17 @@
              x:Class="DigitalScoreboard.SettingsPage"
              x:DataType="local:SettingsViewModel"
              Title="Settings">
+
+    <!--<StackLayout BindableLayout.ItemsSource="">
+    </StackLayout>-->
     <TableView>
         <TableRoot>
+            <TableSection Title="Rule Set">
+                <EntryCell Label="Name" Text="{Binding RuleSetName}" />
+                <TextCell Text="Save" Command="{Binding SaveRuleSet}" />
+                <TextCell Text="Load" />
+            </TableSection>
+
             <TableSection Title="Teams">
                 <EntryCell Label="Home"
                            Text="{Binding HomeTeam}" />

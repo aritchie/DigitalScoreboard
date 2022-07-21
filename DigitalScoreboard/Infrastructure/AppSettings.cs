@@ -1,6 +1,6 @@
 ﻿namespace DigitalScoreboard.Infrastructure;
 
-public class AppSettings : RuleSet // TODO: rulesets
+public class AppSettings : RuleSet
 {
     public Game? CurrentGame { get; private set; }
 
@@ -32,12 +32,19 @@ public class AppSettings : RuleSet // TODO: rulesets
     public void SaveCurrentRuleSet(string name)
     {
         this.SavedRules.Remove(name);
-        //this.SavedRules.Add(name, new RuleSet
-        //{
-
-        //});
+        this.SavedRules.Add(name, new RuleSet
+        {
+            PlayClock = this.PlayClock,
+            PeriodDurationMins = this.PeriodDurationMins,
+            BreakTimeMins = this.BreakTimeMins,
+            Periods = this.Periods,
+            Downs = this.Downs,
+            DefaultYardsToGo = this.DefaultYardsToGo,
+            MaxTimeouts = this.MaxTimeouts
+        });
         this.RaisePropertyChanged(nameof(this.SavedRules));
     }
+
 
     //[Reactive] public string DeviceConnectionName
     public Dictionary<string, RuleSet> SavedRules { get; set; } = new();

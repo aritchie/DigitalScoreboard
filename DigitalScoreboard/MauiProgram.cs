@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Maui;
 using DigitalScoreboard.Infrastructure;
 using Microsoft.Extensions.Configuration;
+
+using Prism.Controls;
 using Prism.DryIoc;
 
 namespace DigitalScoreboard;
@@ -18,7 +20,8 @@ public static class MauiProgram
                 prism => prism
                     .RegisterTypes(registry =>
                     {
-                        registry.RegisterForNavigation<NavigationPage>();
+                        registry.RegisterForNavigation<PrismNavigationPage>("NavigationPage");
+                        //registry.RegisterForNavigation<NavigationPage>();
                         registry.RegisterForNavigation<MainPage, MainViewModel>();
                         registry.RegisterForNavigation<SettingsPage, SettingsViewModel>();
                         registry.RegisterForNavigation<RefereePage, RefereeViewModel>();
@@ -40,6 +43,7 @@ public static class MauiProgram
         builder.Configuration.AddJsonPlatformBundle(optional: false);
         builder.Services.AddSingleton(builder.Configuration.GetSection("Bluetooth").Get<BluetoothConfig>());
 
+        builder.Services.AddSingleton<ScreenOrientation>();
         builder.Services.AddSingleton(DeviceDisplay.Current);
         builder.Services.AddShinyService<AppSettings>();
 
