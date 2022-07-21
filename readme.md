@@ -51,3 +51,35 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 * Set Yards-to-go from referee
 * Ball On Yard
 * Phone Size Scoreboard (with no bluetooth)
+
+## FUTURE?
+
+* Close to Football Scoreboard
+    * Hockey
+        * Shots on Goal per team 
+        * Penalty Time Remaining (2 per team)
+    * Basketball
+        * Fouls
+        * Shot Clock
+    * Soccer
+        * Shots per team
+        * Saves per team
+        * Penalty Time Remaining (2 per team)
+
+* Way Different
+    * Curling
+        * Ends
+        * Who starts
+        * Points per end?
+    * Baseball
+        * Top/Bottom of Inning
+        * Inning Scores
+        * Balls
+        * Strikes
+        * Outs
+        * Errors
+        * Hits
+    * Tennis
+        * Games & Sets
+        * Scoring 0, 15, 30, 40, Tie, Adv
+        * Set Points
