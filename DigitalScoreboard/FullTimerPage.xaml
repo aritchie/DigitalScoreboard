@@ -15,12 +15,10 @@
         </VerticalStackLayout.GestureRecognizers>
 
         <local:FillLabel Text="{Binding TimeRemaining}"
-                         FontFamily="{Binding Font}"
+                         Style="{StaticResource BoardLabel}"
                          TextColor="Yellow"
                          VerticalOptions="FillAndExpand"
-                         VerticalTextAlignment="Center"
-                         HorizontalOptions="FillAndExpand"
-                         HorizontalTextAlignment="Center" />
+                         HorizontalOptions="FillAndExpand" />
     </VerticalStackLayout>
 
     <!--<local:BoardLabel Info="{Binding TimeRemaining}"
