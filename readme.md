@@ -51,6 +51,9 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 * Set Yards-to-go from referee
 * Ball On Yard
 * Phone Size Scoreboard (with no bluetooth)
+* Scan List to determine what "scoreboard" to have the "referee" connect to
+* Setting to auto remember "scoreboard"?
+* Improve Referee layout
 
 ## FUTURE?
 
