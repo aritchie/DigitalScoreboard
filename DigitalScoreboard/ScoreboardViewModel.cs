@@ -135,7 +135,6 @@ public class ScoreboardViewModel : ViewModel
     public ICommand TogglePlayClock { get; }
     public ICommand TogglePeriodClock { get; }
 
-    public string Font => this.settings.Font;
     [Reactive] public int Period { get; private set; }
     [Reactive] public int PlayClock { get; private set; }
     [Reactive] public TimeSpan PeriodClock { get; private set; }

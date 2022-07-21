@@ -22,4 +22,7 @@
                          HorizontalOptions="FillAndExpand"
                          HorizontalTextAlignment="Center" />
     </VerticalStackLayout>
+
+    <!--<local:BoardLabel Info="{Binding TimeRemaining}"
+                      Command="{Binding Toggle}" />-->
 </ContentPage>

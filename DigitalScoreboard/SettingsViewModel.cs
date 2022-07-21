@@ -8,7 +8,6 @@ public class SettingsViewModel : ReactiveObject
     public SettingsViewModel(AppSettings settings)
     {
         this.PlayClock = settings.PlayClock;
-        this.Font = settings.Font;
         this.HomeTeam = settings.HomeTeam;
         this.AwayTeam = settings.AwayTeam;
         this.PeriodDuration = settings.PeriodDurationMins;
@@ -20,7 +19,6 @@ public class SettingsViewModel : ReactiveObject
 
         var valid = this.WhenAny(
             x => x.PlayClock,
-            x => x.Font,
             x => x.HomeTeam,
             x => x.AwayTeam,
             x => x.PeriodDuration,
@@ -29,12 +27,9 @@ public class SettingsViewModel : ReactiveObject
             x => x.MaxTimeouts,
             x => x.BreakTimeMins,
             x => x.DefaultYardsToGo,
-            (pc, font, ht, at, pd, p, downs, to, bt, ytg) =>
+            (pc, ht, at, pd, p, downs, to, bt, ytg) =>
             {
                 if (pc.GetValue() < 10 || pc.GetValue() > 120)
-                    return false;
-
-                if (font.GetValue().IsEmpty())
                     return false;
 
                 if (ht.GetValue().IsEmpty())
@@ -79,7 +74,6 @@ public class SettingsViewModel : ReactiveObject
             () =>
             {
                 settings.PlayClock = this.PlayClock;
-                settings.Font = this.Font;
                 settings.HomeTeam = this.HomeTeam;
                 settings.AwayTeam = this.AwayTeam;
                 settings.PeriodDurationMins = this.PeriodDuration;

@@ -51,9 +51,6 @@ public class AppSettings : RuleSet
 
     [Reactive] public string HomeTeam { get; set; } = "Home";
     [Reactive] public string AwayTeam { get; set; } = "Away";
-
-    // digital, electron
-    [Reactive] public string Font { get; set; } = "electron";
 }
 
 

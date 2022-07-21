@@ -14,26 +14,19 @@
                 <Setter Property="BackgroundColor" Value="Transparent" />
             </Style>
 
-            <Style x:Key="Team" TargetType="Label">
+            <Style x:Key="Team" TargetType="Label" BasedOn="{StaticResource BoardTitleLabel}">
                 <Setter Property="TextColor" Value="White" />
                 <Setter Property="FontSize" Value="60" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
-                <Setter Property="VerticalTextAlignment" Value="Center" />
             </Style>
 
-            <Style x:Key="Title" TargetType="Label">
+            <Style x:Key="Title" TargetType="Label" BasedOn="{StaticResource BoardTitleLabel}">
                 <Setter Property="TextColor" Value="White" />
                 <Setter Property="FontSize" Value="60" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
-                <Setter Property="VerticalTextAlignment" Value="Center" />
             </Style>
 
-            <Style x:Key="Info" TargetType="Label">
-                <Setter Property="FontFamily" Value="{Binding Font}" />
+            <Style x:Key="Info" TargetType="Label" BasedOn="{StaticResource BoardLabel}">
                 <Setter Property="TextColor" Value="Yellow" />
                 <Setter Property="FontSize" Value="80" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
-                <Setter Property="VerticalTextAlignment" Value="Center" />
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
@@ -82,7 +75,6 @@
                         </Label.GestureRecognizers>
                     </Label>
                 </Frame>
-
             </VerticalStackLayout>
 
 

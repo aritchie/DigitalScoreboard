@@ -21,7 +21,6 @@ public static class MauiProgram
                     .RegisterTypes(registry =>
                     {
                         registry.RegisterForNavigation<PrismNavigationPage>("NavigationPage");
-                        //registry.RegisterForNavigation<NavigationPage>();
                         registry.RegisterForNavigation<MainPage, MainViewModel>();
                         registry.RegisterForNavigation<SettingsPage, SettingsViewModel>();
                         registry.RegisterForNavigation<RefereePage, RefereeViewModel>();
@@ -32,7 +31,7 @@ public static class MauiProgram
             )
             .ConfigureFonts(fonts =>
 			{
-				fonts.AddFont("DS-DIGI.TTF", "Digital");
+				//fonts.AddFont("DS-DIGI.TTF", "Digital");
 				fonts.AddFont("electron.ttf", "electron");
 			});
 

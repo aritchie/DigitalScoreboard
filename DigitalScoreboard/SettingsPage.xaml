@@ -61,11 +61,6 @@
             </TableSection>
 
             <TableSection>
-                <EntryCell Label="Font"
-                           Text="{Binding Font}" />
-            </TableSection>
-
-            <TableSection>
                 <TextCell Text="Save"
                           Command="{Binding Save}" />
             </TableSection>

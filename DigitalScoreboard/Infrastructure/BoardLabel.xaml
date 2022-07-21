@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:DigitalScoreboard"
+             x:DataType="local:BoardLabel"
+             x:Class="DigitalScoreboard.BoardLabel">
+
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <Style x:Key="InfoFrame" TargetType="Frame">
+                <Setter Property="CornerRadius" Value="0" />
+                <Setter Property="BorderColor" Value="LightGray" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+            </Style>
+
+            <Style x:Key="Title" TargetType="Label" BasedOn="{StaticResource BoardTitleLabel}">
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontSize" Value="60" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+            </Style>
+
+            <Style x:Key="Info" TargetType="Label" BasedOn="{StaticResource BoardLabel}">
+                <Setter Property="FontSize" Value="80" />
+            </Style>
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <ContentView.Content>
+        <VerticalStackLayout>
+            <VerticalStackLayout.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding Command}" />
+            </VerticalStackLayout.GestureRecognizers>
+
+            <Label Text="{Binding Title}"
+                   Style="{StaticResource BoardTitleLabel}">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding Title}" Value="{x:Null}">
+                        <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+
+            <Frame Style="{StaticResource InfoFrame}">
+                <local:FillLabel Text="{Binding Info}"
+                                 Style="{StaticResource Info}"
+                                 VerticalOptions="FillAndExpand"
+                                 HorizontalOptions="FillAndExpand" />
+            </Frame>
+        </VerticalStackLayout>
+    </ContentView.Content>
+</ContentView>
+

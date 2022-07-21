@@ -50,7 +50,6 @@ public class FullTimerViewModel : ViewModel
 	}
 
 
-    public string Font => this.settings.Font;
 	public ICommand Toggle { get; }
     [Reactive] public string TimeRemaining { get; private set; }
 
@@ -65,9 +64,8 @@ public class FullTimerViewModel : ViewModel
         this.timeRemainingOrig = this.timerType == TimerType.Countdown
             ? TimeSpan.FromSeconds(time)
             : TimeSpan.FromMinutes(time);
-        this.timeRemaining = this.timeRemainingOrig;
-        
 
+        this.timeRemaining = this.timeRemainingOrig;
         this.SetTimeRemaining();
     }
 
