@@ -90,7 +90,14 @@ public class ScoreboardViewModel : ViewModel
 
         this.SetYardsToGo = ReactiveCommand.CreateFromTask(async () =>
         {
-            var result = await this.dialogs.DisplayPromptAsync("YTD", "Enter yards-to-go", "Set", "Cancel", maxLength: 2, keyboardType: KeyboardType.Numeric);
+            var result = await this.dialogs.DisplayPromptAsync(
+                "YTD",
+                "Enter yards-to-go",
+                "Set",
+                "Cancel",
+                maxLength: 2,
+                keyboardType: KeyboardType.Numeric
+            );
             if (Int32.TryParse(result, out var ytg) && ytg > 0 && ytg < 100)
                 this.YardsToGo = ytg;
         });
@@ -327,6 +334,10 @@ public class ScoreboardViewModel : ViewModel
 
                             case Constants.BleIntents.TogglePossession:
                                 this.TogglePossession.Execute(null);
+                                break;
+
+                            case Constants.BleIntents.Ytg:
+                                this.YardsToGo = BitConverter.ToInt16(request.Data, 1);
                                 break;
                         }
                         return GattState.Success;

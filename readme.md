@@ -45,15 +45,14 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 
 ## TODO
 
-* Full Screen Label Font
+* Implement connection manager to hide BLE metrics - opening the door to wifi connection & better testability
+* Full Screen Label Font on timer screen
 * Load/Save Rulesets in settings
 * Online Error Log - AppCenter, Firebase, Sentry, etc
-* Set Yards-to-go from referee
 * Ball On Yard
 * Phone Size Scoreboard (with no bluetooth)
 * Scan List to determine what "scoreboard" to have the "referee" connect to
 * Setting to auto remember "scoreboard"?
-* Improve Referee layout
 
 ## FUTURE?
 

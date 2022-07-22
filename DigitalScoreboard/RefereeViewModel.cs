@@ -1,4 +1,5 @@
-﻿using DigitalScoreboard.Infrastructure;
+﻿using System.Collections.Generic;
+using DigitalScoreboard.Infrastructure;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Managed;
 
@@ -32,17 +33,36 @@ public class RefereeViewModel : ViewModel
         this.config = config;
 
         this.IncrementDown = this.SendCommand(Constants.BleIntents.IncrementDown);
-        this.IncrementPeriod = this.SendCommand(Constants.BleIntents.IncrementPeriod);
+        this.IncrementPeriod = this.SendCommand(Constants.BleIntents.IncrementPeriod, "Move to next QTR/Period?");
         this.TogglePlayClock = this.SendCommand(Constants.BleIntents.TogglePlayClock);
         this.TogglePeriodClock = this.SendCommand(Constants.BleIntents.TogglePeriodClock);
         this.TogglePossession = this.SendCommand(Constants.BleIntents.TogglePossession);
         
         // TODO: command parameters seem to be having issues on reactiveui, hence the split commands
-        this.SetHomeScore = this.CreateScoreCommand(true);
-        this.SetAwayScore = this.CreateScoreCommand(false);
+        this.SetHomeScore = this.CreateTeamCommand(true, "score", Constants.BleIntents.Score);
+        this.SetAwayScore = this.CreateTeamCommand(false, "score", Constants.BleIntents.Score);
 
         this.DecrementHomeTimeouts = this.CreateTimeoutCommand(true);
         this.DecrementAwayTimeouts = this.CreateTimeoutCommand(false);
+
+        this.SetYtg = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var value = await dialogs.DisplayPromptAsync(
+                "YTG",
+                "Set YTG",
+                "Set",
+                "Cancel",
+                maxLength: 2,
+                keyboardType: KeyboardType.Numeric
+            );
+            if (value != null)
+            {
+                var data = new List<byte>();
+                data.Add(Constants.BleIntents.Ytg);
+                data.AddRange(BitConverter.GetBytes(Int16.Parse(value)));
+                await this.SendWrite(data.ToArray());
+            }
+        });
     }
 
 
@@ -57,7 +77,7 @@ public class RefereeViewModel : ViewModel
     public ICommand TogglePlayClock { get; }
     public ICommand TogglePeriodClock { get; }
     public ICommand TogglePossession { get; }
-    //public ICommand SetYtg { get; }
+    public ICommand SetYtg { get; }
 
     [Reactive] public int Down { get; private set; } = 1;
     [Reactive] public int Period { get; private set; } = 1;
@@ -101,78 +121,70 @@ public class RefereeViewModel : ViewModel
     }
 
 
-    ICommand SendCommand(byte command) => this.Send(x => x
-        .Write(
-            this.config.ServiceUuid,
-            this.config.CharacteristicUuid,
-            new byte[] { command },
-            true
-        )
-        .ToTask()
-    );
+    ICommand SendCommand(byte command, string? confirmMsg = null) => ReactiveCommand.CreateFromTask(async () => 
+    {
+        if (confirmMsg != null)
+        {
+            var result = await this.dialogs.DisplayAlertAsync("Confirm", confirmMsg, "Yes", "No");
+            if (!result)
+                return;
+        }
+        await this.SendWrite(new byte[] { command });
+    });
 
 
     ICommand CreateTimeoutCommand(bool homeTeam) => ReactiveCommand.CreateFromTask(async () =>
     {
-        var team = homeTeam ? "Home" : "Away";
-        var value = await this.dialogs.DisplayPromptAsync("Score", $"Set the {team} timeouts remaining", "Set", "Cancel", maxLength: 1, keyboardType: KeyboardType.Numeric);
-        if (Int32.TryParse(value, out var result))
-        {
-            await this.Connect();
+        await this.Connect();
+        var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
+        var list = new List<byte>();
+        list.Add(Constants.BleIntents.DecrementTimeout); // command
+        list.Add(teamByte); // team
 
-            var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
-            var timeOutBytes = BitConverter.GetBytes(result);
-            var list = new List<byte>();
-            list.Add(Constants.BleIntents.DecrementTimeout); // command
-            list.Add(teamByte); // team
-            list.AddRange(timeOutBytes);
-
-            await this.peripheral!
-                .Write(
-                    this.config.ServiceUuid,
-                    this.config.CharacteristicUuid,
-                    list.ToArray(),
-                    true
-                )
-                .Timeout(TimeSpan.FromSeconds(20))
-                .ToTask();
-        }
+        await this.SendWrite(list.ToArray());
     });
 
 
-    ICommand CreateScoreCommand(bool homeTeam) => ReactiveCommand.CreateFromTask(async () =>
+    ICommand CreateTeamCommand(bool homeTeam, string setting, byte command) => ReactiveCommand.CreateFromTask(async () =>
     {
         var team = homeTeam ? "Home" : "Away";
-        var value = await this.dialogs.DisplayPromptAsync("Score", $"Set the {team} score", "Set", "Cancel", maxLength: 2, keyboardType: KeyboardType.Numeric);
+        var value = await this.dialogs.DisplayPromptAsync(
+            "Update",
+            $"Set {team} {setting}",
+            "Set",
+            "Cancel",
+            maxLength: 2,
+            keyboardType: KeyboardType.Numeric
+        );
         if (Int32.TryParse(value, out var result))
         {
             await this.Connect();
 
             var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
-            var scoreBytes = BitConverter.GetBytes(result);
+            var valueBytes = BitConverter.GetBytes(result);
             var list = new List<byte>();
-            list.Add(Constants.BleIntents.Score); // command
+            list.Add(command); // command
             list.Add(teamByte); // team
-            list.AddRange(scoreBytes);
+            list.AddRange(valueBytes);
 
-            await this.peripheral!
-                .Write(
-                    this.config.ServiceUuid,
-                    this.config.CharacteristicUuid,
-                    list.ToArray(),
-                    true
-                )
-                .Timeout(TimeSpan.FromSeconds(20))
-                .ToTask();
+            await this.SendWrite(list.ToArray());
         }
     });
 
 
-    ICommand Send(Func<IManagedPeripheral, Task> func) => ReactiveCommand.CreateFromTask(async () =>
+    async Task SendWrite(byte[] data)
     {
         await this.Connect().ConfigureAwait(false);
-        await func(this.peripheral!).ConfigureAwait(false);
-    });
+        await this.peripheral!
+            .Write(
+                this.config.ServiceUuid,
+                this.config.CharacteristicUuid,
+                data,
+                true
+            )
+            .Timeout(TimeSpan.FromSeconds(20))
+            .ToTask();
+    }
 
 
     async Task Connect()
@@ -193,21 +205,28 @@ public class RefereeViewModel : ViewModel
                     this.config.ServiceUuid,
                     this.config.CharacteristicUuid
                 )
-                .Select(x => x.ToGameInfo())
                 .SubOnMainThread(
-                    x =>
+                    data =>
                     {
-                        this.HomeScore = x.HomeScore;
-                        this.HomeTimeouts = x.HomeTimeouts;
-                        this.HomePossession = x.HomePossession;
-                        this.AwayScore = x.AwayScore;
-                        this.AwayTimeouts = x.AwayTimeouts;
+                        try
+                        {
+                            var x = data!.ToGameInfo();
+                            this.HomeScore = x.HomeScore;
+                            this.HomeTimeouts = x.HomeTimeouts;
+                            this.HomePossession = x.HomePossession;
+                            this.AwayScore = x.AwayScore;
+                            this.AwayTimeouts = x.AwayTimeouts;
 
-                        this.Down = x.Down;
-                        this.Period = x.Period;
-                        this.PeriodClock = TimeSpan.FromSeconds(x.PeriodClockSeconds);
-                        this.PlayClock = x.PlayClockSeconds;
-                        this.YardsToGo = x.YardsToGo;
+                            this.Down = x.Down;
+                            this.Period = x.Period;
+                            this.PeriodClock = TimeSpan.FromSeconds(x.PeriodClockSeconds);
+                            this.PlayClock = x.PlayClockSeconds;
+                            this.YardsToGo = x.YardsToGo;
+                        }
+                        catch (Exception ex)
+                        {
+                            this.logger.LogWarning("Error in notification data", ex);
+                        }
                     },
                     ex => this.logger.LogError("Notification Error", ex)
                 )
