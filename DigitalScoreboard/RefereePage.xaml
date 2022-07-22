@@ -8,11 +8,11 @@
              Title="Referee"
              BackgroundColor="Black">
 
-    <ContentPage.Resources>
+    <!--<ContentPage.Resources>
         <ResourceDictionary>
             <mct:InvertedBoolConverter x:Key="Not" />
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </ContentPage.Resources>-->
 
     <ContentPage.Content>
         <ScrollView>
@@ -25,49 +25,60 @@
                            TextColor="White" />
                 </Frame>
 
-               <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="1*, 1*">                   
+                <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="1*, 1*">                   
+                    <local:BoardLabel Title="Home"
+                                      Info="{Binding HomeScore}"
+                                      Command="{Binding SetHomeScore}"
+                                      Grid.Row="0"
+                                      Grid.Column="0" /> 
 
-                   <VerticalStackLayout Grid.Row="0" Grid.Column="0">
-                       <VerticalStackLayout.GestureRecognizers>
-                           <TapGestureRecognizer Command="{Binding SetHomeScore}" />
-                       </VerticalStackLayout.GestureRecognizers>
+                    <local:BoardLabel Title="Away"
+                                      Info="{Binding AwayScore}"
+                                      Command="{Binding SetAwayScore}"
+                                      Grid.Row="0"
+                                      Grid.Column="1" /> 
 
-                       <Label Text="Home" />
-                       <Label Text="{Binding HomeScore}" />                       
-                   </VerticalStackLayout>
+                    <local:BoardLabel Title="Home T0"
+                                      Info="{Binding HomeTimeouts}"
+                                      Command="{Binding DecrementHomeTimeouts}"
+                                      Grid.Row="1"
+                                      Grid.Column="0" />
 
-                   <VerticalStackLayout Grid.Row="0" Grid.Column="1">
-                       <VerticalStackLayout.GestureRecognizers>
-                           <TapGestureRecognizer Command="{Binding SetAwayScore}" />
-                       </VerticalStackLayout.GestureRecognizers>
+                    <local:BoardLabel Title="Away T0"
+                                      Info="{Binding AwayTimeouts}"
+                                      Command="{Binding DecrementAwayTimeouts}"
+                                      Grid.Row="1"
+                                      Grid.Column="1" />
 
-                       <Label Text="Away" />
-                       <Label Text="{Binding AwayScore}" />
-                   </VerticalStackLayout>
+                    <local:BoardLabel Title="QTR"
+                                      Info="{Binding Period}"
+                                      Command="{Binding IncrementPeriod}"
+                                      Grid.Row="2"
+                                      Grid.Column="0" />
 
-                   <VerticalStackLayout Grid.Row="1" Grid.Column="0">
-                       <VerticalStackLayout.GestureRecognizers>
-                           <TapGestureRecognizer Command="{Binding DecrementHomeTimeouts}" />
-                       </VerticalStackLayout.GestureRecognizers>
+                    <local:BoardLabel Title="PLAY"
+                                      Info="{Binding PlayClock}"
+                                      Command="{Binding TogglePlayClock}"
+                                      Grid.Row="2"
+                                      Grid.Column="1" />
 
-                       <Label Text="T.O" />
-                       <Label Text="{Binding HomeTimeouts}" />
-                   </VerticalStackLayout>
+                    <local:BoardLabel Title="DOWN"
+                                      Info="{Binding Down}"
+                                      Command="{Binding IncrementDown}"
+                                      Grid.Row="3"
+                                      Grid.Column="0" />
 
-                   <VerticalStackLayout Grid.Row="1" Grid.Column="1">
-                       <VerticalStackLayout.GestureRecognizers>
-                           <TapGestureRecognizer Command="{Binding DecrementAwayTimeouts}" />
-                       </VerticalStackLayout.GestureRecognizers>
+                    <local:BoardLabel Title="YTG"
+                                      Info="00"
+                                      Grid.Row="3"
+                                      Grid.Column="1" />
 
-                       <Label Text="T.O" />
-                       <Label Text="{Binding AwayTimeouts}" />
-                   </VerticalStackLayout>
-               </Grid>
-
-                <Button Text="Next Down" Command="{Binding IncrementDown}" />
-                <Button Text="Next Quarter" Command="{Binding IncrementPeriod}" />
-                <Button Text="Resume/Pause Game Clock" Command="{Binding TogglePeriodClock}" />
-                <Button Text="Reset/Start Play Clock" Command="{Binding TogglePlayClock}" />
+                    <local:BoardLabel Title="TIME"
+                                      Info="{Binding PeriodClock, Converter={StaticResource TimeSpan}}"
+                                      Command="{Binding TogglePeriodClock}"
+                                      Grid.Row="4"
+                                      Grid.ColumnSpan="2" />
+                </Grid>
 
                 <Button Text="Toggle Possession" Command="{Binding TogglePossession}" />                                
             </VerticalStackLayout>

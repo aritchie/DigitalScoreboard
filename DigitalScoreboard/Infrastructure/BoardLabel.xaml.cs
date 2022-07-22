@@ -6,7 +6,6 @@ public partial class BoardLabel : ContentView
 	public BoardLabel()
 	{
 		this.InitializeComponent();
-		this.BindingContext = this;
 	}
 
 
@@ -36,9 +35,6 @@ public partial class BoardLabel : ContentView
     }
 
 
-    //public static readonly BindableProperty FontSizeProperty = FontElement.FontSizeProperty;
-
-
     public static readonly BindableProperty CommandProperty = BindableProperty.Create(
         nameof(Command),
         typeof(ICommand),
@@ -49,5 +45,23 @@ public partial class BoardLabel : ContentView
     {
         get => (ICommand)this.GetValue(CommandProperty);
         set => this.SetValue(CommandProperty, value);
+    }
+
+
+    protected override void OnPropertyChanged(string? propertyName = null)
+    {
+        if (propertyName == TitleProperty.PropertyName)
+        {
+            this.lblTitle.Text = this.Title;
+            this.lblTitle.IsVisible = !String.IsNullOrWhiteSpace(this.Title);
+        }
+        else if (propertyName == InfoProperty.PropertyName)
+        {
+            this.lblInfo.Text = this.Info;
+        }
+        else if (propertyName == CommandProperty.PropertyName)
+        {
+            grCommand.Command = this.Command;
+        }
     }
 }

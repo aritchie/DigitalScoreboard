@@ -36,7 +36,7 @@ public class RefereeViewModel : ViewModel
         this.TogglePlayClock = this.SendCommand(Constants.BleIntents.TogglePlayClock);
         this.TogglePeriodClock = this.SendCommand(Constants.BleIntents.TogglePeriodClock);
         this.TogglePossession = this.SendCommand(Constants.BleIntents.TogglePossession);
-
+        
         // TODO: command parameters seem to be having issues on reactiveui, hence the split commands
         this.SetHomeScore = this.CreateScoreCommand(true);
         this.SetAwayScore = this.CreateScoreCommand(false);
@@ -57,15 +57,19 @@ public class RefereeViewModel : ViewModel
     public ICommand TogglePlayClock { get; }
     public ICommand TogglePeriodClock { get; }
     public ICommand TogglePossession { get; }
+    //public ICommand SetYtg { get; }
 
-    [Reactive] public int Down { get; private set; } = 0;
-    [Reactive] public int Period { get; private set; } = 0;
-    [Reactive] public bool HomePossession { get; private set; }
+    [Reactive] public int Down { get; private set; } = 1;
+    [Reactive] public int Period { get; private set; } = 1;
+    [Reactive] public bool HomePossession { get; private set; } = true;
     [Reactive] public int HomeScore { get; private set; }
     [Reactive] public int HomeTimeouts { get; private set; }
     [Reactive] public int AwayScore { get; private set; }
     [Reactive] public int AwayTimeouts { get; private set; }
-    // TODO: game & play clocks
+    [Reactive] public int PlayClock { get; private set; }
+    [Reactive] public int YardsToGo { get; private set; }
+    [Reactive] public TimeSpan PeriodClock { get; private set; }
+
 
     public override async void OnAppearing()
     {
@@ -184,32 +188,30 @@ public class RefereeViewModel : ViewModel
                 .Select(x => x.Peripheral.CreateManaged(RxApp.MainThreadScheduler))
                 .FirstAsync();
 
-            //this.peripheral
-            //    .WhenNotificationReceived(
-            //        this.config.ServiceUuid,
-            //        this.config.CharacteristicUuid
-            //    )
-            //    .Select(x => x.ToGameInfo())
-            //    .SubOnMainThread(
-            //        x =>
-            //        {
-            //            this.HomeScore = x.HomeScore;
-            //            this.HomeTimeouts = x.HomeTimeouts;
-            //            this.HomePossession = x.HomePossession;
-            //            this.AwayScore = x.AwayScore;
-            //            this.AwayTimeouts = x.AwayTimeouts;
+            this.peripheral
+                .WhenNotificationReceived(
+                    this.config.ServiceUuid,
+                    this.config.CharacteristicUuid
+                )
+                .Select(x => x.ToGameInfo())
+                .SubOnMainThread(
+                    x =>
+                    {
+                        this.HomeScore = x.HomeScore;
+                        this.HomeTimeouts = x.HomeTimeouts;
+                        this.HomePossession = x.HomePossession;
+                        this.AwayScore = x.AwayScore;
+                        this.AwayTimeouts = x.AwayTimeouts;
 
-            //            this.Down = x.Down;
-            //            this.Period = x.Period;
-
-            //            // TODO: yards to go
-            //        },
-            //        ex =>
-            //        {
-            //            Console.WriteLine(ex);
-            //        }
-            //    )
-            //    .DisposedBy(this.DestroyWith);
+                        this.Down = x.Down;
+                        this.Period = x.Period;
+                        this.PeriodClock = TimeSpan.FromSeconds(x.PeriodClockSeconds);
+                        this.PlayClock = x.PlayClockSeconds;
+                        this.YardsToGo = x.YardsToGo;
+                    },
+                    ex => this.logger.LogError("Notification Error", ex)
+                )
+                .DisposedBy(this.DestroyWith);
         }
         this.peripheral
             .Peripheral

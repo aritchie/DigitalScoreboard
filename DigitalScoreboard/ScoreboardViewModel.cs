@@ -284,7 +284,6 @@ public class ScoreboardViewModel : ViewModel
         {
             notifier = sb.AddCharacteristic(charUuid, cb => cb
                 .SetNotification()
-                //.SetRead(read => ReadResult.Success(new byte[] { 0x01 }))
                 .SetWrite(request =>
                 {
                     try
@@ -342,7 +341,7 @@ public class ScoreboardViewModel : ViewModel
 
         await this.bleManager!.StartAdvertising(new AdvertisementOptions
         {
-            AndroidIncludeDeviceName = true,
+            //AndroidIncludeDeviceName = true,
             LocalName = "Scoreboard",
             ServiceUuids =
             {
@@ -350,33 +349,33 @@ public class ScoreboardViewModel : ViewModel
             }
         });
 
-        //Observable
-        //    .Interval(TimeSpan.FromSeconds(3))
-        //    .Where(x => notifier.SubscribedCentrals.Count > 0)
-        //    .SubscribeAsync(async _ =>
-        //    {
-        //        try
-        //        {
-        //            var info = new GameInfo(
-        //                this.HomeTeamScore,
-        //                this.HomeTeamTimeouts,
-        //                this.AwayTeamScore,
-        //                this.AwayTeamTimeouts,
-        //                this.HomeTeamPossession,
-        //                this.Period,
-        //                this.Down,
-        //                this.YardsToGo,
-        //                this.PlayClock,
-        //                Convert.ToInt32(Math.Floor(this.PeriodClock.TotalSeconds))
-        //            );
-        //            var bytes = info.ToBytes();
-        //            await notifier.Notify(bytes);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            this.logger.LogWarning("Failed to notify updates", ex);
-        //        }
-        //    })
-        //    .DisposedBy(this.DeactivateWith);
+        Observable
+            .Interval(TimeSpan.FromSeconds(3))
+            .Where(x => notifier.SubscribedCentrals.Count > 0)
+            .SubscribeAsync(async _ =>
+            {
+                try
+                {
+                    var info = new GameInfo(
+                        this.HomeTeamScore,
+                        this.HomeTeamTimeouts,
+                        this.AwayTeamScore,
+                        this.AwayTeamTimeouts,
+                        this.HomeTeamPossession,
+                        this.Period,
+                        this.Down,
+                        this.YardsToGo,
+                        this.PlayClock,
+                        Convert.ToInt32(Math.Floor(this.PeriodClock.TotalSeconds))
+                    );
+                    var bytes = info.ToBytes();
+                    await notifier.Notify(bytes);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning("Failed to notify updates", ex);
+                }
+            })
+            .DisposedBy(this.DeactivateWith);
     }
 }
