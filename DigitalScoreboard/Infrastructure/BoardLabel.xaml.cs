@@ -35,6 +35,18 @@ public partial class BoardLabel : ContentView
     }
 
 
+    public static readonly BindableProperty IsInfoFramedProperty = BindableProperty.Create(
+        nameof(IsInfoFramed),
+        typeof(bool),
+        typeof(BoardLabel),
+        null
+    );
+    public bool IsInfoFramed
+    {
+        get => (bool)this.GetValue(InfoProperty);
+        set => this.SetValue(InfoProperty, value);
+    }
+
     public static readonly BindableProperty CommandProperty = BindableProperty.Create(
         nameof(Command),
         typeof(ICommand),
@@ -63,5 +75,11 @@ public partial class BoardLabel : ContentView
         {
             grCommand.Command = this.Command;
         }
+        else if (propertyName == IsInfoFramedProperty.PropertyName)
+        {
+            //frInfo.BorderColor = this.IsInfoFramed
+            //    ? Color.LightGray
+            //    : Color. //Color.Transparent;
+        } 
     }
 }

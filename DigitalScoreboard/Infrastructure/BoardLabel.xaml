@@ -7,22 +7,24 @@
 
     <ContentView.Resources>
         <ResourceDictionary>
-            <Style x:Key="InfoFrame" TargetType="Frame">
-                <Setter Property="CornerRadius" Value="0" />
-                <Setter Property="BorderColor" Value="LightGray" />
-                <Setter Property="BackgroundColor" Value="Transparent" />
-            </Style>
-
-            <Style x:Key="Title" TargetType="Label" BasedOn="{StaticResource BoardTitleLabel}">
-                <Setter Property="TextColor" Value="White" />
-                <Setter Property="FontSize" Value="60" />
+            <Style x:Key="TitleLabel" TargetType="Label">
+                <Setter Property="Text" Value="White" />
                 <Setter Property="HorizontalTextAlignment" Value="Center" />
                 <Setter Property="VerticalTextAlignment" Value="Center" />
             </Style>
 
-            <Style x:Key="Info" TargetType="Label" BasedOn="{StaticResource BoardLabel}">
+            <Style x:Key="InfoLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="electron" />
+                <Setter Property="Text" Value="Yellow" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
                 <Setter Property="TextColor" Value="Yellow" />
-                <Setter Property="FontSize" Value="80" />
+            </Style>
+
+            <Style x:Key="InfoFrame" TargetType="Frame">
+                <Setter Property="CornerRadius" Value="0" />
+                <Setter Property="BorderColor" Value="LightGray" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
             </Style>
         </ResourceDictionary>
     </ContentView.Resources>
@@ -34,12 +36,13 @@
             </VerticalStackLayout.GestureRecognizers>
 
             <Label x:Name="lblTitle"
-                   Style="{StaticResource BoardTitleLabel}"
+                   Style="{StaticResource TitleLabel}"
                    IsVisible="false" />
 
-            <Frame Style="{StaticResource InfoFrame}">
+            <Frame x:Name="frInfo"
+                   Style="{StaticResource InfoFrame}">
                 <local:FillLabel x:Name="lblInfo"
-                                 Style="{StaticResource Info}"
+                                 Style="{StaticResource InfoLabel}"
                                  VerticalOptions="FillAndExpand"
                                  HorizontalOptions="FillAndExpand" />
             </Frame>

@@ -360,6 +360,19 @@ public class ScoreboardViewModel : ViewModel
             }
         });
 
+        // TODO: send back commands when playclock starts/resets & period clock starts/stops (/w values) - app can run own timers
+        // TODO: otherwise, send all updates back for game info
+        this.WhenAnyProperty()
+            .Where(x =>
+                x.PropertyName != nameof(this.PlayClock) &&
+                x.PropertyName != nameof(this.PeriodClock)
+            )
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .Subscribe(x =>
+            {
+
+            });
+
         Observable
             .Interval(TimeSpan.FromSeconds(3))
             .Where(x => notifier.SubscribedCentrals.Count > 0)

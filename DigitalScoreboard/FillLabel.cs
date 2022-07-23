@@ -21,11 +21,10 @@ public class FillLabel : Label
             var v = handler.PlatformView;
 
             v.AdjustsFontSizeToFitWidth = true;
+            v.MinimumFontSize = 60;
             v.Lines = 1;
             v.BaselineAdjustment = UIKit.UIBaselineAdjustment.AlignCenters;
             v.LineBreakMode = UIKit.UILineBreakMode.Clip;
-
-
 #endif
         });
     }

@@ -50,7 +50,7 @@
 	<ItemGroup>
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.254-beta" />
 		<PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="1.1.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="1.2.0" />
 		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0015" />
 		<PackageReference Include="Shiny.Extensions.Configuration" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
