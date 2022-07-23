@@ -49,6 +49,7 @@ public class AppSettings : RuleSet
     //[Reactive] public string DeviceConnectionName
     public Dictionary<string, RuleSet> SavedRules { get; set; } = new();
 
+    [Reactive] public string AdvertisingName { get; set; } = "1234"; // TODO: should randomize... validate at 4 characters
     [Reactive] public string HomeTeam { get; set; } = "Home";
     [Reactive] public string AwayTeam { get; set; } = "Away";
 }

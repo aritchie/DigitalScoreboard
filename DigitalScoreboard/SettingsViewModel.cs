@@ -7,6 +7,7 @@ public class SettingsViewModel : ReactiveObject
 {
     public SettingsViewModel(AppSettings settings)
     {
+        this.AdvertisingName = settings.AdvertisingName;
         this.PlayClock = settings.PlayClock;
         this.HomeTeam = settings.HomeTeam;
         this.AwayTeam = settings.AwayTeam;
@@ -18,6 +19,7 @@ public class SettingsViewModel : ReactiveObject
         this.DefaultYardsToGo = settings.DefaultYardsToGo;
 
         var valid = this.WhenAny(
+            x => x.AdvertisingName,
             x => x.PlayClock,
             x => x.HomeTeam,
             x => x.AwayTeam,
@@ -27,8 +29,11 @@ public class SettingsViewModel : ReactiveObject
             x => x.MaxTimeouts,
             x => x.BreakTimeMins,
             x => x.DefaultYardsToGo,
-            (pc, ht, at, pd, p, downs, to, bt, ytg) =>
+            (adn, pc, ht, at, pd, p, downs, to, bt, ytg) =>
             {
+                if (adn.GetValue().Length != 4)
+                    return false;
+
                 if (pc.GetValue() < 10 || pc.GetValue() > 120)
                     return false;
 
@@ -73,6 +78,7 @@ public class SettingsViewModel : ReactiveObject
         this.Save = ReactiveCommand.Create(
             () =>
             {
+                settings.AdvertisingName = this.AdvertisingName;
                 settings.PlayClock = this.PlayClock;
                 settings.HomeTeam = this.HomeTeam;
                 settings.AwayTeam = this.AwayTeam;
@@ -98,6 +104,7 @@ public class SettingsViewModel : ReactiveObject
     public ICommand SwitchTeams { get; }
     public ICommand SaveRuleSet { get; }
 
+    [Reactive] public string AdvertisingName { get; set; }
     [Reactive] public string RuleSetName { get; set; }
     [Reactive] public int DefaultYardsToGo { get; set; }
     [Reactive] public int BreakTimeMins { get; set; }

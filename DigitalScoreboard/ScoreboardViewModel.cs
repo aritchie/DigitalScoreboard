@@ -142,6 +142,7 @@ public class ScoreboardViewModel : ViewModel
     public ICommand TogglePlayClock { get; }
     public ICommand TogglePeriodClock { get; }
 
+    public string AdvertisingName => this.settings.AdvertisingName;
     [Reactive] public int Period { get; private set; }
     [Reactive] public int PlayClock { get; private set; }
     [Reactive] public TimeSpan PeriodClock { get; private set; }
@@ -352,8 +353,7 @@ public class ScoreboardViewModel : ViewModel
 
         await this.bleManager!.StartAdvertising(new AdvertisementOptions
         {
-            //AndroidIncludeDeviceName = true,
-            LocalName = "Scoreboard",
+            LocalName = this.settings.AdvertisingName,
             ServiceUuids =
             {
                 this.btConfig.ServiceUuid
