@@ -67,6 +67,7 @@ public class RefereeViewModel : ViewModel
 
 
     [ObservableAsProperty] public bool IsConnected { get; }
+    public string ConnectedToName => this.peripheral?.Name ?? String.Empty;
 
     public ICommand SetHomeScore { get; }
     public ICommand SetAwayScore { get; }
