@@ -8,51 +8,34 @@ namespace DigitalScoreboard.Infrastructure;
 public class GameBleGattCharacteristic : BleGattCharacteristic
 {
     readonly AppSettings settings;
+    IDisposable? gameSub;
+
+
     public GameBleGattCharacteristic(AppSettings settings) => this.settings = settings;
 
 
     public override Task OnSubscriptionChanged(IPeripheral peripheral, bool subscribed)
     {
-        // TODO: send back commands when playclock starts/resets & period clock starts/stops (/w values) - app can run own timers
-        // TODO: otherwise, send all updates back for game info
-        //this.WhenAnyProperty()
-        //    .Where(x =>
-        //        x.PropertyName != nameof(this.PlayClock) &&
-        //        x.PropertyName != nameof(this.PeriodClock)
-        //    )
-        //    .Throttle(TimeSpan.FromMilliseconds(500))
-        //    .Subscribe(x =>
-        //    {
-
-        //    });
-        //Observable
-        //    .Interval(TimeSpan.FromSeconds(3))
-        //    .Where(x => notifier.SubscribedCentrals.Count > 0)
-        //    .SubscribeAsync(async _ =>
-        //    {
-        //        try
-        //        {
-        //            var info = new GameInfo(
-        //                this.HomeTeamScore,
-        //                this.HomeTeamTimeouts,
-        //                this.AwayTeamScore,
-        //                this.AwayTeamTimeouts,
-        //                this.HomeTeamPossession,
-        //                this.Period,
-        //                this.Down,
-        //                this.YardsToGo,
-        //                this.PlayClock,
-        //                Convert.ToInt32(Math.Floor(this.PeriodClock.TotalSeconds))
-        //            );
-        //            var bytes = info.ToBytes();
-        //            await notifier.Notify(bytes);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            this.logger.LogWarning("Failed to notify updates", ex);
-        //        }
-        //    })
-        //    .DisposedBy(this.DeactivateWith);
+        if (this.Characteristic.SubscribedCentrals.Count == 0)
+        {
+            this.gameSub?.Dispose();
+        }
+        else
+        {
+            this.gameSub = this.settings
+                .CurrentGame
+                .WhenAnyProperty()
+                .Where(x =>
+                    x.PropertyName != nameof(Game.PlayClock) &&
+                    x.PropertyName != nameof(Game.PeriodClock)
+                )
+                .Select(x => x.Object)
+                .Subscribe(
+                    // TODO: I need to know what prop is changing in order to send to server
+                        // TODO: I should hook this through the connection manager for server, connection manager could turn around and turn this on instead
+                    // TODO: write to characteristic notify
+                );
+        }
         return Task.CompletedTask;
     }
 
@@ -64,6 +47,7 @@ public class GameBleGattCharacteristic : BleGattCharacteristic
         if (game == null)
             return Task.FromResult(GattState.Success);
 
+        // TODO: could route this through connection manager
         switch (request.Data[0])
         {
             case Constants.BleIntents.Score:
@@ -87,11 +71,11 @@ public class GameBleGattCharacteristic : BleGattCharacteristic
                 break;
 
             case Constants.BleIntents.TogglePlayClock:
-                //this.TogglePlayClock.Execute(null);
+                game.TogglePlayClock();
                 break;
 
             case Constants.BleIntents.TogglePeriodClock:
-                //this.TogglePeriodClock.Execute(null);
+                game.TogglePeriodClock();
                 break;
 
             case Constants.BleIntents.DecrementTimeout:

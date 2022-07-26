@@ -24,7 +24,11 @@ public class MainViewModel : ViewModel
 		{
 			if (appSettings.CurrentGame == null)
             {
-				appSettings.NewGame();
+				appSettings.CurrentGame = new Game(appSettings)
+				{
+					HomeTeamName = appSettings.HomeTeam,
+					AwayTeamName = appSettings.AwayTeam
+				};
             }
 			else
             {
@@ -32,7 +36,13 @@ public class MainViewModel : ViewModel
 				var details = $"QTR: {g.Period} ({g.Period:c}) - {g.HomeTeamName}: {g.HomeTeamScore} / {g.AwayTeamName}: {g.AwayTeamScore}";
 				var result = await dialogs.Confirm("Do you wish to resume your current game? " + details, "Resume Game?", "Yes", "No");
 				if (!result)
-					appSettings.NewGame();
+				{
+                    appSettings.CurrentGame = new Game(appSettings)
+                    {
+                        HomeTeamName = appSettings.HomeTeam,
+                        AwayTeamName = appSettings.AwayTeam
+                    };
+                }
             }
 			await navigator.Navigate(nameof(ScoreboardPage));
 		});

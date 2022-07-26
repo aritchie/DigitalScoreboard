@@ -1,5 +1,4 @@
-﻿using System;
-using Shiny.BluetoothLE;
+﻿using Shiny.BluetoothLE;
 
 namespace DigitalScoreboard;
 
@@ -8,7 +7,6 @@ public class ScanViewModel : ViewModel
 {
     public ScanViewModel(
         IBleManager bleManager,
-        BleConfiguration config,
         BaseServices services
     ) : base(services)
     {
@@ -18,11 +16,14 @@ public class ScanViewModel : ViewModel
                 .Scan(new ScanConfig(
                     BleScanType.Balanced,
                     false,
-                    ""
+                    Constants.GameServiceUuid
                 ))
-                .SubOnMainThread(x =>
+                .Where(x => x.AdvertisementData?.LocalName != null)
+                .Select(x => x.AdvertisementData.LocalName)
+                .SubOnMainThread(name =>
                 {
-
+                    if (!this.Scoreboards.Any(x => x.DiscoveryName.Equals(name)))
+                        this.Scoreboards.Add(new Scoreboard(name));
                 })
                 .DisposedBy(this.DeactivateWith);
         });
@@ -30,7 +31,11 @@ public class ScanViewModel : ViewModel
 
 
     [Reactive] public string ActionDescription { get; private set; } = "Scanning For Scoreboards";
-    public ObservableList<object> Scoreboards { get; } = new();
+    public ObservableList<Scoreboard> Scoreboards { get; } = new();
     public ICommand Scan { get; }
 }
 
+
+public record Scoreboard(
+    string DiscoveryName
+);

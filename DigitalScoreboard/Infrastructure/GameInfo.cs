@@ -11,5 +11,6 @@ public record GameInfo(
     int YardsToGo,
     int PlayClockSeconds,
     int PeriodClockSeconds
-);
 
+    // TODO: add period remaing, play clock running/reset, period clock running/stopped
+);

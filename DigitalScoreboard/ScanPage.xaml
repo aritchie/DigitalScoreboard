@@ -5,11 +5,25 @@
              x:DataType="local:ScanViewModel"
              x:Class="DigitalScoreboard.ScanPage"
              Title="Scanning for Scoreboards">
-    <StackLayout>
-        <CollectionView ItemsSource="{Binding Scoreboards}">
-            
 
+    <VerticalStackLayout>
+        <HorizontalStackLayout>
+            <ActivityIndicator IsRunning="True" />
+            <Label Text="{Binding ActionDescription}" />
+        </HorizontalStackLayout>
+
+        <CollectionView ItemsSource="{Binding Scoreboards}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="local:Scoreboard">
+                    <VerticalStackLayout>
+                        <Label Text="{Binding DiscoveryName}" />
+                        <BoxView HorizontalOptions="FillAndExpand"
+                                 HeightRequest="1"
+                                 BackgroundColor="Black" />
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
         </CollectionView>
-    </StackLayout>
+    </VerticalStackLayout>
 </ContentPage>
 

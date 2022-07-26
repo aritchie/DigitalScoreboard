@@ -24,6 +24,9 @@ public class ScoreboardViewModel : ViewModel
     )
     : base(services)
     {
+        if (settings.CurrentGame == null)
+            throw new InvalidOperationException("There must be a game started");
+
         this.logger = logger;
         this.settings = settings;
         this.display = display;
@@ -31,12 +34,12 @@ public class ScoreboardViewModel : ViewModel
         this.bleManager = bleManager;
 
         // TODO: ble manager should check before coming here - it is no longer needed at this level
-        this.SetHomeScore = this.SetScore("Home Team Score?", x => this.settings.CurrentGame!.HomeTeamScore = x);
-        this.SetAwayScore = this.SetScore("Away Team Score?", x => this.settings.CurrentGame!.AwayTeamScore = x);
+        this.SetHomeScore = this.SetScore("Home Team Score?", x => this.Game.HomeTeamScore = x);
+        this.SetAwayScore = this.SetScore("Away Team Score?", x => this.Game.AwayTeamScore = x);
 
-        this.TogglePlayClock = ReactiveCommand.Create(() => this.settings.CurrentGame.TogglePlayClock());
-        this.TogglePeriodClock = ReactiveCommand.Create(() => this.settings.CurrentGame.TogglePeriodClock());
-        this.TogglePossession = ReactiveCommand.Create(() => this.settings.CurrentGame.TogglePossession());
+        this.TogglePlayClock = ReactiveCommand.Create(() => this.Game.TogglePlayClock());
+        this.TogglePeriodClock = ReactiveCommand.Create(() => this.Game.TogglePeriodClock());
+        this.TogglePossession = ReactiveCommand.Create(() => this.Game.TogglePossession());
 
         this.SetYardsToGo = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -49,19 +52,22 @@ public class ScoreboardViewModel : ViewModel
                 keyboardType: KeyboardType.Numeric
             );
             if (Int32.TryParse(result, out var ytg) && ytg > 0 && ytg < 100)
-                this.settings.CurrentGame.YardsToGo = ytg;
+                this.Game.YardsToGo = ytg;
         });
 
-        this.IncrementDown = ReactiveCommand.Create(() => this.settings.CurrentGame.IncrementDown());
-        this.DecrementHomeTimeout = ReactiveCommand.Create(() => this.settings.CurrentGame.UseTimeout(true));
-        this.DecrementAwayTimeout = ReactiveCommand.Create(() => this.settings.CurrentGame.UseTimeout(false));
+        this.IncrementDown = ReactiveCommand.Create(() => this.Game.IncrementDown());
+        this.DecrementHomeTimeout = ReactiveCommand.Create(() => this.Game.UseTimeout(true));
+        this.DecrementAwayTimeout = ReactiveCommand.Create(() => this.Game.UseTimeout(false));
         this.IncrementPeriod = ReactiveCommand.Create(async () =>
         {
             var result = await this.dialogs.DisplayAlertAsync("Next", "Increment Quarter?", "Yes", "No");
             if (result)
-                this.settings.CurrentGame.IncrementPeriod();
+                this.Game.IncrementPeriod();
         });
     }
+
+
+    Game Game => this.settings.CurrentGame!;
 
     public ICommand SetHomeScore { get; }
     public ICommand SetAwayScore { get; }
@@ -75,24 +81,74 @@ public class ScoreboardViewModel : ViewModel
     public ICommand TogglePeriodClock { get; }
 
     public string AdvertisingName => this.settings.AdvertisingName;
-    [Reactive] public int Period { get; private set; }
-    [Reactive] public int PlayClock { get; private set; }
-    [Reactive] public TimeSpan PeriodClock { get; private set; }
-    [Reactive] public int Down { get; private set; }
-    [Reactive] public int YardsToGo { get; private set; }
+    public int Period { get; private set; }
+    public int PlayClock { get; private set; }
+    public TimeSpan PeriodClock { get; private set; }
+    public int Down { get; private set; }
+    public int YardsToGo { get; private set; }
 
-    public string HomeTeamName => this.settings.HomeTeam;
-    [Reactive] public int HomeTeamScore { get; private set; }
-    [Reactive] public bool HomeTeamPossession { get; private set; }
-    [Reactive] public int HomeTeamTimeouts { get; private set; }
+    public string HomeTeamName { get; private set; }
+    public int HomeTeamScore { get; private set; }
+    public bool HomeTeamPossession { get; private set; }
+    public int HomeTeamTimeouts { get; private set; }
 
-    public string AwayTeamName => this.settings.AwayTeam;
-    [Reactive] public int AwayTeamScore { get; private set; }
-    [Reactive] public int AwayTeamTimeouts { get; private set; }
+    public string AwayTeamName { get; private set; }
+    public int AwayTeamScore { get; private set; }
+    public int AwayTeamTimeouts { get; private set; }
 
 
     public override Task<bool> CanNavigateAsync(INavigationParameters parameters)
         => this.dialogs.DisplayAlertAsync("Confirm", "Are you sure you wish to exit the scoreboard?", "Yes", "No");
+
+
+    public override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        this.settings
+            .CurrentGame
+            .WhenAnyProperty()
+            .Select(x => x.Object!)
+            .SubOnMainThread(game =>
+            {
+                this.HomeTeamName = game.HomeTeamName;
+                this.HomeTeamScore = game.HomeTeamScore;
+                this.HomeTeamTimeouts = game.HomeTeamTimeouts;
+                this.AwayTeamName = game.AwayTeamName;
+                this.AwayTeamScore = game.AwayTeamScore;
+                this.AwayTeamTimeouts = game.AwayTeamTimeouts;
+                this.PeriodClock = game.PeriodClock;
+                this.Period = game.Period;
+                this.Down = game.Down;
+                this.YardsToGo = game.YardsToGo;
+                this.HomeTeamPossession = game.HomeTeamPossession;
+                this.PlayClock = game.PlayClock;
+
+                this.RaisePropertyChanged();
+            })
+            .DisposedBy(this.DeactivateWith);
+
+        try
+        {
+            this.display.KeepScreenOn = true;
+            if (this.bleManager == null)
+            {
+                await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
+            }
+            else
+            {
+                await this.bleManager!.AttachRegisteredServices();
+                await this.bleManager!.StartAdvertising(new AdvertisementOptions(
+                    this.settings.AdvertisingName,
+                    Constants.GameServiceUuid
+                ));
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogWarning("Failed to startup", ex);
+        }
+    }
 
 
     public override void OnDisappearing()
@@ -113,52 +169,6 @@ public class ScoreboardViewModel : ViewModel
         catch (Exception ex)
         {
             this.logger.LogWarning(ex, "Error cleaning up");
-        }
-    }
-
-
-    public override async void OnAppearing()
-    {
-        base.OnAppearing();
-
-        this.settings
-            .CurrentGame
-            .WhenAnyProperty()
-            .SubOnMainThread(x =>
-            {
-                var game = x.Object!;
-                this.HomeTeamScore = game.HomeTeamScore;
-                this.HomeTeamTimeouts = game.HomeTeamTimeouts;
-                this.AwayTeamScore = game.AwayTeamScore;
-                this.AwayTeamTimeouts = game.AwayTeamTimeouts;
-                this.PeriodClock = game.PeriodClock;
-                this.Period = game.Period;
-                this.Down = game.Down;
-                this.YardsToGo = game.YardsToGo;
-                this.HomeTeamPossession = game.HomeTeamPossession;
-                this.PlayClock = game.PlayClock;
-            })
-            .DisposedBy(this.DeactivateWith);
-
-        try
-        {
-            this.display.KeepScreenOn = true;
-            if (this.bleManager == null)
-            {
-                await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
-            }
-            else
-                {
-                await this.bleManager!.AttachRegisteredServices();
-                await this.bleManager!.StartAdvertising(new AdvertisementOptions(
-                    this.settings.AdvertisingName,
-                    Constants.GameServiceUuid
-                ));
-            }
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogWarning("Failed to startup", ex);
         }
     }
 

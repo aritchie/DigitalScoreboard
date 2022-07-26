@@ -3,15 +3,7 @@
 
 public class AppSettings : RuleSet
 {
-    public Game? CurrentGame { get; private set; }
-
-
-    public void NewGame()
-    {
-        var game = new Game(this.HomeTeam, this.AwayTeam);
-        game.NewGame(this);
-        this.CurrentGame = game;
-    }
+    public Game? CurrentGame { get; set; }
 
 
     public void SetRuleSet(string name)
@@ -20,6 +12,9 @@ public class AppSettings : RuleSet
             throw new InvalidOperationException("No ruleset named " + name);
 
         var rules = this.SavedRules[name];
+        rules.BreakTimeMins = this.BreakTimeMins;
+
+        this.RaisePropertyChanged(nameof(this.SavedRules));
     }
 
 
@@ -40,12 +35,10 @@ public class AppSettings : RuleSet
     }
 
 
-    //[Reactive] public string DeviceConnectionName
     public Dictionary<string, RuleSet> SavedRules { get; set; } = new();
 
 
-    // TODO: should randomize... validate at 4 characters
-    // TODO: this should refresh advertising
+    // TODO: should randomize... validate at 4 characters - if null, randomize on start?
     [Reactive] public string AdvertisingName { get; set; } = "1234";
     [Reactive] public string HomeTeam { get; set; } = "Home";
     [Reactive] public string AwayTeam { get; set; } = "Away";

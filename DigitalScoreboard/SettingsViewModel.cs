@@ -9,8 +9,6 @@ public class SettingsViewModel : ReactiveObject
     {
         this.AdvertisingName = settings.AdvertisingName;
         this.PlayClock = settings.PlayClock;
-        this.HomeTeam = settings.HomeTeam;
-        this.AwayTeam = settings.AwayTeam;
         this.PeriodDuration = settings.PeriodDurationMins;
         this.Periods = settings.Periods;
         this.Downs = settings.Downs;
@@ -88,6 +86,12 @@ public class SettingsViewModel : ReactiveObject
                 settings.MaxTimeouts = this.MaxTimeouts;
                 settings.BreakTimeMins = this.BreakTimeMins;
                 settings.DefaultYardsToGo = this.DefaultYardsToGo;
+
+                if (settings.CurrentGame != null)
+                {
+                    settings.CurrentGame.HomeTeamName = this.HomeTeam;
+                    settings.CurrentGame.AwayTeamName = this.AwayTeam;
+                }
             },
             valid
         );
