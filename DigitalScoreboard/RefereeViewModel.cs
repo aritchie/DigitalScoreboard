@@ -12,7 +12,6 @@ public class RefereeViewModel : ViewModel
     readonly IBleManager bleManager;
 	readonly IDeviceDisplay display;
     readonly IPageDialogService dialogs;
-    readonly BluetoothConfig config;
     IManagedPeripheral? peripheral;
 
 
@@ -21,8 +20,7 @@ public class RefereeViewModel : ViewModel
         ILogger<RefereeViewModel> logger,
 		IBleManager bleManager,
 		IDeviceDisplay display,
-        IPageDialogService dialogs,
-        BluetoothConfig config
+        IPageDialogService dialogs
 	)
     : base(services)
 	{
@@ -30,14 +28,13 @@ public class RefereeViewModel : ViewModel
         this.bleManager = bleManager;
 		this.display = display;
         this.dialogs = dialogs;
-        this.config = config;
 
         this.IncrementDown = this.SendCommand(Constants.BleIntents.IncrementDown);
         this.IncrementPeriod = this.SendCommand(Constants.BleIntents.IncrementPeriod, "Move to next QTR/Period?");
         this.TogglePlayClock = this.SendCommand(Constants.BleIntents.TogglePlayClock);
         this.TogglePeriodClock = this.SendCommand(Constants.BleIntents.TogglePeriodClock);
         this.TogglePossession = this.SendCommand(Constants.BleIntents.TogglePossession);
-        
+
         // TODO: command parameters seem to be having issues on reactiveui, hence the split commands
         this.SetHomeScore = this.CreateTeamCommand(true, "score", Constants.BleIntents.Score);
         this.SetAwayScore = this.CreateTeamCommand(false, "score", Constants.BleIntents.Score);
@@ -122,7 +119,7 @@ public class RefereeViewModel : ViewModel
     }
 
 
-    ICommand SendCommand(byte command, string? confirmMsg = null) => ReactiveCommand.CreateFromTask(async () => 
+    ICommand SendCommand(byte command, string? confirmMsg = null) => ReactiveCommand.CreateFromTask(async () =>
     {
         if (confirmMsg != null)
         {
@@ -178,8 +175,8 @@ public class RefereeViewModel : ViewModel
         await this.Connect().ConfigureAwait(false);
         await this.peripheral!
             .Write(
-                this.config.ServiceUuid,
-                this.config.CharacteristicUuid,
+                Constants.GameServiceUuid,
+                Constants.GameCharacteristicUuid,
                 data,
                 true
             )
@@ -196,15 +193,15 @@ public class RefereeViewModel : ViewModel
                 .Scan(new ScanConfig(
                     BleScanType.Balanced,
                     false,
-                    this.config.ServiceUuid
+                    Constants.GameServiceUuid
                 ))
                 .Select(x => x.Peripheral.CreateManaged(RxApp.MainThreadScheduler))
                 .FirstAsync();
 
             this.peripheral
                 .WhenNotificationReceived(
-                    this.config.ServiceUuid,
-                    this.config.CharacteristicUuid
+                    Constants.GameServiceUuid,
+                    Constants.GameCharacteristicUuid
                 )
                 .SubOnMainThread(
                     data =>

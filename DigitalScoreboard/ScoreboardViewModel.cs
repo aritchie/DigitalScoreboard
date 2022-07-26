@@ -11,9 +11,7 @@ public class ScoreboardViewModel : ViewModel
     readonly IPageDialogService dialogs;
     readonly IDeviceDisplay display;
     readonly IBleHostingManager? bleManager;
-    readonly BluetoothConfig? btConfig;
-    IDisposable? gameClockSub;
-    IDisposable? playClockSub;
+
 
 
     public ScoreboardViewModel(
@@ -22,7 +20,6 @@ public class ScoreboardViewModel : ViewModel
            AppSettings settings,
            IDeviceDisplay display,
            IPageDialogService dialogs,
-           BluetoothConfig btConfig,
            IBleHostingManager? bleManager = null
     )
     : base(services)
@@ -31,62 +28,15 @@ public class ScoreboardViewModel : ViewModel
         this.settings = settings;
         this.display = display;
         this.dialogs = dialogs;
-        this.btConfig = btConfig;
         this.bleManager = bleManager;
 
-        this.HomeTeamScore = settings.CurrentGame!.HomeTeamScore;
-        this.HomeTeamTimeouts = settings.CurrentGame!.HomeTeamTimeouts;
-        this.AwayTeamScore = settings.CurrentGame!.AwayTeamScore;
-        this.AwayTeamTimeouts = settings.CurrentGame!.AwayTeamTimeouts;
-        this.PeriodClock = settings.CurrentGame!.PeriodClock;
-        this.Period = settings.CurrentGame!.Period;
-        this.Down = settings.CurrentGame!.Down;
-        this.YardsToGo = settings.CurrentGame!.YardsToGo;
-        this.HomeTeamPossession = settings.CurrentGame!.HomeTeamPossession;
-        this.PlayClock = settings.PlayClock;
+        // TODO: ble manager should check before coming here - it is no longer needed at this level
+        this.SetHomeScore = this.SetScore("Home Team Score?", x => this.settings.CurrentGame!.HomeTeamScore = x);
+        this.SetAwayScore = this.SetScore("Away Team Score?", x => this.settings.CurrentGame!.AwayTeamScore = x);
 
-        this.SetHomeScore = this.SetScore("Home Team Score?", x => this.HomeTeamScore = x);
-        this.SetAwayScore = this.SetScore("Away Team Score?", x => this.AwayTeamScore = x);
-
-        this.TogglePlayClock = ReactiveCommand.Create(() =>
-        {
-            if (this.playClockSub == null)
-            {
-                this.playClockSub = Observable
-                    .Interval(TimeSpan.FromSeconds(1))
-                    .Where(_ => this.PlayClock > 0)
-                    .SubOnMainThread(_ =>
-                        this.PlayClock = this.PlayClock - 1
-                    );
-            }
-            else
-            {
-                this.KillPlayClock();
-            }
-        });
-
-        this.TogglePeriodClock = ReactiveCommand.Create(() =>
-        {
-            if (this.gameClockSub == null)
-            {
-                this.gameClockSub = Observable
-                    .Interval(TimeSpan.FromSeconds(1))
-                    .Where(_ => this.PeriodClock.TotalSeconds > 0)
-                    .SubOnMainThread(x =>
-                        this.PeriodClock = this.PeriodClock.Subtract(TimeSpan.FromSeconds(1))
-                    );
-            }
-            else
-            {
-                this.KillPeriodClock(false);
-            }
-        });
-
-        this.TogglePossession = ReactiveCommand.Create(() =>
-        {
-            this.HomeTeamPossession = !this.HomeTeamPossession;
-            this.Reset(false);
-        });
+        this.TogglePlayClock = ReactiveCommand.Create(() => this.settings.CurrentGame.TogglePlayClock());
+        this.TogglePeriodClock = ReactiveCommand.Create(() => this.settings.CurrentGame.TogglePeriodClock());
+        this.TogglePossession = ReactiveCommand.Create(() => this.settings.CurrentGame.TogglePossession());
 
         this.SetYardsToGo = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -99,35 +49,17 @@ public class ScoreboardViewModel : ViewModel
                 keyboardType: KeyboardType.Numeric
             );
             if (Int32.TryParse(result, out var ytg) && ytg > 0 && ytg < 100)
-                this.YardsToGo = ytg;
+                this.settings.CurrentGame.YardsToGo = ytg;
         });
 
-        this.IncrementDown = ReactiveCommand.Create(() =>
-        {
-            this.Down++;
-            if (this.Down > settings.Downs)
-            {
-                this.Down = 1;
-                this.YardsToGo = this.settings.DefaultYardsToGo;
-            }
-            this.KillPlayClock();
-        });
-
-        this.DecrementHomeTimeout = this.SetTimeouts(
-            () => this.HomeTeamTimeouts,
-            x => this.HomeTeamTimeouts = x
-        );
-
-        this.DecrementAwayTimeout = this.SetTimeouts(
-            () => this.AwayTeamTimeouts,
-            x => this.AwayTeamTimeouts = x
-        );
-
+        this.IncrementDown = ReactiveCommand.Create(() => this.settings.CurrentGame.IncrementDown());
+        this.DecrementHomeTimeout = ReactiveCommand.Create(() => this.settings.CurrentGame.UseTimeout(true));
+        this.DecrementAwayTimeout = ReactiveCommand.Create(() => this.settings.CurrentGame.UseTimeout(false));
         this.IncrementPeriod = ReactiveCommand.Create(async () =>
         {
             var result = await this.dialogs.DisplayAlertAsync("Next", "Increment Quarter?", "Yes", "No");
             if (result)
-                this.Reset(true);
+                this.settings.CurrentGame.IncrementPeriod();
         });
     }
 
@@ -169,22 +101,12 @@ public class ScoreboardViewModel : ViewModel
 
         try
         {
-            settings.CurrentGame!.HomeTeamScore = this.HomeTeamScore;
-            settings.CurrentGame!.HomeTeamTimeouts = this.HomeTeamTimeouts;
-            settings.CurrentGame!.HomeTeamPossession = this.HomeTeamPossession;
-            settings.CurrentGame!.AwayTeamScore = this.AwayTeamScore;
-            settings.CurrentGame!.AwayTeamTimeouts = this.AwayTeamTimeouts;
-            settings.CurrentGame!.PeriodClock = this.PeriodClock;
-            settings.CurrentGame!.Period = this.Period;
-            settings.CurrentGame!.Down = this.Down;
-            settings.CurrentGame!.YardsToGo = this.YardsToGo;
-
             this.display.KeepScreenOn = false;
 
             if (this.bleManager != null)
             {
                 this.bleManager.StopAdvertising();
-                this.bleManager.ClearServices();
+                this.bleManager.DetachRegisteredServices();
             }
 
         }
@@ -199,32 +121,46 @@ public class ScoreboardViewModel : ViewModel
     {
         base.OnAppearing();
 
+        this.settings
+            .CurrentGame
+            .WhenAnyProperty()
+            .SubOnMainThread(x =>
+            {
+                var game = x.Object!;
+                this.HomeTeamScore = game.HomeTeamScore;
+                this.HomeTeamTimeouts = game.HomeTeamTimeouts;
+                this.AwayTeamScore = game.AwayTeamScore;
+                this.AwayTeamTimeouts = game.AwayTeamTimeouts;
+                this.PeriodClock = game.PeriodClock;
+                this.Period = game.Period;
+                this.Down = game.Down;
+                this.YardsToGo = game.YardsToGo;
+                this.HomeTeamPossession = game.HomeTeamPossession;
+                this.PlayClock = game.PlayClock;
+            })
+            .DisposedBy(this.DeactivateWith);
+
         try
         {
             this.display.KeepScreenOn = true;
             if (this.bleManager == null)
+            {
                 await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
+            }
             else
-                await this.StartBle();
+                {
+                await this.bleManager!.AttachRegisteredServices();
+                await this.bleManager!.StartAdvertising(new AdvertisementOptions(
+                    this.settings.AdvertisingName,
+                    Constants.GameServiceUuid
+                ));
+            }
         }
         catch (Exception ex)
         {
             this.logger.LogWarning("Failed to startup", ex);
         }
     }
-
-
-    ICommand SetTimeouts(Func<int> getCurrentTo, Action<int> setter) => ReactiveCommand.Create(() =>
-    {
-        this.KillPeriodClock(false);
-        this.KillPlayClock();
-
-        var to = getCurrentTo() - 1;
-        if (to < 0)
-            to = this.settings.MaxTimeouts;
-
-        setter(to);
-    });
 
 
     ICommand SetScore(string question, Action<int> action) => ReactiveCommand.CreateFromTask(async () =>
@@ -240,166 +176,4 @@ public class ScoreboardViewModel : ViewModel
         if (Int32.TryParse(value, out var score))
             action(score);
     });
-
-
-    void Reset(bool incrementPeriod)
-    {
-        this.Down = 1;
-        this.YardsToGo = this.settings.DefaultYardsToGo;
-
-        if (this.Period == 0)
-            this.Period = 1;
-
-        if (incrementPeriod)
-        {
-            this.Period++;
-
-            // TODO: when moving past the half, timeouts should reset for both teams
-            if (this.Period > this.settings.Periods)
-                this.Period = 1; // TODO: or end of game? 
-        }
-        this.KillPeriodClock(incrementPeriod);
-        this.KillPlayClock();
-    }
-
-
-    void KillPeriodClock(bool reset)
-    {
-        if (reset)
-            this.PeriodClock = TimeSpan.FromMinutes(this.settings.PeriodDurationMins);
-
-        this.gameClockSub?.Dispose();
-        this.gameClockSub = null;
-    }
-
-
-    void KillPlayClock()
-    {
-        this.PlayClock = this.settings.PlayClock;
-        this.playClockSub?.Dispose();
-        this.playClockSub = null;
-    }
-
-
-    async Task StartBle()
-    {
-        IGattCharacteristic notifier = null!;
-        var serviceUuid = this.btConfig!.ServiceUuid;
-        var charUuid = this.btConfig!.CharacteristicUuid;
-
-        this.bleManager!.ClearServices();
-        await this.bleManager!.AddService(serviceUuid, true, sb =>
-        {
-            notifier = sb.AddCharacteristic(charUuid, cb => cb
-                .SetNotification()
-                .SetWrite(request =>
-                {
-                    try
-                    {
-                        switch (request.Data[0])
-                        {
-                            case Constants.BleIntents.Score:
-                                var score = BitConverter.ToInt16(request.Data, 2);
-                                if (request.Data[1] == Constants.BleIntents.HomeTeam)
-                                {
-                                    this.HomeTeamScore = score;
-                                }
-                                else
-                                {
-                                    this.AwayTeamScore = score;
-                                }
-                                break;
-
-                            case Constants.BleIntents.IncrementDown:
-                                this.IncrementDown.Execute(null);
-                                break;
-
-                            case Constants.BleIntents.IncrementPeriod:
-                                this.Reset(true);
-                                break;
-
-                            case Constants.BleIntents.TogglePlayClock:
-                                this.TogglePlayClock.Execute(null);
-                                break;
-
-                            case Constants.BleIntents.TogglePeriodClock:
-                                this.TogglePeriodClock.Execute(null);
-                                break;
-
-                            case Constants.BleIntents.DecrementTimeout:
-                                if (request.Data[1] == Constants.BleIntents.HomeTeam)
-                                    this.DecrementHomeTimeout.Execute(null);
-                                else
-                                    this.DecrementAwayTimeout.Execute(null);
-                                break;
-
-                            case Constants.BleIntents.TogglePossession:
-                                this.TogglePossession.Execute(null);
-                                break;
-
-                            case Constants.BleIntents.Ytg:
-                                this.YardsToGo = BitConverter.ToInt16(request.Data, 1);
-                                break;
-                        }
-                        return GattState.Success;
-                    }
-                    catch (Exception ex)
-                    {
-                        this.logger.LogError("Bad write data", ex);
-                        return GattState.Failure;
-                    }
-                }));
-        });
-
-        await this.bleManager!.StartAdvertising(new AdvertisementOptions
-        {
-            LocalName = this.settings.AdvertisingName,
-            ServiceUuids =
-            {
-                this.btConfig.ServiceUuid
-            }
-        });
-
-        // TODO: send back commands when playclock starts/resets & period clock starts/stops (/w values) - app can run own timers
-        // TODO: otherwise, send all updates back for game info
-        this.WhenAnyProperty()
-            .Where(x =>
-                x.PropertyName != nameof(this.PlayClock) &&
-                x.PropertyName != nameof(this.PeriodClock)
-            )
-            .Throttle(TimeSpan.FromMilliseconds(500))
-            .Subscribe(x =>
-            {
-
-            });
-
-        Observable
-            .Interval(TimeSpan.FromSeconds(3))
-            .Where(x => notifier.SubscribedCentrals.Count > 0)
-            .SubscribeAsync(async _ =>
-            {
-                try
-                {
-                    var info = new GameInfo(
-                        this.HomeTeamScore,
-                        this.HomeTeamTimeouts,
-                        this.AwayTeamScore,
-                        this.AwayTeamTimeouts,
-                        this.HomeTeamPossession,
-                        this.Period,
-                        this.Down,
-                        this.YardsToGo,
-                        this.PlayClock,
-                        Convert.ToInt32(Math.Floor(this.PeriodClock.TotalSeconds))
-                    );
-                    var bytes = info.ToBytes();
-                    await notifier.Notify(bytes);
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogWarning("Failed to notify updates", ex);
-                }
-            })
-            .DisposedBy(this.DeactivateWith);
-    }
 }

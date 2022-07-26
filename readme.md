@@ -45,6 +45,7 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 
 ## TODO
 
+* Scoreboard & Referee could share the same "notification" object
 * Play clock start/resets send command /w settings value to ref - ref runs own timer
 * Period clock start/stop command /w current value to ref - ref runs own timer
 * Move possession indicator to be a mini football beside team name or score
@@ -56,7 +57,6 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 * Phone Size Scoreboard (with no bluetooth)
 * Scan List to determine what "scoreboard" to have the "referee" connect to
 * Setting to auto remember "scoreboard"?
-* Background BLE GATT server
 
 ## FUTURE?
 

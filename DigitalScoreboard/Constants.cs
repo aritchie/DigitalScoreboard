@@ -3,6 +3,9 @@
 
 public static class Constants
 {
+    public const string GameServiceUuid = "144340bf-3566-425e-98ff-e57aab8c6360";
+    public const string GameCharacteristicUuid = "144340bf-3566-425e-98ff-e57aab8c6361";
+
     public static class BleIntents
     {
         public const byte HomeTeam = 0x01;

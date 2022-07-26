@@ -39,10 +39,6 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-
-        builder.Configuration.AddJsonPlatformBundle(optional: false);
-        builder.Services.AddSingleton(builder.Configuration.GetSection("Bluetooth").Get<BluetoothConfig>());
-
         builder.Services.AddSingleton<ScreenOrientation>();
         builder.Services.AddSingleton(DeviceDisplay.Current);
         builder.Services.AddShinyService<AppSettings>();
@@ -59,7 +55,7 @@ public static class MauiProgram
         });
 
         builder.Services.AddBluetoothLE();
-		builder.Services.AddBluetoothLeHosting();
+        builder.Services.AddBleHostedCharacteristic<GameBleGattCharacteristic>();
 
 		return builder.Build();
 	}

@@ -1,5 +1,6 @@
 ﻿namespace DigitalScoreboard.Infrastructure;
 
+
 public class AppSettings : RuleSet
 {
     public Game? CurrentGame { get; private set; }
@@ -7,16 +8,9 @@ public class AppSettings : RuleSet
 
     public void NewGame()
     {
-        this.CurrentGame = new Game(this.HomeTeam, this.AwayTeam)
-        {
-            Period = 1,
-            Down = 1,
-            PeriodClock = TimeSpan.FromMinutes(this.PeriodDurationMins),
-            YardsToGo = this.DefaultYardsToGo,
-            AwayTeamTimeouts = this.MaxTimeouts,
-            HomeTeamTimeouts = this.MaxTimeouts,
-            HomeTeamPossession = true
-        };
+        var game = new Game(this.HomeTeam, this.AwayTeam);
+        game.NewGame(this);
+        this.CurrentGame = game;
     }
 
 
@@ -49,45 +43,10 @@ public class AppSettings : RuleSet
     //[Reactive] public string DeviceConnectionName
     public Dictionary<string, RuleSet> SavedRules { get; set; } = new();
 
-    [Reactive] public string AdvertisingName { get; set; } = "1234"; // TODO: should randomize... validate at 4 characters
+
+    // TODO: should randomize... validate at 4 characters
+    // TODO: this should refresh advertising
+    [Reactive] public string AdvertisingName { get; set; } = "1234";
     [Reactive] public string HomeTeam { get; set; } = "Home";
     [Reactive] public string AwayTeam { get; set; } = "Away";
-}
-
-
-public class RuleSet : ReactiveObject
-{
-    [Reactive] public int DefaultYardsToGo { get; set; } = 10;
-    [Reactive] public int PeriodDurationMins { get; set; } = 15;
-    [Reactive] public int BreakTimeMins { get; set; } = 10;
-    [Reactive] public int MaxTimeouts { get; set; } = 3;
-
-    [Reactive] public int PlayClock { get; set; } = 40;
-    [Reactive] public int Downs { get; set; } = 4;
-    [Reactive] public int Periods { get; set; } = 4;
-}
-
-
-public class Game
-{
-    public Game(string homeTeam, string awayTeam)
-    {
-        this.HomeTeamName = homeTeam;
-        this.AwayTeamName = awayTeam;
-    }
-
-
-    public int Period { get; set; } = 1;
-    public TimeSpan PeriodClock { get; set; }
-    public int Down { get; set; }
-    public int YardsToGo { get; set; }
-
-    public string HomeTeamName { get; }
-    public int HomeTeamScore { get; set; }
-    public bool HomeTeamPossession { get; set; }
-    public int HomeTeamTimeouts { get; set; }
-
-    public string AwayTeamName { get; }
-    public int AwayTeamScore { get; set; }
-    public int AwayTeamTimeouts { get; set; }
 }
