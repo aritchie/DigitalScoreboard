@@ -1,46 +1,44 @@
 ﻿using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Hosting;
 using Shiny.BluetoothLE.Managed;
-
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 
 namespace DigitalScoreboard.Infrastructure;
 
 
-public record ScannedGame(
-    string Name,
-    int Signal
-);
+public class ScannedGame
+{
+    public ScannedGame(string name) => this.Name = name;
+
+    public string Name { get; }
+    [Reactive] public int SignalStrength { get; set; }
+}
+
+
+public class ConnectedGame
+{
+    public string HostName { get; }
+    public bool IsConnected { get; }
+    public Game Game { get; }
+}
 
 public interface IConnectionManager
 {
-    //IObservable<bool> WhenConnected();
-    //IObservable<ScanResultx> Scan();
-    //void SetScore(bool homeTeam, int score);
-    //void ToggleGameClock();
-    //void TogglePlayClock();
-    //void IncrementPeriod();
-    //void IncrementDown();
-    //void SetYardsToGo(int value);
-    //void DecrementTimeout(bool homeTeam);
-    //void SwitchPosession();
-    //IObservable<GameInfo> WhenUpdate();
-
-    IObservable<ObservableCollection<ScannedGame>> ScanForHostedGames(IScheduler scheduler);
-
-    Task<Game> StartHostedGame();
+    Game? CurrentHostedGame { get; }
+    Task StartHostedGame();
     Task StopHostedGame();
 
-    //Task SendUpdate(GameInfo game);
+    IObservable<ObservableCollection<ScannedGame>> ScanForHostedGames(IScheduler scheduler);
     IObservable<Game> ConnectToGame(string advertiserName);
 }
 
 
+// TODO: updates need to be blocked temporarily to prevent looping
 public class ConnectionManager : IConnectionManager
 {
+    IDisposable? gameSub;
     readonly ILogger logger;
     readonly AppSettings appSettings;
     readonly IBleManager bleManager;
@@ -58,6 +56,48 @@ public class ConnectionManager : IConnectionManager
         this.appSettings = appSettings;
         this.bleManager = bleManager;
         this.bleHostingManager = bleHostingManager;
+    }
+
+
+    public Game? CurrentHostedGame { get; private set; }
+
+
+    // TODO: StartHostedGame and create a Game property?  Would need StopHostedGame as well - stop bg support
+    public async Task StartHostedGame()
+    {
+        this.CurrentHostedGame = new(this.appSettings)
+        {
+            HomeTeamName = this.appSettings.HomeTeam,
+            AwayTeamName = this.appSettings.AwayTeam
+        };
+
+        this.gameSub = this.CurrentHostedGame!
+            .WhenAnyProperty()
+            .Synchronize(this.CurrentHostedGame)
+            .Subscribe(x =>
+            {
+                // synchronize to result in sequential write
+                // prevent other updates
+            });
+
+        // TODO: hook into managed characteristic
+        // TODO: game object is stored to session and used by scoreboard
+        await this.bleHostingManager.AttachRegisteredServices();
+        await bleHostingManager.StartAdvertising(new AdvertisementOptions(
+            this.appSettings.AdvertisingName,
+            Constants.GameServiceUuid
+        ));
+    }
+
+
+    public Task StopHostedGame()
+    {
+        // TODO: when should this happen? add button to main page?
+        this.CurrentHostedGame = null;
+        this.gameSub?.Dispose();
+        bleHostingManager.DetachRegisteredServices();
+        bleHostingManager.StopAdvertising();
+        return Task.CompletedTask;
     }
 
 
@@ -82,19 +122,27 @@ public class ConnectionManager : IConnectionManager
             //.ObserveOn(scheduler)
             .Subscribe(scan =>
             {
+                var sr = scan.ScanResult!;
+
                 switch (scan.Action)
                 {
                     case ManagedScanListAction.Add:
-                        list.Add(new ScannedGame(
-                            scan.ScanResult!.LocalName!,
-                            scan.ScanResult!.Rssi
-                        ));
+                        list.Add(new ScannedGame(sr.LocalName!)
+                        {
+                            SignalStrength = scan.ScanResult!.Rssi
+                        });
                         break;
 
                     case ManagedScanListAction.Update:
+                        var item = list.FirstOrDefault(x => x.Name.Equals(sr.LocalName));
+                        if (item != null)
+                            item.SignalStrength = sr.Rssi;
                         break;
 
                     case ManagedScanListAction.Remove:
+                        var remove = list.FirstOrDefault(x => x.Name.Equals(sr.LocalName));
+                        if (remove != null)
+                            list.Remove(remove);
                         break;
                 }
             })
@@ -104,30 +152,25 @@ public class ConnectionManager : IConnectionManager
     });
 
 
-    // TODO: StartHostedGame and create a Game property?  Would need StopHostedGame as well - stop bg support
-    public async Task<Game> StartHostedGame()
-    {
-        // TODO: start managed characteristic (attach/detach) here
-            // TODO: game object is stored to session and used by scoreboard
-        // TODO: stop server needed to nullify current game session, stop advertising, and stop server (when should this happen? add button to main page)?
-        return null;
-    }
-
-
-    public async Task StopHostedGame()
-    {
-    }
-
-
     // TODO: need a "connecting" phase - perhaps info on top of the game object
-        // TODO: game object is passed to referee (along with who we are connected to and a way to monitor connection state)
-        // TODO: writes to game object should be throttled
-        // TODO: writes to game object are triggered back to scoreboard host
-    public IObservable<Game> ConnectToGame(string advertiserName) => Observable.Create<Game>(ob =>
+    // TODO: game object is passed to referee (along with who we are connected to and a way to monitor connection state)
+    // TODO: writes to game object should be throttled
+    // TODO: writes to game object are triggered back to scoreboard host
+    public IObservable<ConnectedGame> ConnectToGame(string advertiserName) => Observable.Create<ConnectedGame>(ob =>
     {
         // TODO: start game object and monitor it for send backs - how do I do this without grabbing rules from scoreboard?  do I need initial read from scoreboard first?
         // TODO: I'd have to watch for individual changes to send back to the scoreboard
+        Game? game = null;
         var disposer = new CompositeDisposable();
+        var syncLock = new object();
+
+        //game
+        //    .WhenAnyProperty()
+        //    .Synchronize(syncLock)
+        //    .Subscribe(x =>
+        //    {
+        //        // get notify characteristic and ship update
+        //    });
 
         this.bleManager
             .Scan(new ScanConfig(ServiceUuids: Constants.GameServiceUuid))
@@ -141,33 +184,18 @@ public class ConnectionManager : IConnectionManager
                     Constants.GameCharacteristicUuid
                 )
                 .Select(data => data.ToGameInfo())
+                .Synchronize(syncLock)
                 .Subscribe(
-                     game => { },
+                     game =>
+                     {
+                         // unhook from updates for a moment (or pause)
+                     },
                      ex => { }
                 )
                 .DisposedBy(disposer)
             )
             .DisposedBy(disposer);
 
-
         return disposer;
     });
-
-
-    async Task SetBluetooth(bool start)
-    {
-        if (start)
-        {
-            await this.bleHostingManager.AttachRegisteredServices();
-            await bleHostingManager.StartAdvertising(new AdvertisementOptions(
-                this.appSettings.AdvertisingName,
-                Constants.GameServiceUuid
-            ));
-        }
-        else
-        {
-            bleHostingManager.DetachRegisteredServices();
-            bleHostingManager.StopAdvertising();
-        }
-    }
 }
