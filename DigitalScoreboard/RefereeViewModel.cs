@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DigitalScoreboard.Infrastructure;
+﻿using DigitalScoreboard.Infrastructure;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Managed;
 
@@ -9,7 +8,6 @@ namespace DigitalScoreboard;
 public class RefereeViewModel : ViewModel
 {
     readonly ILogger logger;
-    readonly IBleManager bleManager;
 	readonly IDeviceDisplay display;
     readonly IPageDialogService dialogs;
     IManagedPeripheral? peripheral;
@@ -18,14 +16,12 @@ public class RefereeViewModel : ViewModel
 	public RefereeViewModel(
         BaseServices services,
         ILogger<RefereeViewModel> logger,
-		IBleManager bleManager,
 		IDeviceDisplay display,
         IPageDialogService dialogs
 	)
     : base(services)
 	{
         this.logger = logger;
-        this.bleManager = bleManager;
 		this.display = display;
         this.dialogs = dialogs;
 
@@ -87,6 +83,13 @@ public class RefereeViewModel : ViewModel
     [Reactive] public int PlayClock { get; private set; }
     [Reactive] public int YardsToGo { get; private set; }
     [Reactive] public TimeSpan PeriodClock { get; private set; }
+    public IScoreboard Scoreboard { get; private set; }
+
+    public override void OnNavigatedTo(INavigationParameters parameters)
+    {
+        base.OnNavigatedTo(parameters);
+        this.Scoreboard = parameters.GetValue<IScoreboard>(nameof(this.Scoreboard));
+    }
 
 
     public override async void OnAppearing()
@@ -187,59 +190,59 @@ public class RefereeViewModel : ViewModel
 
     async Task Connect()
     {
-        if (this.peripheral == null)
-        {
-            this.peripheral = await this.bleManager
-                .Scan(new ScanConfig(
-                    BleScanType.Balanced,
-                    false,
-                    Constants.GameServiceUuid
-                ))
-                .Select(x => x.Peripheral.CreateManaged(RxApp.MainThreadScheduler))
-                .FirstAsync();
+        //if (this.peripheral == null)
+        //{
+        //    //this.peripheral = await this.bleManager
+        //    //    .Scan(new ScanConfig(
+        //    //        BleScanType.Balanced,
+        //    //        false,
+        //    //        Constants.GameServiceUuid
+        //    //    ))
+        //    //    .Select(x => x.Peripheral.CreateManaged(RxApp.MainThreadScheduler))
+        //    //    .FirstAsync();
 
-            this.peripheral
-                .WhenNotificationReceived(
-                    Constants.GameServiceUuid,
-                    Constants.GameCharacteristicUuid
-                )
-                .SubOnMainThread(
-                    data =>
-                    {
-                        try
-                        {
-                            var x = data!.ToGameInfo();
-                            this.HomeScore = x.HomeScore;
-                            this.HomeTimeouts = x.HomeTimeouts;
-                            this.HomePossession = x.HomePossession;
-                            this.AwayScore = x.AwayScore;
-                            this.AwayTimeouts = x.AwayTimeouts;
+        //    this.peripheral
+        //        .WhenNotificationReceived(
+        //            Constants.GameServiceUuid,
+        //            Constants.GameCharacteristicUuid
+        //        )
+        //        .SubOnMainThread(
+        //            data =>
+        //            {
+        //                try
+        //                {
+        //                    var x = data!.ToGameInfo();
+        //                    this.HomeScore = x.HomeScore;
+        //                    this.HomeTimeouts = x.HomeTimeouts;
+        //                    this.HomePossession = x.HomePossession;
+        //                    this.AwayScore = x.AwayScore;
+        //                    this.AwayTimeouts = x.AwayTimeouts;
 
-                            this.Down = x.Down;
-                            this.Period = x.Period;
-                            this.PeriodClock = TimeSpan.FromSeconds(x.PeriodClockSeconds);
-                            this.PlayClock = x.PlayClockSeconds;
-                            this.YardsToGo = x.YardsToGo;
-                        }
-                        catch (Exception ex)
-                        {
-                            this.logger.LogWarning("Error in notification data", ex);
-                        }
-                    },
-                    ex => this.logger.LogError("Notification Error", ex)
-                )
-                .DisposedBy(this.DestroyWith);
-        }
-        this.peripheral
-            .Peripheral
-            .WhenStatusChanged()
-            .Select(x => x == ConnectionState.Connected)
-            .ToPropertyEx(this, x => x.IsConnected);
+        //                    this.Down = x.Down;
+        //                    this.Period = x.Period;
+        //                    this.PeriodClock = TimeSpan.FromSeconds(x.PeriodClockSeconds);
+        //                    this.PlayClock = x.PlayClockSeconds;
+        //                    this.YardsToGo = x.YardsToGo;
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    this.logger.LogWarning("Error in notification data", ex);
+        //                }
+        //            },
+        //            ex => this.logger.LogError("Notification Error", ex)
+        //        )
+        //        .DisposedBy(this.DestroyWith);
+        //}
+        //this.peripheral
+        //    .Peripheral
+        //    .WhenStatusChanged()
+        //    .Select(x => x == ConnectionState.Connected)
+        //    .ToPropertyEx(this, x => x.IsConnected);
 
-        await this.peripheral
-            .Peripheral
-            .WithConnectIf()
-            .Timeout(TimeSpan.FromSeconds(20))
-            .ToTask();
+        //await this.peripheral
+        //    .Peripheral
+        //    .WithConnectIf()
+        //    .Timeout(TimeSpan.FromSeconds(20))
+        //    .ToTask();
     }
 }

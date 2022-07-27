@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:DigitalScoreboard"
+             xmlns:infra="clr-namespace:DigitalScoreboard.Infrastructure"
              x:DataType="local:ScanViewModel"
              x:Class="DigitalScoreboard.ScanPage"
              Title="Scanning for Scoreboards">
@@ -14,9 +15,10 @@
 
         <CollectionView ItemsSource="{Binding Scoreboards}">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="local:Scoreboard">
+                <DataTemplate x:DataType="infra:IScoreboard">
                     <VerticalStackLayout>
-                        <Label Text="{Binding DiscoveryName}" />
+                        <Label Text="{Binding Name}" />
+                        <Label Text="{Binding SignalStrength, StringFormat='Signal: {0}'}" />
                         <BoxView HorizontalOptions="FillAndExpand"
                                  HeightRequest="1"
                                  BackgroundColor="Black" />
