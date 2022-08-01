@@ -12,36 +12,36 @@ public class MainViewModel : ViewModel
 		BaseServices services,
 		INavigationService navigator,
 		IDialogs dialogs,
-		AppSettings appSettings
+		IScoreboardManager scoreboardManager
 	)
 	: base(services)
 	{
-		this.appSettings = appSettings;
 
 		this.ContinueGame = navigator.NavigateCommand(nameof(ScoreboardPage));
 
 		this.NewGame = ReactiveCommand.CreateFromTask(async () =>
 		{
-			if (appSettings.CurrentGame == null)
+			if (scoreboardManager.CurrentHostedGame == null)
             {
-				appSettings.CurrentGame = new Game(appSettings)
-				{
-					HomeTeamName = appSettings.HomeTeam,
-					AwayTeamName = appSettings.AwayTeam
-				};
+				await scoreboardManager.StartHosting();
+				//appSettings.CurrentGame = new Game(appSettings)
+				//{
+				//	HomeTeamName = appSettings.HomeTeam,
+				//	AwayTeamName = appSettings.AwayTeam
+				//};
             }
 			else
             {
-				var g = appSettings.CurrentGame;
+				var g = scoreboardManager.CurrentHostedGame!;
 				var details = $"QTR: {g.Period} ({g.Period:c}) - {g.HomeTeamName}: {g.HomeTeamScore} / {g.AwayTeamName}: {g.AwayTeamScore}";
 				var result = await dialogs.Confirm("Do you wish to resume your current game? " + details, "Resume Game?", "Yes", "No");
 				if (!result)
 				{
-                    appSettings.CurrentGame = new Game(appSettings)
-                    {
-                        HomeTeamName = appSettings.HomeTeam,
-                        AwayTeamName = appSettings.AwayTeam
-                    };
+                    //appSettings.CurrentGame = new Game(appSettings)
+                    //{
+                    //    HomeTeamName = appSettings.HomeTeam,
+                    //    AwayTeamName = appSettings.AwayTeam
+                    //};
                 }
             }
 			await navigator.Navigate(nameof(ScoreboardPage));
@@ -49,14 +49,14 @@ public class MainViewModel : ViewModel
         this.Referee = navigator.NavigateCommand(nameof(RefereePage));
 		this.Settings = navigator.NavigateCommand(nameof(SettingsPage));
 
-		this.HalfTime = navigator.NavigateCommand(nameof(FullTimerPage), p => p.AddRange(
-			("Type", TimerType.Clock),
-			("Time", appSettings.BreakTimeMins)
-		));
-		this.PlayClock = navigator.NavigateCommand(nameof(FullTimerPage), p => p.AddRange(
-            ("Type", TimerType.Countdown),
-            ("Time", appSettings.PlayClock)
-        ));
+		//this.HalfTime = navigator.NavigateCommand(nameof(FullTimerPage), p => p.AddRange(
+		//	("Type", TimerType.Clock),
+		//	("Time", appSettings.BreakTimeMins)
+		//));
+		//this.PlayClock = navigator.NavigateCommand(nameof(FullTimerPage), p => p.AddRange(
+  //          ("Type", TimerType.Countdown),
+  //          ("Time", appSettings.PlayClock)
+  //      ));
     }
 
 
@@ -67,13 +67,13 @@ public class MainViewModel : ViewModel
 	public ICommand HalfTime { get; }
 	public ICommand PlayClock { get; }
 
-    [Reactive] public bool IsGameInProgress { get; private set; }
+  //  [Reactive] public bool IsGameInProgress { get; private set; }
 
 
-    public override void OnAppearing()
-    {
-        base.OnAppearing();
-		this.IsGameInProgress = this.appSettings.CurrentGame != null;
-    }
+  //  public override void OnAppearing()
+  //  {
+  //      base.OnAppearing();
+		//this.IsGameInProgress = this.appSettings.CurrentGame != null;
+  //  }
 }
 

@@ -3,9 +3,6 @@
 
 public class AppSettings : RuleSet
 {
-    public Game? CurrentGame { get; set; }
-
-
     public void SetRuleSet(string name)
     {
         if (!this.SavedRules.ContainsKey(name))

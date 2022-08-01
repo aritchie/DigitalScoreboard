@@ -1,6 +1,4 @@
 ﻿using DigitalScoreboard.Infrastructure;
-using Shiny.BluetoothLE;
-using Shiny.BluetoothLE.Managed;
 
 namespace DigitalScoreboard;
 
@@ -10,12 +8,12 @@ public class RefereeViewModel : ViewModel
     readonly ILogger logger;
 	readonly IDeviceDisplay display;
     readonly IPageDialogService dialogs;
-    IManagedPeripheral? peripheral;
 
 
 	public RefereeViewModel(
         BaseServices services,
         ILogger<RefereeViewModel> logger,
+        IScoreboardManager scoreboardManager,
 		IDeviceDisplay display,
         IPageDialogService dialogs
 	)
@@ -25,18 +23,18 @@ public class RefereeViewModel : ViewModel
 		this.display = display;
         this.dialogs = dialogs;
 
-        this.IncrementDown = this.SendCommand(Constants.BleIntents.IncrementDown);
-        this.IncrementPeriod = this.SendCommand(Constants.BleIntents.IncrementPeriod, "Move to next QTR/Period?");
-        this.TogglePlayClock = this.SendCommand(Constants.BleIntents.TogglePlayClock);
-        this.TogglePeriodClock = this.SendCommand(Constants.BleIntents.TogglePeriodClock);
-        this.TogglePossession = this.SendCommand(Constants.BleIntents.TogglePossession);
+        //this.IncrementDown = this.SendCommand(Constants.BleIntents.IncrementDown);
+        //this.IncrementPeriod = this.SendCommand(Constants.BleIntents.IncrementPeriod, "Move to next QTR/Period?");
+        //this.TogglePlayClock = this.SendCommand(Constants.BleIntents.TogglePlayClock);
+        //this.TogglePeriodClock = this.SendCommand(Constants.BleIntents.TogglePeriodClock);
+        //this.TogglePossession = this.SendCommand(Constants.BleIntents.TogglePossession);
 
-        // TODO: command parameters seem to be having issues on reactiveui, hence the split commands
-        this.SetHomeScore = this.CreateTeamCommand(true, "score", Constants.BleIntents.Score);
-        this.SetAwayScore = this.CreateTeamCommand(false, "score", Constants.BleIntents.Score);
+        //// TODO: command parameters seem to be having issues on reactiveui, hence the split commands
+        //this.SetHomeScore = this.CreateTeamCommand(true, "score", Constants.BleIntents.Score);
+        //this.SetAwayScore = this.CreateTeamCommand(false, "score", Constants.BleIntents.Score);
 
-        this.DecrementHomeTimeouts = this.CreateTimeoutCommand(true);
-        this.DecrementAwayTimeouts = this.CreateTimeoutCommand(false);
+        //this.DecrementHomeTimeouts = this.CreateTimeoutCommand(true);
+        //this.DecrementAwayTimeouts = this.CreateTimeoutCommand(false);
 
         this.SetYtg = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -50,17 +48,18 @@ public class RefereeViewModel : ViewModel
             );
             if (value != null)
             {
-                var data = new List<byte>();
-                data.Add(Constants.BleIntents.Ytg);
-                data.AddRange(BitConverter.GetBytes(Int16.Parse(value)));
-                await this.SendWrite(data.ToArray());
+                //var data = new List<byte>();
+                //data.Add(Constants.BleIntents.Ytg);
+                //data.AddRange(BitConverter.GetBytes(Int16.Parse(value)));
+                //await this.SendWrite(data.ToArray());
             }
         });
     }
 
 
     [ObservableAsProperty] public bool IsConnected { get; }
-    public string ConnectedToName => this.peripheral?.Name ?? String.Empty;
+    // TODO
+    //public string ConnectedToName => this.peripheral?.Name ?? String.Empty;
 
     public ICommand SetHomeScore { get; }
     public ICommand SetAwayScore { get; }
@@ -89,160 +88,150 @@ public class RefereeViewModel : ViewModel
     {
         base.OnNavigatedTo(parameters);
         this.Scoreboard = parameters.GetValue<IScoreboard>(nameof(this.Scoreboard));
+
+        this.Scoreboard
+            .WhenAnyValue(x => x.IsConnected)
+            .ToPropertyEx(this, x => x.IsConnected)
+            .DisposedBy(this.DestroyWith);
+
     }
 
 
-    public override async void OnAppearing()
+    public override void OnAppearing()
     {
         base.OnAppearing();
-        try
-        {
-            this.display.KeepScreenOn = true;
-            await this.Connect();
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogWarning("Failed initial connection", ex);
-        }
+        this.display.KeepScreenOn = true;
     }
 
 
     public override void OnDisappearing()
     {
         base.OnDisappearing();
-        try
-        {
-            this.display.KeepScreenOn = false;
-            this.peripheral?.CancelConnection();
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogWarning("Error cleaning up", ex);
-        }
+        this.display.KeepScreenOn = false;
     }
 
 
-    ICommand SendCommand(byte command, string? confirmMsg = null) => ReactiveCommand.CreateFromTask(async () =>
-    {
-        if (confirmMsg != null)
-        {
-            var result = await this.dialogs.DisplayAlertAsync("Confirm", confirmMsg, "Yes", "No");
-            if (!result)
-                return;
-        }
-        await this.SendWrite(new byte[] { command });
-    });
+    //ICommand SendCommand(byte command, string? confirmMsg = null) => ReactiveCommand.CreateFromTask(async () =>
+    //{
+    //    if (confirmMsg != null)
+    //    {
+    //        var result = await this.dialogs.DisplayAlertAsync("Confirm", confirmMsg, "Yes", "No");
+    //        if (!result)
+    //            return;
+    //    }
+    //    await this.SendWrite(new byte[] { command });
+    //});
 
 
-    ICommand CreateTimeoutCommand(bool homeTeam) => ReactiveCommand.CreateFromTask(async () =>
-    {
-        await this.Connect();
-        var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
-        var list = new List<byte>();
-        list.Add(Constants.BleIntents.DecrementTimeout); // command
-        list.Add(teamByte); // team
+    //ICommand CreateTimeoutCommand(bool homeTeam) => ReactiveCommand.CreateFromTask(async () =>
+    //{
+    //    await this.Connect();
+    //    var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
+    //    var list = new List<byte>();
+    //    list.Add(Constants.BleIntents.DecrementTimeout); // command
+    //    list.Add(teamByte); // team
 
-        await this.SendWrite(list.ToArray());
-    });
-
-
-    ICommand CreateTeamCommand(bool homeTeam, string setting, byte command) => ReactiveCommand.CreateFromTask(async () =>
-    {
-        var team = homeTeam ? "Home" : "Away";
-        var value = await this.dialogs.DisplayPromptAsync(
-            "Update",
-            $"Set {team} {setting}",
-            "Set",
-            "Cancel",
-            maxLength: 2,
-            keyboardType: KeyboardType.Numeric
-        );
-        if (Int32.TryParse(value, out var result))
-        {
-            await this.Connect();
-
-            var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
-            var valueBytes = BitConverter.GetBytes(result);
-            var list = new List<byte>();
-            list.Add(command); // command
-            list.Add(teamByte); // team
-            list.AddRange(valueBytes);
-
-            await this.SendWrite(list.ToArray());
-        }
-    });
+    //    await this.SendWrite(list.ToArray());
+    //});
 
 
-    async Task SendWrite(byte[] data)
-    {
-        await this.Connect().ConfigureAwait(false);
-        await this.peripheral!
-            .Write(
-                Constants.GameServiceUuid,
-                Constants.GameCharacteristicUuid,
-                data,
-                true
-            )
-            .Timeout(TimeSpan.FromSeconds(20))
-            .ToTask();
-    }
+    //ICommand CreateTeamCommand(bool homeTeam, string setting, byte command) => ReactiveCommand.CreateFromTask(async () =>
+    //{
+    //    var team = homeTeam ? "Home" : "Away";
+    //    var value = await this.dialogs.DisplayPromptAsync(
+    //        "Update",
+    //        $"Set {team} {setting}",
+    //        "Set",
+    //        "Cancel",
+    //        maxLength: 2,
+    //        keyboardType: KeyboardType.Numeric
+    //    );
+    //    if (Int32.TryParse(value, out var result))
+    //    {
+    //        await this.Connect();
+
+    //        var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
+    //        var valueBytes = BitConverter.GetBytes(result);
+    //        var list = new List<byte>();
+    //        list.Add(command); // command
+    //        list.Add(teamByte); // team
+    //        list.AddRange(valueBytes);
+
+    //        await this.SendWrite(list.ToArray());
+    //    }
+    //});
 
 
-    async Task Connect()
-    {
-        //if (this.peripheral == null)
-        //{
-        //    //this.peripheral = await this.bleManager
-        //    //    .Scan(new ScanConfig(
-        //    //        BleScanType.Balanced,
-        //    //        false,
-        //    //        Constants.GameServiceUuid
-        //    //    ))
-        //    //    .Select(x => x.Peripheral.CreateManaged(RxApp.MainThreadScheduler))
-        //    //    .FirstAsync();
+    //async Task SendWrite(byte[] data)
+    //{
+    //    await this.Connect().ConfigureAwait(false);
+    //    await this.peripheral!
+    //        .Write(
+    //            Constants.GameServiceUuid,
+    //            Constants.GameCharacteristicUuid,
+    //            data,
+    //            true
+    //        )
+    //        .Timeout(TimeSpan.FromSeconds(20))
+    //        .ToTask();
+    //}
 
-        //    this.peripheral
-        //        .WhenNotificationReceived(
-        //            Constants.GameServiceUuid,
-        //            Constants.GameCharacteristicUuid
-        //        )
-        //        .SubOnMainThread(
-        //            data =>
-        //            {
-        //                try
-        //                {
-        //                    var x = data!.ToGameInfo();
-        //                    this.HomeScore = x.HomeScore;
-        //                    this.HomeTimeouts = x.HomeTimeouts;
-        //                    this.HomePossession = x.HomePossession;
-        //                    this.AwayScore = x.AwayScore;
-        //                    this.AwayTimeouts = x.AwayTimeouts;
 
-        //                    this.Down = x.Down;
-        //                    this.Period = x.Period;
-        //                    this.PeriodClock = TimeSpan.FromSeconds(x.PeriodClockSeconds);
-        //                    this.PlayClock = x.PlayClockSeconds;
-        //                    this.YardsToGo = x.YardsToGo;
-        //                }
-        //                catch (Exception ex)
-        //                {
-        //                    this.logger.LogWarning("Error in notification data", ex);
-        //                }
-        //            },
-        //            ex => this.logger.LogError("Notification Error", ex)
-        //        )
-        //        .DisposedBy(this.DestroyWith);
-        //}
-        //this.peripheral
-        //    .Peripheral
-        //    .WhenStatusChanged()
-        //    .Select(x => x == ConnectionState.Connected)
-        //    .ToPropertyEx(this, x => x.IsConnected);
+    //async Task Connect()
+    //{
+    //    //if (this.peripheral == null)
+    //    //{
+    //    //    //this.peripheral = await this.bleManager
+    //    //    //    .Scan(new ScanConfig(
+    //    //    //        BleScanType.Balanced,
+    //    //    //        false,
+    //    //    //        Constants.GameServiceUuid
+    //    //    //    ))
+    //    //    //    .Select(x => x.Peripheral.CreateManaged(RxApp.MainThreadScheduler))
+    //    //    //    .FirstAsync();
 
-        //await this.peripheral
-        //    .Peripheral
-        //    .WithConnectIf()
-        //    .Timeout(TimeSpan.FromSeconds(20))
-        //    .ToTask();
-    }
+    //    //    this.peripheral
+    //    //        .WhenNotificationReceived(
+    //    //            Constants.GameServiceUuid,
+    //    //            Constants.GameCharacteristicUuid
+    //    //        )
+    //    //        .SubOnMainThread(
+    //    //            data =>
+    //    //            {
+    //    //                try
+    //    //                {
+    //    //                    var x = data!.ToGameInfo();
+    //    //                    this.HomeScore = x.HomeScore;
+    //    //                    this.HomeTimeouts = x.HomeTimeouts;
+    //    //                    this.HomePossession = x.HomePossession;
+    //    //                    this.AwayScore = x.AwayScore;
+    //    //                    this.AwayTimeouts = x.AwayTimeouts;
+
+    //    //                    this.Down = x.Down;
+    //    //                    this.Period = x.Period;
+    //    //                    this.PeriodClock = TimeSpan.FromSeconds(x.PeriodClockSeconds);
+    //    //                    this.PlayClock = x.PlayClockSeconds;
+    //    //                    this.YardsToGo = x.YardsToGo;
+    //    //                }
+    //    //                catch (Exception ex)
+    //    //                {
+    //    //                    this.logger.LogWarning("Error in notification data", ex);
+    //    //                }
+    //    //            },
+    //    //            ex => this.logger.LogError("Notification Error", ex)
+    //    //        )
+    //    //        .DisposedBy(this.DestroyWith);
+    //    //}
+    //    //this.peripheral
+    //    //    .Peripheral
+    //    //    .WhenStatusChanged()
+    //    //    .Select(x => x == ConnectionState.Connected)
+    //    //    .ToPropertyEx(this, x => x.IsConnected);
+
+    //    //await this.peripheral
+    //    //    .Peripheral
+    //    //    .WithConnectIf()
+    //    //    .Timeout(TimeSpan.FromSeconds(20))
+    //    //    .ToTask();
+    //}
 }

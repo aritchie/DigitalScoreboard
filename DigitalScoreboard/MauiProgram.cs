@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using DigitalScoreboard.Infrastructure;
+using DigitalScoreboard.Infrastructure.Impl;
 using Microsoft.Extensions.Configuration;
-
 using Prism.Controls;
 using Prism.DryIoc;
 
@@ -42,6 +42,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ScreenOrientation>();
         builder.Services.AddSingleton(DeviceDisplay.Current);
         builder.Services.AddShinyService<AppSettings>();
+        builder.Services.AddBluetoothScoreboardServices();
 
         builder.Services.AddGlobalCommandExceptionHandler(options =>
         {
@@ -54,8 +55,6 @@ public static class MauiProgram
 #endif
         });
 
-        builder.Services.AddBluetoothLE();
-        builder.Services.AddBleHostedCharacteristic<GameBleGattCharacteristic>();
 
 		return builder.Build();
 	}

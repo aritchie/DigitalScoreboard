@@ -49,6 +49,7 @@ public class ScoreboardManager : IScoreboardManager
 
         this.gameSub = this.CurrentHostedGame!
             .WhenAnyProperty()
+            .Buffer(TimeSpan.FromMilliseconds(500), 3)
             .Synchronize(this.CurrentHostedGame)
             .Subscribe(x =>
             {
@@ -58,6 +59,7 @@ public class ScoreboardManager : IScoreboardManager
 
         // TODO: hook into managed characteristic
         // TODO: game object is stored to session and used by scoreboard
+        // TODO: when an update comes in from the GATT, block updates from UI
         await this.bleHostingManager.AttachRegisteredServices();
         await bleHostingManager.StartAdvertising(new AdvertisementOptions(
             this.appSettings.AdvertisingName,

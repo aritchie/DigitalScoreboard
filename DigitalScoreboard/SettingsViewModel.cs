@@ -87,11 +87,11 @@ public class SettingsViewModel : ReactiveObject
                 settings.BreakTimeMins = this.BreakTimeMins;
                 settings.DefaultYardsToGo = this.DefaultYardsToGo;
 
-                if (settings.CurrentGame != null)
-                {
-                    settings.CurrentGame.HomeTeamName = this.HomeTeam;
-                    settings.CurrentGame.AwayTeamName = this.AwayTeam;
-                }
+                //if (settings.CurrentGame != null)
+                //{
+                //    settings.CurrentGame.HomeTeamName = this.HomeTeam;
+                //    settings.CurrentGame.AwayTeamName = this.AwayTeam;
+                //}
             },
             valid
         );

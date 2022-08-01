@@ -10,30 +10,26 @@ public class ScoreboardViewModel : ViewModel
     readonly AppSettings settings;
     readonly IPageDialogService dialogs;
     readonly IDeviceDisplay display;
-    readonly IBleHostingManager? bleManager;
+    readonly IScoreboardManager scoreboardManager;
 
 
 
     public ScoreboardViewModel(
            BaseServices services,
            ILogger<ScoreboardViewModel> logger,
+           IScoreboardManager scoreboardManager,
            AppSettings settings,
            IDeviceDisplay display,
-           IPageDialogService dialogs,
-           IBleHostingManager? bleManager = null
+           IPageDialogService dialogs
     )
     : base(services)
     {
-        if (settings.CurrentGame == null)
-            throw new InvalidOperationException("There must be a game started");
-
         this.logger = logger;
         this.settings = settings;
         this.display = display;
         this.dialogs = dialogs;
-        this.bleManager = bleManager;
+        this.scoreboardManager = scoreboardManager;
 
-        // TODO: ble manager should check before coming here - it is no longer needed at this level
         this.SetHomeScore = this.SetScore("Home Team Score?", x => this.Game.HomeTeamScore = x);
         this.SetAwayScore = this.SetScore("Away Team Score?", x => this.Game.AwayTeamScore = x);
 
@@ -67,7 +63,7 @@ public class ScoreboardViewModel : ViewModel
     }
 
 
-    Game Game => this.settings.CurrentGame!;
+    Game Game => this.scoreboardManager.CurrentHostedGame!;
 
     public ICommand SetHomeScore { get; }
     public ICommand SetAwayScore { get; }
@@ -101,12 +97,11 @@ public class ScoreboardViewModel : ViewModel
         => this.dialogs.DisplayAlertAsync("Confirm", "Are you sure you wish to exit the scoreboard?", "Yes", "No");
 
 
-    public override async void OnAppearing()
+    public override void OnAppearing()
     {
         base.OnAppearing();
 
-        this.settings
-            .CurrentGame
+        this.Game
             .WhenAnyProperty()
             .Select(x => x.Object!)
             .SubOnMainThread(game =>
@@ -128,26 +123,7 @@ public class ScoreboardViewModel : ViewModel
             })
             .DisposedBy(this.DeactivateWith);
 
-        try
-        {
-            this.display.KeepScreenOn = true;
-            if (this.bleManager == null)
-            {
-                await this.dialogs.DisplayAlertAsync("Unavailable", "BLE is not available", "OK");
-            }
-            else
-            {
-                await this.bleManager!.AttachRegisteredServices();
-                await this.bleManager!.StartAdvertising(new AdvertisementOptions(
-                    this.settings.AdvertisingName,
-                    Constants.GameServiceUuid
-                ));
-            }
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogWarning("Failed to startup", ex);
-        }
+        this.display.KeepScreenOn = true;
     }
 
 
@@ -155,21 +131,7 @@ public class ScoreboardViewModel : ViewModel
     {
         base.OnDisappearing();
 
-        try
-        {
-            this.display.KeepScreenOn = false;
-
-            if (this.bleManager != null)
-            {
-                this.bleManager.StopAdvertising();
-                this.bleManager.DetachRegisteredServices();
-            }
-
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogWarning(ex, "Error cleaning up");
-        }
+        this.display.KeepScreenOn = false;
     }
 
 
