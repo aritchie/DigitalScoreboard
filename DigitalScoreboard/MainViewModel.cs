@@ -11,13 +11,12 @@ public class MainViewModel : ViewModel
 	public MainViewModel(
 		BaseServices services,
 		INavigationService navigator,
-		IDialogs dialogs,
 		IScoreboardManager scoreboardManager
 	)
 	: base(services)
 	{
 
-		this.ContinueGame = navigator.NavigateCommand(nameof(ScoreboardPage));
+		this.Scoreboard = navigator.NavigateCommand(nameof(ScoreboardPage));
 
 		this.NewGame = ReactiveCommand.CreateFromTask(async () =>
 		{
@@ -34,7 +33,7 @@ public class MainViewModel : ViewModel
             {
 				var g = scoreboardManager.CurrentHostedGame!;
 				var details = $"QTR: {g.Period} ({g.Period:c}) - {g.HomeTeamName}: {g.HomeTeamScore} / {g.AwayTeamName}: {g.AwayTeamScore}";
-				var result = await dialogs.Confirm("Do you wish to resume your current game? " + details, "Resume Game?", "Yes", "No");
+				var result = await this.Dialogs.Confirm("Do you wish to resume your current game? " + details, "Resume Game?", "Yes", "No");
 				if (!result)
 				{
                     //appSettings.CurrentGame = new Game(appSettings)
@@ -61,7 +60,7 @@ public class MainViewModel : ViewModel
 
 
 	public ICommand NewGame { get; }
-    public ICommand ContinueGame { get; }
+    public ICommand Scoreboard { get; }
     public ICommand Referee { get; }
 	public ICommand Settings { get; }
 	public ICommand HalfTime { get; }

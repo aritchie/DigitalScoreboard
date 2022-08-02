@@ -45,17 +45,15 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 
 ## TODO
 
-* Scoreboard & Referee could share the same "notification" object
 * Play clock start/resets send command /w settings value to ref - ref runs own timer
 * Period clock start/stop command /w current value to ref - ref runs own timer
 * Move possession indicator to be a mini football beside team name or score
-* Implement connection manager to hide BLE metrics - opening the door to wifi connection & better testability
 * Full Screen Label Font on timer screen
 * Load/Save Rulesets in settings
 * Online Error Log - AppCenter, Firebase, Sentry, etc
 * Ball On Yard
-* Phone Size Scoreboard (with no bluetooth)
-* Scan List to determine what "scoreboard" to have the "referee" connect to
+* Remove Referee Screen
+    * You connect to scoreboard or host a scoreboard - you can also just have a scoreboard with no connections
 * Setting to auto remember "scoreboard"?
 
 ## FUTURE?

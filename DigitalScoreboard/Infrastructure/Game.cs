@@ -43,6 +43,26 @@ public class Game : ReactiveObject
     }
 
 
+    public void UseTimeout(bool homeTeam)
+    {
+        this.KillPeriodClock(false);
+        this.KillPlayClock();
+
+        if (homeTeam)
+        {
+            this.HomeTeamTimeouts = this.HomeTeamTimeouts - 1;
+            if (this.HomeTeamTimeouts < 0)
+                this.HomeTeamTimeouts = this.ruleSet.MaxTimeouts;
+        }
+        else
+        {
+            this.HomeTeamTimeouts = this.AwayTeamTimeouts - 1;
+            if (this.HomeTeamTimeouts < 0)
+                this.HomeTeamTimeouts = this.ruleSet.MaxTimeouts;
+        }
+    }
+
+
     public void TogglePossession()
     {
         this.HomeTeamPossession = !this.HomeTeamPossession;
@@ -59,18 +79,6 @@ public class Game : ReactiveObject
             this.YardsToGo = this.ruleSet.DefaultYardsToGo;
         }
         this.KillPlayClock();
-    }
-
-
-    public void UseTimeout(bool homeTeam)
-    {
-        this.KillPeriodClock(false);
-        this.KillPlayClock();
-
-        var to = homeTeam ? this.HomeTeamTimeouts : this.AwayTeamTimeouts;
-        to--;
-        if (to < 0)
-            to = this.ruleSet!.MaxTimeouts;
     }
 
 

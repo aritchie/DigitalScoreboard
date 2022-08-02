@@ -14,52 +14,47 @@ public class RefereeViewModel : ViewModel
         BaseServices services,
         ILogger<RefereeViewModel> logger,
         IScoreboardManager scoreboardManager,
-		IDeviceDisplay display,
-        IPageDialogService dialogs
+		IDeviceDisplay display
 	)
     : base(services)
 	{
         this.logger = logger;
 		this.display = display;
-        this.dialogs = dialogs;
 
-        //this.IncrementDown = this.SendCommand(Constants.BleIntents.IncrementDown);
-        //this.IncrementPeriod = this.SendCommand(Constants.BleIntents.IncrementPeriod, "Move to next QTR/Period?");
-        //this.TogglePlayClock = this.SendCommand(Constants.BleIntents.TogglePlayClock);
-        //this.TogglePeriodClock = this.SendCommand(Constants.BleIntents.TogglePeriodClock);
-        //this.TogglePossession = this.SendCommand(Constants.BleIntents.TogglePossession);
+        this.IncrementDown = ReactiveCommand.Create(() => this.Scoreboard!.Game!.IncrementDown());
+        this.IncrementPeriod = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var result = await this.Dialogs.Confirm("Move to next QTR/Period?");
+            if (result)
+                this.Scoreboard!.Game!.IncrementPeriod();
+        });
 
-        //// TODO: command parameters seem to be having issues on reactiveui, hence the split commands
-        //this.SetHomeScore = this.CreateTeamCommand(true, "score", Constants.BleIntents.Score);
-        //this.SetAwayScore = this.CreateTeamCommand(false, "score", Constants.BleIntents.Score);
+        this.SetHomeScore = this.SetTeamScore(true);
+        this.SetAwayScore = this.SetTeamScore(false);
 
-        //this.DecrementHomeTimeouts = this.CreateTimeoutCommand(true);
-        //this.DecrementAwayTimeouts = this.CreateTimeoutCommand(false);
+        this.TogglePlayClock = ReactiveCommand.Create(() => this.Scoreboard.Game.TogglePlayClock());
+        this.TogglePeriodClock = ReactiveCommand.Create(() => this.Scoreboard.Game.TogglePeriodClock());
+        this.TogglePossession = ReactiveCommand.Create(() => this.Scoreboard.Game.TogglePossession());
+        this.DecrementHomeTimeouts = this.UseTimeout(true);
+        this.DecrementAwayTimeouts = this.UseTimeout(false);
 
         this.SetYtg = ReactiveCommand.CreateFromTask(async () =>
         {
-            var value = await dialogs.DisplayPromptAsync(
+            var value = await this.Dialogs.Input(
                 "YTG",
                 "Set YTG",
                 "Set",
                 "Cancel",
-                maxLength: 2,
-                keyboardType: KeyboardType.Numeric
+                maxLength: 2
             );
-            if (value != null)
-            {
-                //var data = new List<byte>();
-                //data.Add(Constants.BleIntents.Ytg);
-                //data.AddRange(BitConverter.GetBytes(Int16.Parse(value)));
-                //await this.SendWrite(data.ToArray());
-            }
+            if (Int32.TryParse(value, out var result) && result < 100)
+                this.Scoreboard.Game.YardsToGo = result;
         });
     }
 
 
-    [ObservableAsProperty] public bool IsConnected { get; }
-    // TODO
-    //public string ConnectedToName => this.peripheral?.Name ?? String.Empty;
+    [ObservableAsProperty] public bool IsConnected { get; }    
+    [Reactive] public string ConnectedToName { get; private set; } = null!;
 
     public ICommand SetHomeScore { get; }
     public ICommand SetAwayScore { get; }
@@ -82,7 +77,8 @@ public class RefereeViewModel : ViewModel
     [Reactive] public int PlayClock { get; private set; }
     [Reactive] public int YardsToGo { get; private set; }
     [Reactive] public TimeSpan PeriodClock { get; private set; }
-    public IScoreboard Scoreboard { get; private set; }
+    public IScoreboard Scoreboard { get; private set; } = null!;
+
 
     public override void OnNavigatedTo(INavigationParameters parameters)
     {
@@ -94,6 +90,19 @@ public class RefereeViewModel : ViewModel
             .ToPropertyEx(this, x => x.IsConnected)
             .DisposedBy(this.DestroyWith);
 
+        //    //                    var x = data!.ToGameInfo();
+        //    //                    this.HomeScore = x.HomeScore;
+        //    //                    this.HomeTimeouts = x.HomeTimeouts;
+        //    //                    this.HomePossession = x.HomePossession;
+        //    //                    this.AwayScore = x.AwayScore;
+        //    //                    this.AwayTimeouts = x.AwayTimeouts;
+
+        //    //                    this.Down = x.Down;
+        //    //                    this.Period = x.Period;
+        //    //                    this.PeriodClock = TimeSpan.FromSeconds(x.PeriodClockSeconds);
+        //    //                    this.PlayClock = x.PlayClockSeconds;
+        //    //                    this.YardsToGo = x.YardsToGo;
+        this.ConnectedToName = this.Scoreboard.Name;
     }
 
 
@@ -111,127 +120,38 @@ public class RefereeViewModel : ViewModel
     }
 
 
-    //ICommand SendCommand(byte command, string? confirmMsg = null) => ReactiveCommand.CreateFromTask(async () =>
-    //{
-    //    if (confirmMsg != null)
-    //    {
-    //        var result = await this.dialogs.DisplayAlertAsync("Confirm", confirmMsg, "Yes", "No");
-    //        if (!result)
-    //            return;
-    //    }
-    //    await this.SendWrite(new byte[] { command });
-    //});
+    ICommand UseTimeout(bool homeTeam) => ReactiveCommand.CreateFromTask(async () =>
+    {
+        var g = this.Scoreboard.Game;
+        var to = homeTeam ? g.HomeTeamTimeouts : g.AwayTeamTimeouts;
+        var team = homeTeam ? "Home" : "Away";
+        var msg = to < 0 ? $"Reset timeouts for {team} team?" : $"Use {team} timeout?";
+        var result = await this.Dialogs.Confirm(msg);
+        if (result)
+            g.UseTimeout(homeTeam);
+    });
 
-
-    //ICommand CreateTimeoutCommand(bool homeTeam) => ReactiveCommand.CreateFromTask(async () =>
-    //{
-    //    await this.Connect();
-    //    var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
-    //    var list = new List<byte>();
-    //    list.Add(Constants.BleIntents.DecrementTimeout); // command
-    //    list.Add(teamByte); // team
-
-    //    await this.SendWrite(list.ToArray());
-    //});
-
-
-    //ICommand CreateTeamCommand(bool homeTeam, string setting, byte command) => ReactiveCommand.CreateFromTask(async () =>
-    //{
-    //    var team = homeTeam ? "Home" : "Away";
-    //    var value = await this.dialogs.DisplayPromptAsync(
-    //        "Update",
-    //        $"Set {team} {setting}",
-    //        "Set",
-    //        "Cancel",
-    //        maxLength: 2,
-    //        keyboardType: KeyboardType.Numeric
-    //    );
-    //    if (Int32.TryParse(value, out var result))
-    //    {
-    //        await this.Connect();
-
-    //        var teamByte = homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
-    //        var valueBytes = BitConverter.GetBytes(result);
-    //        var list = new List<byte>();
-    //        list.Add(command); // command
-    //        list.Add(teamByte); // team
-    //        list.AddRange(valueBytes);
-
-    //        await this.SendWrite(list.ToArray());
-    //    }
-    //});
-
-
-    //async Task SendWrite(byte[] data)
-    //{
-    //    await this.Connect().ConfigureAwait(false);
-    //    await this.peripheral!
-    //        .Write(
-    //            Constants.GameServiceUuid,
-    //            Constants.GameCharacteristicUuid,
-    //            data,
-    //            true
-    //        )
-    //        .Timeout(TimeSpan.FromSeconds(20))
-    //        .ToTask();
-    //}
-
-
-    //async Task Connect()
-    //{
-    //    //if (this.peripheral == null)
-    //    //{
-    //    //    //this.peripheral = await this.bleManager
-    //    //    //    .Scan(new ScanConfig(
-    //    //    //        BleScanType.Balanced,
-    //    //    //        false,
-    //    //    //        Constants.GameServiceUuid
-    //    //    //    ))
-    //    //    //    .Select(x => x.Peripheral.CreateManaged(RxApp.MainThreadScheduler))
-    //    //    //    .FirstAsync();
-
-    //    //    this.peripheral
-    //    //        .WhenNotificationReceived(
-    //    //            Constants.GameServiceUuid,
-    //    //            Constants.GameCharacteristicUuid
-    //    //        )
-    //    //        .SubOnMainThread(
-    //    //            data =>
-    //    //            {
-    //    //                try
-    //    //                {
-    //    //                    var x = data!.ToGameInfo();
-    //    //                    this.HomeScore = x.HomeScore;
-    //    //                    this.HomeTimeouts = x.HomeTimeouts;
-    //    //                    this.HomePossession = x.HomePossession;
-    //    //                    this.AwayScore = x.AwayScore;
-    //    //                    this.AwayTimeouts = x.AwayTimeouts;
-
-    //    //                    this.Down = x.Down;
-    //    //                    this.Period = x.Period;
-    //    //                    this.PeriodClock = TimeSpan.FromSeconds(x.PeriodClockSeconds);
-    //    //                    this.PlayClock = x.PlayClockSeconds;
-    //    //                    this.YardsToGo = x.YardsToGo;
-    //    //                }
-    //    //                catch (Exception ex)
-    //    //                {
-    //    //                    this.logger.LogWarning("Error in notification data", ex);
-    //    //                }
-    //    //            },
-    //    //            ex => this.logger.LogError("Notification Error", ex)
-    //    //        )
-    //    //        .DisposedBy(this.DestroyWith);
-    //    //}
-    //    //this.peripheral
-    //    //    .Peripheral
-    //    //    .WhenStatusChanged()
-    //    //    .Select(x => x == ConnectionState.Connected)
-    //    //    .ToPropertyEx(this, x => x.IsConnected);
-
-    //    //await this.peripheral
-    //    //    .Peripheral
-    //    //    .WithConnectIf()
-    //    //    .Timeout(TimeSpan.FromSeconds(20))
-    //    //    .ToTask();
-    //}
+    ICommand SetTeamScore(bool homeTeam) => ReactiveCommand.CreateFromTask(async () =>
+    {
+        var team = homeTeam ? "Home" : "Away";
+        var value = await this.Dialogs.Input(
+            "Update",
+            $"Set {team} score",
+            "Set",
+            "Cancel",
+            maxLength: 2
+        );
+        if (Int32.TryParse(value, out var result))
+        {
+            var g = this.Scoreboard!.Game!;
+            if (homeTeam)
+            {
+                g.HomeTeamScore = result;
+            }
+            else
+            {
+                g.AwayTeamScore = result;
+            }
+        }
+    });
 }

@@ -20,30 +20,13 @@ public class ScanViewModel : ViewModel
         this.Scan = ReactiveCommand.CreateFromTask(async () =>
         {
             var access = await scoreboardManager.StartScan(RxApp.MainThreadScheduler);
-
-            //gameManager
-            //    .ScanForHostedGames()
-            //    .Subscribe()
-
-            //bleManager
-            //    .Scan(new ScanConfig(
-            //        BleScanType.Balanced,
-            //        false,
-            //        Constants.GameServiceUuid
-            //    ))
-            //    .Where(x => x.AdvertisementData?.LocalName != null)
-            //    .Select(x => x.AdvertisementData.LocalName)
-            //    .SubOnMainThread(name =>
-            //    {
-            //        if (!this.Scoreboards.Any(x => x.DiscoveryName.Equals(name)))
-            //            this.Scoreboards.Add(new Scoreboard(name));
-            //    })
-            //    .DisposedBy(this.DeactivateWith);
+            if (access != AccessState.Available)
+                await this.Dialogs.Alert("Unable to scan for scoreboards due to permission: " + access);
         });
 
         this.Connect = ReactiveCommand.CreateFromTask<IScoreboard>(async sb =>
         {
-            sb.Connect();
+            sb.Connect(); // TODO: wait for command
             await navigator.Navigate(
                 nameof(RefereePage),
                 (nameof(RefereeViewModel.Scoreboard), sb)
