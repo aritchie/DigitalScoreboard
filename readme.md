@@ -55,6 +55,7 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 * Remove Referee Screen
     * You connect to scoreboard or host a scoreboard - you can also just have a scoreboard with no connections
 * Setting to auto remember "scoreboard"?
+* Client can tell remote scoreboard to go to fullscreen play clock or timer
 
 ## FUTURE?
 
