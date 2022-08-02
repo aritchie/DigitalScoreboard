@@ -25,7 +25,6 @@ public class Game : ReactiveObject
     [Reactive] public int Period { get; private set; } = 1;
     [Reactive] public int Down { get; private set; }
 
-
     [Reactive] public bool HomeTeamPossession { get; private set; }
     [Reactive] public int HomeTeamTimeouts { get; private set; }
     [Reactive] public int AwayTeamTimeouts { get; private set; }

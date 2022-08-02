@@ -56,35 +56,3 @@ The settings screen allows you to set all of the scoreboard constraints and othe
     * You connect to scoreboard or host a scoreboard - you can also just have a scoreboard with no connections
 * Setting to auto remember "scoreboard"?
 * Client can tell remote scoreboard to go to fullscreen play clock or timer
-
-## FUTURE?
-
-* Close to Football Scoreboard
-    * Hockey
-        * Shots on Goal per team 
-        * Penalty Time Remaining (2 per team)
-    * Basketball
-        * Fouls
-        * Shot Clock
-    * Soccer
-        * Shots per team
-        * Saves per team
-        * Penalty Time Remaining (2 per team)
-
-* Way Different
-    * Curling
-        * Ends
-        * Who starts
-        * Points per end?
-    * Baseball
-        * Top/Bottom of Inning
-        * Inning Scores
-        * Balls
-        * Strikes
-        * Outs
-        * Errors
-        * Hits
-    * Tennis
-        * Games & Sets
-        * Scoring 0, 15, 30, 40, Tie, Adv
-        * Set Points
