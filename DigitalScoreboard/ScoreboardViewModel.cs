@@ -97,6 +97,16 @@ public class ScoreboardViewModel : ViewModel
         => this.dialogs.DisplayAlertAsync("Confirm", "Are you sure you wish to exit the scoreboard?", "Yes", "No");
 
 
+    public override void OnNavigatedTo(INavigationParameters parameters)
+    {
+        base.OnNavigatedTo(parameters);
+
+        // TODO: start hosting
+        // TODO: connecting to
+        // TODO: no hosting or connection
+    }
+
+
     public override void OnAppearing()
     {
         base.OnAppearing();

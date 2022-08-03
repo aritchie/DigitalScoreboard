@@ -24,13 +24,13 @@ public class ScanViewModel : ViewModel
                 await this.Dialogs.Alert("Unable to scan for scoreboards due to permission: " + access);
         });
 
-        this.Connect = ReactiveCommand.CreateFromTask<IScoreboard>(async sb =>
+        this.Connect = ReactiveCommand.CreateFromTask<IScoreboard, Unit>(async sb =>
         {
-            sb.Connect(); // TODO: wait for command
-            await navigator.Navigate(
-                nameof(RefereePage),
-                (nameof(RefereeViewModel.Scoreboard), sb)
-            );
+            sb.Connect();
+            //await navigator.Navigate(
+            //    nameof(RefereePage),
+            //    (nameof(RefereeViewModel.Scoreboard), sb)
+            //);
         });
     }
 

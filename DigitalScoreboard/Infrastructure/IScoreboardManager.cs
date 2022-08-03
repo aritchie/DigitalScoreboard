@@ -4,14 +4,17 @@ using System.Reactive.Concurrency;
 namespace DigitalScoreboard.Infrastructure;
 
 
-public interface IScoreboard : IReactiveObject, IDisposable
+public interface IScoreboard : IReactiveObject
 {
     string Name { get; }
     int SignalStrength { get; }
     bool IsConnected { get; }
     Game? Game { get; }
 
+    //IObservable<Unit> StartPlayClock();
+
     void Connect();
+    void Disconnect();
 }
 
 

@@ -5,7 +5,7 @@ using Shiny.BluetoothLE.Managed;
 namespace DigitalScoreboard.Infrastructure.Impl;
 
 
-public class ScoreboardImpl : ReactiveObject, IScoreboard
+public class ScoreboardImpl : ReactiveObject, IScoreboard, IDisposable
 {
     readonly CompositeDisposable disposer = new();
     readonly IManagedPeripheral peripheral;
@@ -22,6 +22,7 @@ public class ScoreboardImpl : ReactiveObject, IScoreboard
     [Reactive] public int SignalStrength { get; internal set; }
     public Game? Game { get; private set; }
     public bool IsConnected { get; private set; }
+    // TODO: is connecting?
 
 
     public void Connect()
@@ -31,8 +32,8 @@ public class ScoreboardImpl : ReactiveObject, IScoreboard
 
         this.peripheral
             .Peripheral
-            .WhenStatusChanged()
-            .Subscribe(x => this.IsConnected = x == ConnectionState.Connected)
+            .WhenDisconnected()
+            .Subscribe(x => this.IsConnected = false)
             .DisposedBy(this.disposer);
 
         this.peripheral
@@ -42,9 +43,14 @@ public class ScoreboardImpl : ReactiveObject, IScoreboard
             .Switch()
             .WhereNotNull()
             .Select(x => x.ToRuleSet())
-            .Subscribe(ruleSet => this.Game = new(ruleSet))
+            .Subscribe(ruleSet =>
+            {
+                this.Game = new(ruleSet);
+                this.IsConnected = true;
+            })
             .DisposedBy(this.disposer);
 
+        // TODO: commands - start play clock, reset play clock, start game clock
         this.peripheral
             .WhenNotificationReceived(
                 Constants.GameServiceUuid,
@@ -69,11 +75,16 @@ public class ScoreboardImpl : ReactiveObject, IScoreboard
             .DisposedBy(this.disposer);
     }
 
+    public void Disconnect()
+    {
+        this.disposer.Dispose();
+    }
+
 
     public void Dispose()
     {
         this.peripheral.Dispose();
-        this.disposer.Dispose();
+        this.Disconnect();
     }
 
 

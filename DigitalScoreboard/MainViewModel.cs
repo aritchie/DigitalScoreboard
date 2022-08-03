@@ -45,7 +45,6 @@ public class MainViewModel : ViewModel
             }
 			await navigator.Navigate(nameof(ScoreboardPage));
 		});
-        this.Referee = navigator.NavigateCommand(nameof(RefereePage));
 		this.Settings = navigator.NavigateCommand(nameof(SettingsPage));
 
 		//this.HalfTime = navigator.NavigateCommand(nameof(FullTimerPage), p => p.AddRange(
@@ -65,14 +64,5 @@ public class MainViewModel : ViewModel
 	public ICommand Settings { get; }
 	public ICommand HalfTime { get; }
 	public ICommand PlayClock { get; }
-
-  //  [Reactive] public bool IsGameInProgress { get; private set; }
-
-
-  //  public override void OnAppearing()
-  //  {
-  //      base.OnAppearing();
-		//this.IsGameInProgress = this.appSettings.CurrentGame != null;
-  //  }
 }
 
