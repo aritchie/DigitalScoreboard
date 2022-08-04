@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using DigitalScoreboard.Infrastructure;
 using DigitalScoreboard.Infrastructure.Impl;
-using Microsoft.Extensions.Configuration;
 using Prism.Controls;
 using Prism.DryIoc;
 
@@ -24,7 +23,6 @@ public static class MauiProgram
                         registry.RegisterForNavigation<ScanPage, ScanViewModel>();
                         registry.RegisterForNavigation<MainPage, MainViewModel>();
                         registry.RegisterForNavigation<SettingsPage, SettingsViewModel>();
-                        registry.RegisterForNavigation<RefereePage, RefereeViewModel>();
                         registry.RegisterForNavigation<ScoreboardPage, ScoreboardViewModel>();
                         registry.RegisterForNavigation<FullTimerPage, FullTimerViewModel>();
                     })
