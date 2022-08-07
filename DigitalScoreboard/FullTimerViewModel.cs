@@ -12,17 +12,14 @@ public enum TimerType
 
 public class FullTimerViewModel : ViewModel
 {
-    readonly AppSettings settings;
     TimeSpan timeRemaining;
     TimeSpan timeRemainingOrig;
     TimerType timerType;
     IDisposable? timerSub;
 
 
-	public FullTimerViewModel(BaseServices services, AppSettings settings) : base(services)
+	public FullTimerViewModel(BaseServices services) : base(services)
 	{
-        this.settings = settings;
-
         this.Toggle = ReactiveCommand.Create(() =>
         {
             // restart (countdown) vs resume (clock)

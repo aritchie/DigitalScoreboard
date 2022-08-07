@@ -42,16 +42,13 @@ public static class MauiProgram
         builder.Services.AddShinyService<AppSettings>();
         builder.Services.AddBluetoothScoreboardServices();
 
-        builder.Services.AddGlobalCommandExceptionHandler(options =>
-        {
+        builder.Services.AddGlobalCommandExceptionHandler(new(
 #if DEBUG
-            options.AlertType = ErrorAlertType.FullError; // this will show the full error in a dialog during debug
-            options.LogError = false;
+            ErrorAlertType.FullError
 #else
-            options.AlertType = ErrorAlertType.NoLocalize;
-            options.LogError = true;
+            ErrorAlertType.NoLocalize
 #endif
-        });
+        ));
 
 
 		return builder.Build();

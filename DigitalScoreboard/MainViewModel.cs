@@ -5,18 +5,15 @@ namespace DigitalScoreboard;
 
 public class MainViewModel : ViewModel
 {
-	readonly AppSettings appSettings;
-
 
 	public MainViewModel(
 		BaseServices services,
-		INavigationService navigator,
 		IScoreboardManager scoreboardManager
 	)
 	: base(services)
 	{
 
-		this.Scoreboard = navigator.NavigateCommand(nameof(ScoreboardPage));
+		this.Scoreboard = this.Navigation.NavigateCommand(nameof(ScoreboardPage));
 
 		this.NewGame = ReactiveCommand.CreateFromTask(async () =>
 		{
@@ -43,9 +40,9 @@ public class MainViewModel : ViewModel
                     //};
                 }
             }
-			await navigator.Navigate(nameof(ScoreboardPage));
+			await this.Navigation.Navigate(nameof(ScoreboardPage));
 		});
-		this.Settings = navigator.NavigateCommand(nameof(SettingsPage));
+		this.Settings = this.Navigation.NavigateCommand(nameof(SettingsPage));
 
 		//this.HalfTime = navigator.NavigateCommand(nameof(FullTimerPage), p => p.AddRange(
 		//	("Type", TimerType.Clock),

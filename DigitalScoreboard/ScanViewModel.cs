@@ -11,8 +11,7 @@ public class ScanViewModel : ViewModel
 
     public ScanViewModel(
         BaseServices services,
-        INavigationService navigator,
-        IScoreboardManager scoreboardManager 
+        IScoreboardManager scoreboardManager
     ) : base(services)
     {
         this.scoreboardManager = scoreboardManager;
@@ -31,6 +30,7 @@ public class ScanViewModel : ViewModel
             //    nameof(RefereePage),
             //    (nameof(RefereeViewModel.Scoreboard), sb)
             //);
+            return Unit.Default;
         });
     }
 
