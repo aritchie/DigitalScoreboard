@@ -46,20 +46,6 @@ public class ScoreboardManager : IScoreboardManager
             HomeTeamName = this.appSettings.HomeTeam,
             AwayTeamName = this.appSettings.AwayTeam
         };
-
-        this.gameSub = this.CurrentHostedGame!
-            .WhenAnyProperty()
-            .Buffer(TimeSpan.FromMilliseconds(500), 3)
-            .Synchronize(this.CurrentHostedGame)
-            .Subscribe(x =>
-            {
-                // synchronize to result in sequential write
-                // prevent other updates
-            });
-
-        // TODO: hook into managed characteristic
-        // TODO: game object is stored to session and used by scoreboard
-        // TODO: when an update comes in from the GATT, block updates from UI
         await this.bleHostingManager.AttachRegisteredServices();
         await bleHostingManager.StartAdvertising(new AdvertisementOptions(
             this.appSettings.AdvertisingName,

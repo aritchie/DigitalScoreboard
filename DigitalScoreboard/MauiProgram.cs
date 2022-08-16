@@ -13,8 +13,9 @@ public static class MauiProgram
 	{
 		var builder = MauiApp
 			.CreateBuilder()
+            .UseMauiApp<App>()
 			.UseMauiCommunityToolkit()
-            .UseShinyFramework<App>(
+            .UseShinyFramework(
                 new DryIocContainerExtension(),
                 prism => prism
                     .RegisterTypes(registry =>
