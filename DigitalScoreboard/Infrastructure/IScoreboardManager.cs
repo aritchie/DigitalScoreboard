@@ -3,23 +3,22 @@ using System.Reactive.Concurrency;
 
 namespace DigitalScoreboard.Infrastructure;
 
-
-public interface IScoreboard : IReactiveObject
+public enum ScoreboardEvent
 {
-    string Name { get; }
-    int SignalStrength { get; }
-    bool IsConnected { get; }
-    Game? Game { get; }
-
-    //IObservable<Unit> StartPlayClock();
-
-    void Connect();
-    void Disconnect();
+    ScoreUpdate,
+    PosessionChange
 }
+
+
 
 
 public interface IScoreboardManager
 {
+    // TODO
+    // IScoreboard? Current { get; } // hosted, self, or connected
+    // Task<IScoreboard> CreateHosted { get; }
+
+
     Game? CurrentHostedGame { get; }
     Task<AccessState> StartHosting();
     void StopHosting();
