@@ -9,12 +9,14 @@
     <ScrollView>
         <VerticalStackLayout 
             Spacing="25" 
-            Padding="30,0" 
+            Padding="30,0"  
             VerticalOptions="Center">
 
-            <Button Text="Scoreboard" Command="{Binding Scoreboard}" />
+            <!--if game-->
+            <Button Text="Current Game" Command="{Binding Current}" />
+            <Button Text="End Game" Command="{Binding EndGame}" />
+
             <Button Text="Start New Game" Command="{Binding NewGame}" />
-            <Button Text="Referee" Command="{Binding Referee}" />
             <Button Text="Settings" Command="{Binding Settings}" />
 
             <Button Text="Half Time Countdown" Command="{Binding HalfTime}" />

@@ -25,7 +25,7 @@ public class ScanViewModel : ViewModel
 
         this.Connect = ReactiveCommand.CreateFromTask<IScoreboard, Unit>(async sb =>
         {
-            sb.Connect();
+            //sb.Connect();
             //await navigator.Navigate(
             //    nameof(RefereePage),
             //    (nameof(RefereeViewModel.Scoreboard), sb)
@@ -36,7 +36,7 @@ public class ScanViewModel : ViewModel
 
 
     [Reactive] public string ActionDescription { get; private set; } = "Scanning For Scoreboards";
-    public ObservableCollection<IScoreboard> Scoreboards => this.scoreboardManager.Scoreboards;
+    public ObservableCollection<IScoreboard> Scoreboards => null;// this.scoreboardManager.Scoreboards;
     public ICommand Scan { get; }
     public ICommand Connect { get; }
 
