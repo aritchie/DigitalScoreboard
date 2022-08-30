@@ -3,6 +3,22 @@
 namespace DigitalScoreboard.Infrastructure.Impl;
 
 
+public record GameInfo(
+    int HomeScore,
+    int HomeTimeouts,
+    int AwayScore,
+    int AwayTimeouts,
+    bool HomePossession,
+    int Period,
+    int Down,
+    int YardsToGo,
+    int PlayClockSeconds,
+    int PeriodClockSeconds
+
+// TODO: add period remaing, play clock running/reset, period clock running/stopped
+);
+
+
 public static class Extensions
 {
     public static byte[] ToBytes(this RuleSet ruleSet)

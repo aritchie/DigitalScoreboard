@@ -3,43 +3,52 @@
 namespace DigitalScoreboard.Infrastructure;
 
 
-public interface IScoreboard : IReactiveObject
+public enum ScoreboardType
 {
-    string Name { get; }
-    int SignalStrength { get; }
-    bool IsConnected { get; }
+    Self,
+    BleHost,
+    BleClient
+}
 
-    string HomeTeam { get; }
-    int HomeScore { get; }
-    int HomeTimeouts { get; }
+public enum ScoreboardEvent
+{
+    ScoreUpdate,
+    PosessionChange
+}
 
-    string AwayTeam { get; }
-    int AwayScore { get; }
-    int AwayTimeouts { get; }
+public record Team(
+    string Name,
+    int Score,
+    int Timeouts
+);
 
-    int Period { get; }
-    TimeSpan PeriodClock { get; }
+public interface IScoreboard
+{
+    ScoreboardType Type { get; }
+    IObservable<bool> WhenConnectedChanged();
 
+    Team Home { get; }
+    Team Away { get; }
 
-    // football specific
-    bool HomePosession { get; }
+    bool HomePossession { get; }
     int YardsToGo { get; }
     int Down { get; }
 
-    // RuleSet from remote
-    //TimeSpan PlayClock
-    Task UseTimeout(bool homeTeam);
-    Task SetPosession(bool homeTeam);
-    Task SetDown(int down);
-    Task IncrementPeriod();
+    int Period { get; }
+    int PlayClockSeconds { get; }
+    TimeSpan PeriodClock { get; }
+    
 
-    //Task SetPlayClock(bool start, int value)
-    Task StartClocks(bool period, bool play);
 
-    // raised by tasks
     IObservable<ScoreboardEvent> WhenEvent();
 
-    void Connect();
-    void Disconnect();
+    Task TogglePossession();
+    Task IncrementPeriod();
+    Task IncrementDown();
+    Task SetYardsToGo(int yards);
+    Task UseTimeout(bool homeTeam);
+    Task SetScore(bool homeTeam, int score);
+    Task TogglePeriodClock();
+    Task TogglePlayClock();
+    //Task StartClocks(bool period, bool play); // period clock resumes/pauses, play clock resets on starts/resets
 }
-

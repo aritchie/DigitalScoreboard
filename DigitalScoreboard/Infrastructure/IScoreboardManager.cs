@@ -3,27 +3,19 @@ using System.Reactive.Concurrency;
 
 namespace DigitalScoreboard.Infrastructure;
 
-public enum ScoreboardEvent
-{
-    ScoreUpdate,
-    PosessionChange
-}
-
-
-
 
 public interface IScoreboardManager
 {
-    // TODO
-    // IScoreboard? Current { get; } // hosted, self, or connected
-    // Task<IScoreboard> CreateHosted { get; }
+   
+    IScoreboard? Current { get; }
 
+    Task<AccessState> Create(bool hosted);
 
-    Game? CurrentHostedGame { get; }
-    Task<AccessState> StartHosting();
-    void StopHosting();
+    // TODO: end game - kills hosting, peripheral connection
+    Task EndCurrent();
+    //Task<IScoreboard> Create(ScoreboardType scoreboardType);
 
-    ObservableCollection<IScoreboard> Scoreboards { get; }
+    //ObservableCollection<Scoreboard> Scoreboards { get; }
     Task<AccessState> StartScan(IScheduler scheduler);
     void StopScan();
 }
