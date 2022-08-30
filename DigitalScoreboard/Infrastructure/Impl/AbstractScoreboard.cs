@@ -59,6 +59,8 @@ public abstract class AbstractScoreboard : IScoreboard
             this.YardsToGo = this.Rules.DefaultYardsToGo;
         }
         this.ResetPlayClock();
+        this.eventSubj.OnNext(ScoreboardEvent.Down);
+
         return Task.CompletedTask;
     }
 
@@ -66,54 +68,60 @@ public abstract class AbstractScoreboard : IScoreboard
     public virtual Task IncrementPeriod()
     {
         this.Reset(true);
+        this.eventSubj.OnNext(ScoreboardEvent.Period);
+
         return Task.CompletedTask;
     }
 
 
-    public Task SetScore(bool homeTeam, int score)
+    public virtual Task SetScore(bool homeTeam, int score)
     {
         var newTeam = (homeTeam ? this.Home : this.Away) with { Score = score };
         this.SetTeam(homeTeam, newTeam);
+        this.eventSubj.OnNext(ScoreboardEvent.Score);
+
         return Task.CompletedTask;
     }
 
 
-    public Task SetYardsToGo(int yards)
+    public virtual Task SetYardsToGo(int yards)
     {
         this.YardsToGo = yards;
         return Task.CompletedTask;
     }
 
 
-    public Task TogglePeriodClock()
+    public virtual Task TogglePeriodClock()
     {
         this.periodClockRunning = !this.periodClockRunning;
         return Task.CompletedTask;
     }
 
 
-    public Task TogglePlayClock()
+    public virtual Task TogglePlayClock()
     {
-        if (!this.playClockRunning)
+        if (this.playClockRunning)
         {
-            this.playClockRunning = true;
+            this.ResetPlayClock();            
         }
         else
         {
-            this.ResetPlayClock();
+            this.playClockRunning = true;
         }
         return Task.CompletedTask;
     }
 
 
-    public Task TogglePossession()
+    public virtual Task TogglePossession()
     {
         this.HomePossession = !this.HomePossession;
         this.Reset(false);
+        this.eventSubj.OnNext(ScoreboardEvent.Possession);
+
         return Task.CompletedTask;
     }
 
-    public Task UseTimeout(bool homeTeam)
+    public virtual Task UseTimeout(bool homeTeam)
     {
         var team = homeTeam ? this.Home : this.Away;
         var timeouts = team.Timeouts - 1;
@@ -122,8 +130,9 @@ public abstract class AbstractScoreboard : IScoreboard
 
         this.ResetPlayClock();
         this.periodClockRunning = false;
-
         this.SetTeam(homeTeam, team with { Timeouts = timeouts });
+        this.eventSubj.OnNext(ScoreboardEvent.Timeout);
+
         return Task.CompletedTask;
     }
 

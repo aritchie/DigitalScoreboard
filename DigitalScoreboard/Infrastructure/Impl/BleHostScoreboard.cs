@@ -8,7 +8,9 @@ public class BleHostScoreboard : AbstractScoreboard
 {
     readonly IBleHostingManager hostingManager;
 
-
+    // TODO: shuttle characteristic to notify with
+    // TODO: shuttle over events
+        // could use hostingmanager raw right here?
     public BleHostScoreboard(
         IBleHostingManager hostingManager,
         RuleSet rules,

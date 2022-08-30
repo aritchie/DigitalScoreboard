@@ -23,5 +23,12 @@ public class BleClientScoreboard : AbstractScoreboard
     {
         this.peripheral = peripheral;
     }
+
+
+    public override async Task SetScore(bool homeTeam, int score)
+    {
+        await base.SetScore(homeTeam, score).ConfigureAwait(false);
+        // TODO: write
+    }
 }
 

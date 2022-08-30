@@ -8,62 +8,57 @@ public class ScoreboardViewModel : ViewModel
 {
     readonly ILogger logger;
     readonly AppSettings settings;
-    readonly IPageDialogService dialogs;
     readonly IDeviceDisplay display;
     readonly IScoreboardManager scoreboardManager;
 
 
-
     public ScoreboardViewModel(
-           BaseServices services,
-           ILogger<ScoreboardViewModel> logger,
-           IScoreboardManager scoreboardManager,
-           AppSettings settings,
-           IDeviceDisplay display,
-           IPageDialogService dialogs
+        BaseServices services,
+        ILogger<ScoreboardViewModel> logger,
+        IScoreboardManager scoreboardManager,
+        AppSettings settings,
+        IDeviceDisplay display
     )
     : base(services)
     {
         this.logger = logger;
         this.settings = settings;
         this.display = display;
-        this.dialogs = dialogs;
         this.scoreboardManager = scoreboardManager;
 
-        this.SetHomeScore = this.SetScore("Home Team Score?", x => this.Game.HomeTeamScore = x);
-        this.SetAwayScore = this.SetScore("Away Team Score?", x => this.Game.AwayTeamScore = x);
+        this.SetHomeScore = this.SetScore("Home Team Score?", x => this.Game.SetScore(true, x));
+        this.SetAwayScore = this.SetScore("Away Team Score?", x => this.Game.SetScore(false, x));
 
-        this.TogglePlayClock = ReactiveCommand.Create(() => this.Game.TogglePlayClock());
-        this.TogglePeriodClock = ReactiveCommand.Create(() => this.Game.TogglePeriodClock());
-        this.TogglePossession = ReactiveCommand.Create(() => this.Game.TogglePossession());
+        this.TogglePlayClock = ReactiveCommand.CreateFromTask(() => this.Game.TogglePlayClock());
+        this.TogglePeriodClock = ReactiveCommand.CreateFromTask(() => this.Game.TogglePeriodClock());
+        this.TogglePossession = ReactiveCommand.CreateFromTask(() => this.Game.TogglePossession());
 
         this.SetYardsToGo = ReactiveCommand.CreateFromTask(async () =>
         {
-            var result = await this.dialogs.DisplayPromptAsync(
+            var result = await this.Dialogs.Input(
                 "YTD",
                 "Enter yards-to-go",
                 "Set",
                 "Cancel",
-                maxLength: 2,
-                keyboardType: KeyboardType.Numeric
+                maxLength: 2
+                //keyboardType: KeyboardType.Numeric
             );
             if (Int32.TryParse(result, out var ytg) && ytg > 0 && ytg < 100)
-                this.Game.YardsToGo = ytg;
+                await this.Game.SetYardsToGo(ytg);
         });
 
-        this.IncrementDown = ReactiveCommand.Create(() => this.Game.IncrementDown());
-        this.DecrementHomeTimeout = ReactiveCommand.Create(() => this.Game.UseTimeout(true));
-        this.DecrementAwayTimeout = ReactiveCommand.Create(() => this.Game.UseTimeout(false));
-        this.IncrementPeriod = ReactiveCommand.Create(async () =>
+        this.IncrementDown = ReactiveCommand.CreateFromTask(() => this.Game.IncrementDown());
+        this.DecrementHomeTimeout = ReactiveCommand.CreateFromTask(() => this.Game.UseTimeout(true));
+        this.DecrementAwayTimeout = ReactiveCommand.CreateFromTask(() => this.Game.UseTimeout(false));
+        this.IncrementPeriod = ReactiveCommand.CreateFromTask(async () =>
         {
-            var result = await this.dialogs.DisplayAlertAsync("Next", "Increment Quarter?", "Yes", "No");
+            var result = await this.Dialogs.Confirm("Next", "Increment Quarter?", "Yes", "No");
             if (result)
-                this.Game.IncrementPeriod();
+                await this.Game.IncrementPeriod();
         });
     }
 
-
-    Game Game => this.scoreboardManager.CurrentHostedGame!;
+    public IScoreboard Game => this.scoreboardManager.Current!;
 
     public ICommand SetHomeScore { get; }
     public ICommand SetAwayScore { get; }
@@ -94,7 +89,7 @@ public class ScoreboardViewModel : ViewModel
 
 
     public override Task<bool> CanNavigateAsync(INavigationParameters parameters)
-        => this.dialogs.DisplayAlertAsync("Confirm", "Are you sure you wish to exit the scoreboard?", "Yes", "No");
+        => this.Dialogs.Confirm("Confirm", "Are you sure you wish to exit the scoreboard?", "Yes", "No");
 
 
     public override void OnNavigatedTo(INavigationParameters parameters)
@@ -112,24 +107,21 @@ public class ScoreboardViewModel : ViewModel
         base.OnAppearing();
 
         this.Game
-            .WhenAnyProperty()
-            .Select(x => x.Object!)
-            .SubOnMainThread(game =>
-            {
-                this.HomeTeamName = game.HomeTeamName;
-                this.HomeTeamScore = game.HomeTeamScore;
-                this.HomeTeamTimeouts = game.HomeTeamTimeouts;
-                this.AwayTeamName = game.AwayTeamName;
-                this.AwayTeamScore = game.AwayTeamScore;
-                this.AwayTeamTimeouts = game.AwayTeamTimeouts;
-                this.PeriodClock = game.PeriodClock;
-                this.Period = game.Period;
-                this.Down = game.Down;
-                this.YardsToGo = game.YardsToGo;
-                this.HomeTeamPossession = game.HomeTeamPossession;
-                this.PlayClock = game.PlayClock;
+            .WhenEvent()
+            .SubOnMainThread(_ => this.SetFromGame())
+            .DisposedBy(this.DeactivateWith);
 
-                this.RaisePropertyChanged();
+        this.Game
+            .WhenConnectedChanged()
+            .SubOnMainThread(connected => { }) // TODO
+            .DisposedBy(this.DeactivateWith);
+
+        this.Game
+            .ObserveClocks()
+            .SubOnMainThread(x =>
+            {
+                this.PeriodClock = x.Period;
+                this.PlayClock = x.Play;
             })
             .DisposedBy(this.DeactivateWith);
 
@@ -145,17 +137,33 @@ public class ScoreboardViewModel : ViewModel
     }
 
 
-    ICommand SetScore(string question, Action<int> action) => ReactiveCommand.CreateFromTask(async () =>
+    void SetFromGame()
     {
-        var value = await this.dialogs.DisplayPromptAsync(
+        this.HomeTeamName = this.Game.Home.Name;
+        this.HomeTeamScore = this.Game.Home.Score;
+        this.HomeTeamTimeouts = this.Game.Home.Timeouts;
+        this.AwayTeamName = this.Game.Away.Name;
+        this.AwayTeamScore = this.Game.Away.Score;
+        this.AwayTeamTimeouts = this.Game.Away.Timeouts;
+        this.Period = this.Game.Period;
+        this.Down = this.Game.Down;
+        this.YardsToGo = this.Game.YardsToGo;
+        this.HomeTeamPossession = this.Game.HomePossession;
+
+        this.RaisePropertyChanged();
+    }
+
+    ICommand SetScore(string question, Func<int, Task> action) => ReactiveCommand.CreateFromTask(async () =>
+    {
+        var value = await this.Dialogs.Input(
             "Score",
             question,
             "Set",
             "Cancel",
-            maxLength: 2,
-            keyboardType: KeyboardType.Numeric
+            maxLength: 2
+            //keyboardType: KeyboardType.Numeric
         );
         if (Int32.TryParse(value, out var score))
-            action(score);
+            await action.Invoke(score);
     });
 }

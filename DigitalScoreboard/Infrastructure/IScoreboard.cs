@@ -12,8 +12,14 @@ public enum ScoreboardType
 
 public enum ScoreboardEvent
 {
-    ScoreUpdate,
-    PosessionChange
+    // TODO: probably need play & period clock events since both can be started without other events
+        // TODO: clocks are only stopped by other events
+    // TODO: yards to go
+    Score,
+    Timeout,
+    Possession,
+    Down,
+    Period
 }
 
 public record Team(
@@ -38,8 +44,6 @@ public interface IScoreboard
     int PlayClockSeconds { get; }
     TimeSpan PeriodClock { get; }
     
-
-
     IObservable<ScoreboardEvent> WhenEvent();
 
     Task TogglePossession();
@@ -50,5 +54,4 @@ public interface IScoreboard
     Task SetScore(bool homeTeam, int score);
     Task TogglePeriodClock();
     Task TogglePlayClock();
-    //Task StartClocks(bool period, bool play); // period clock resumes/pauses, play clock resets on starts/resets
 }
