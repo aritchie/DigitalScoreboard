@@ -1,6 +1,9 @@
-﻿using System.Reactive.Concurrency;
+﻿using System.Collections.ObjectModel;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Hosting;
+using Shiny.BluetoothLE.Managed;
 
 namespace DigitalScoreboard.Infrastructure.Impl;
 
@@ -11,6 +14,7 @@ public class ScoreboardManager : IScoreboardManager
     readonly AppSettings appSettings;
     readonly IBleManager bleManager;
     readonly IBleHostingManager hostingManager;
+    CompositeDisposable? scanDisposer;
 
 
     public ScoreboardManager(
@@ -28,98 +32,103 @@ public class ScoreboardManager : IScoreboardManager
 
 
     public IScoreboard? Current { get; private set; }
+    public ObservableCollection<IScoreboard> Scoreboards { get; } = new();
 
 
     public async Task<AccessState> Create(bool hosted)
     {
-        //        var access = await this.bleHostingManager.RequestAccess();
-        //        if (access != AccessState.Available)
-        //            return access;
-        //        await this.bleHostingManager.AttachRegisteredServices();
-        //        await bleHostingManager.StartAdvertising(new AdvertisementOptions(
-        //            this.appSettings.AdvertisingName,
-        //            Constants.GameServiceUuid
-        //        ));
+        var access = AccessState.Available;
 
-        // TODO: create hosted or self
-        throw new NotImplementedException();
+        if (!hosted)
+        {
+            this.Current = new SelfScoreboard(this.appSettings, this.appSettings);
+        }
+        else
+        {
+            access = await this.hostingManager.RequestAccess();
+            if (access == AccessState.Available)
+            {
+                await this.hostingManager.AttachRegisteredServices();
+                await hostingManager.StartAdvertising(new AdvertisementOptions(
+                    this.appSettings.AdvertisingName,
+                    Constants.GameServiceUuid
+                ));
+            }
+        }
+        return access;
     }
 
 
     public async Task EndCurrent()
     {
-        // TODO: kill peripheral connection
-        // TODO: kill hosting attached services
+        (this.Current as IDisposable)?.Dispose();
+        if (this.Current is IAsyncDisposable ad)
+            await ad.DisposeAsync();
     }
 
 
-    public Task<AccessState> StartScan(IScheduler scheduler)
+    public async Task<AccessState> StartScan(IScheduler scheduler)
     {
-        throw new NotImplementedException();
+        if (this.scanDisposer != null)
+            return AccessState.Available;
+
+        var state = await this.bleManager.RequestAccess();
+        if (state == AccessState.Available)
+        {
+            // TODO: signal strength
+            this.scanDisposer = new CompositeDisposable();
+            this.Scoreboards.Clear();
+
+            var scanner = this.bleManager
+                .CreateManagedScanner(
+                    scheduler,
+                    TimeSpan.FromSeconds(10),
+                    new ScanConfig(
+                        ServiceUuids: Constants.GameServiceUuid
+                    )
+                )
+                .DisposedBy(this.scanDisposer);
+
+            scanner
+                .WhenScan()
+                .Where(x => x.ScanResult?.LocalName != null)
+                .ObserveOn(scheduler)
+                .Subscribe(scan =>
+                {
+                    var sr = scan.ScanResult!;
+
+                    switch (scan.Action)
+                    {
+                        case ManagedScanListAction.Add:
+                            this.Scoreboards.Add(new BleClientScoreboard(
+                                sr.Peripheral,
+                                this.appSettings,
+                                this.appSettings
+                            ));
+                            break;
+
+                        case ManagedScanListAction.Update:
+                            //var item = this.Scoreboards.FirstOrDefault(x => x.Name.Equals(sr.LocalName)) as ScoreboardImpl;
+                            //if (item != null)
+                            //    item.SignalStrength = sr.Rssi;
+                            break;
+
+                        case ManagedScanListAction.Remove:
+                            //var remove = this.Scoreboards.FirstOrDefault(x => x.Name.Equals(sr.LocalName));
+                            //if (remove != null)
+                            //    this.Scoreboards.Remove(remove);
+                            break;
+                    }
+                })
+                .DisposedBy(this.scanDisposer);
+        }
+        return state;
     }
+
 
     public void StopScan()
     {
-        throw new NotImplementedException();
+        this.scanDisposer?.Dispose();
+        this.scanDisposer = null;
     }
-
-
-    //    CompositeDisposable? scanDisposer;
-    //    public ObservableCollection<IScoreboard> Scoreboards { get; } = new();
-
-    //    public async Task<AccessState> StartScan(IScheduler scheduler)
-    //    {
-    //        var result = await this.bleManager.RequestAccess();
-    //        if (result != AccessState.Available)
-    //            return result;
-
-    //        this.scanDisposer = new CompositeDisposable();
-    //        this.Scoreboards.Clear();
-
-    //        var scanner = this.bleManager
-    //            .CreateManagedScanner(
-    //                scheduler,
-    //                TimeSpan.FromSeconds(10),
-    //                new ScanConfig(
-    //                    ServiceUuids: Constants.GameServiceUuid
-    //                )
-    //            )
-    //            .DisposedBy(this.scanDisposer);
-
-    //        scanner
-    //            .WhenScan()
-    //            .Where(x => x.ScanResult?.LocalName != null)
-    //            //.ObserveOn(scheduler)
-    //            .Subscribe(scan =>
-    //            {
-    //                var sr = scan.ScanResult!;
-
-    //                switch (scan.Action)
-    //                {
-    //                    case ManagedScanListAction.Add:
-    //                        // TODO: I may need to shove the local name in here
-    //                        this.Scoreboards.Add(new ScoreboardImpl(sr.Peripheral.CreateManaged())
-    //                        {
-    //                            SignalStrength = scan.ScanResult!.Rssi
-    //                        });
-    //                        break;
-
-    //                    case ManagedScanListAction.Update:
-    //                        var item = this.Scoreboards.FirstOrDefault(x => x.Name.Equals(sr.LocalName)) as ScoreboardImpl;
-    //                        if (item != null)
-    //                            item.SignalStrength = sr.Rssi;
-    //                        break;
-
-    //                    case ManagedScanListAction.Remove:
-    //                        var remove = this.Scoreboards.FirstOrDefault(x => x.Name.Equals(sr.LocalName));
-    //                        if (remove != null)
-    //                            this.Scoreboards.Remove(remove);
-    //                        break;
-    //                }
-    //            })
-    //            .DisposedBy(this.scanDisposer);
-
-    //        return result;
-    //    }
-
 }

@@ -49,8 +49,8 @@ public abstract class AbstractScoreboard : IScoreboard
     public TimeSpan PeriodClock { get; protected set; }
     public int PlayClockSeconds { get; protected set; }
 
-    
-    public virtual Task IncrementDown()
+
+    protected void DoIncrementDown()
     {
         this.Down++;
         if (this.Down > this.Rules.Downs)
@@ -60,68 +60,118 @@ public abstract class AbstractScoreboard : IScoreboard
         }
         this.ResetPlayClock();
         this.eventSubj.OnNext(ScoreboardEvent.Down);
-
-        return Task.CompletedTask;
     }
 
 
-    public virtual Task IncrementPeriod()
+    public Task IncrementDown()
+    {
+        this.DoIncrementDown();        
+        return this.Write(new[] { Constants.BleIntents.IncrementDown });
+    }
+
+
+    protected void DoIncrementPeriod()
     {
         this.Reset(true);
         this.eventSubj.OnNext(ScoreboardEvent.Period);
+    }
 
-        return Task.CompletedTask;
+
+    public Task IncrementPeriod()
+    {
+        this.DoIncrementPeriod();
+        return this.Write(new[] { Constants.BleIntents.IncrementPeriod });
+    }
+
+
+    static byte GetTeamByte(bool homeTeam)
+        => homeTeam ? Constants.BleIntents.HomeTeam : Constants.BleIntents.AwayTeam;
+
+
+    protected void DoSetScore(bool homeTeam, int score)
+    {
+        var newTeam = (homeTeam ? this.Home : this.Away) with { Score = score };
+        this.SetTeam(homeTeam, newTeam);
+        this.eventSubj.OnNext(ScoreboardEvent.Score);
     }
 
 
     public virtual Task SetScore(bool homeTeam, int score)
     {
-        var newTeam = (homeTeam ? this.Home : this.Away) with { Score = score };
-        this.SetTeam(homeTeam, newTeam);
-        this.eventSubj.OnNext(ScoreboardEvent.Score);
-
-        return Task.CompletedTask;
+        this.DoSetScore(homeTeam, score);
+        return this.Write(new[]
+        {
+            Constants.BleIntents.Score,
+            GetTeamByte(homeTeam),
+            Convert.ToByte(score)
+        });
     }
 
 
-    public virtual Task SetYardsToGo(int yards)
+    protected void DoSetYardsToGo(int yards)
     {
         this.YardsToGo = yards;
-        return Task.CompletedTask;
+        this.eventSubj.OnNext(ScoreboardEvent.Ytg);
     }
+
+
+    public Task SetYardsToGo(int yards)
+    {
+        this.DoSetYardsToGo(yards);
+        return this.Write(new[]
+        {
+            Constants.BleIntents.Ytg,
+            Convert.ToByte(yards)
+        });
+    }
+
+
+    protected void DoTogglePeriodClock() => this.periodClockRunning = !this.periodClockRunning;
 
 
     public virtual Task TogglePeriodClock()
     {
-        this.periodClockRunning = !this.periodClockRunning;
-        return Task.CompletedTask;
+        this.DoTogglePeriodClock();
+        return this.Write(new[] { Constants.BleIntents.TogglePeriodClock });
     }
 
 
-    public virtual Task TogglePlayClock()
+    protected void DoTogglePlayClock()
     {
         if (this.playClockRunning)
         {
-            this.ResetPlayClock();            
+            this.ResetPlayClock();
         }
         else
         {
             this.playClockRunning = true;
         }
-        return Task.CompletedTask;
+    }
+
+
+    public virtual Task TogglePlayClock()
+    {
+        this.DoTogglePlayClock();
+        return this.Write(new[] { Constants.BleIntents.TogglePlayClock });
+    }
+
+
+    protected void DoTogglePossession()
+    {
+        this.HomePossession = !this.HomePossession;
+        this.Reset(false);
+        this.eventSubj.OnNext(ScoreboardEvent.Possession);
     }
 
 
     public virtual Task TogglePossession()
     {
-        this.HomePossession = !this.HomePossession;
-        this.Reset(false);
-        this.eventSubj.OnNext(ScoreboardEvent.Possession);
-
-        return Task.CompletedTask;
+        this.DoTogglePossession();
+        return this.Write(new[] { Constants.BleIntents.TogglePossession });
     }
 
-    public virtual Task UseTimeout(bool homeTeam)
+
+    protected void DoUseTimeout(bool homeTeam)
     {
         var team = homeTeam ? this.Home : this.Away;
         var timeouts = team.Timeouts - 1;
@@ -132,14 +182,25 @@ public abstract class AbstractScoreboard : IScoreboard
         this.periodClockRunning = false;
         this.SetTeam(homeTeam, team with { Timeouts = timeouts });
         this.eventSubj.OnNext(ScoreboardEvent.Timeout);
+    }
 
-        return Task.CompletedTask;
+
+    public Task UseTimeout(bool homeTeam)
+    {
+        this.DoUseTimeout(homeTeam);
+        return this.Write(new[]
+        {
+            Constants.BleIntents.DecrementTimeout,
+            GetTeamByte(homeTeam)
+        });
     }
 
 
     public virtual IObservable<bool> WhenConnectedChanged() => Observable.Return(true);
     public IObservable<ScoreboardEvent> WhenEvent() => this.eventSubj;
 
+
+    protected virtual Task Write(byte[] data) => Task.CompletedTask;
 
     protected void SetTeam(bool homeTeam, Team team)
     {
@@ -180,4 +241,3 @@ public abstract class AbstractScoreboard : IScoreboard
         this.PlayClockSeconds = this.Rules.PlayClock;
     }
 }
-

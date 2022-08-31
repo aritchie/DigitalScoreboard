@@ -12,11 +12,9 @@ public enum ScoreboardType
 
 public enum ScoreboardEvent
 {
-    // TODO: probably need play & period clock events since both can be started without other events
-        // TODO: clocks are only stopped by other events
-    // TODO: yards to go
     Score,
     Timeout,
+    Ytg,
     Possession,
     Down,
     Period

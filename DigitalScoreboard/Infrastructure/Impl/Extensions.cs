@@ -13,30 +13,29 @@ public record GameInfo(
     int Down,
     int YardsToGo,
     int PlayClockSeconds,
-    int PeriodClockSeconds
-
-// TODO: add period remaing, play clock running/reset, period clock running/stopped
+    int PeriodClockSeconds,
+    int PeriodClockSecondsRemaining
 );
 
 
 public static class Extensions
 {
-    public static byte[] ToBytes(this RuleSet ruleSet)
-    {
-        var bytes = new List<byte>();
-        bytes.Add(Convert.ToByte(ruleSet.BreakTimeMins));
-        bytes.Add(Convert.ToByte(ruleSet.DefaultYardsToGo));
-        bytes.Add(Convert.ToByte(ruleSet.Downs));
-        //ruleSet.BreakTimeMins
+    //public static byte[] ToBytes(this RuleSet ruleSet)
+    //{
+    //    var bytes = new List<byte>();
+    //    bytes.Add(Convert.ToByte(ruleSet.BreakTimeMins));
+    //    bytes.Add(Convert.ToByte(ruleSet.DefaultYardsToGo));
+    //    bytes.Add(Convert.ToByte(ruleSet.Downs));
+    //    //ruleSet.BreakTimeMins
 
-        return bytes.ToArray();
-    }
+    //    return bytes.ToArray();
+    //}
 
 
-    public static RuleSet ToRuleSet(this byte[] bytes) => new RuleSet
-    {
+    //public static RuleSet ToRuleSet(this byte[] bytes) => new RuleSet
+    //{
 
-    };
+    //};
 
 
     public static byte[] ToBytes(this GameInfo info)
@@ -52,6 +51,7 @@ public static class Extensions
         bytes.Add(Convert.ToByte(info.YardsToGo));
         bytes.Add(Convert.ToByte(info.PlayClockSeconds));
         bytes.AddRange(BitConverter.GetBytes(info.PeriodClockSeconds));
+        bytes.AddRange(BitConverter.GetBytes(info.PeriodClockSecondsRemaining));
         return bytes.ToArray();
     }
 
@@ -66,7 +66,8 @@ public static class Extensions
         Convert.ToInt32(bytes[6]),
         Convert.ToInt32(bytes[7]),
         Convert.ToInt32(bytes[8]),
-        BitConverter.ToInt32(bytes, 9)
+        BitConverter.ToInt32(bytes, 9),
+        BitConverter.ToInt32(bytes, 12)
     );
 }
 
