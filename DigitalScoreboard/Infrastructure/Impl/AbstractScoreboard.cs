@@ -16,6 +16,7 @@ public abstract class AbstractScoreboard : IScoreboard
     {
         this.HostName = hostName;
         this.Rules = ruleSet;
+        this.Type = type;
 
         this.Period = 1;
         this.Down = 1;

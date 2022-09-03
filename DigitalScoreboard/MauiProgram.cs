@@ -21,10 +21,10 @@ public static class MauiProgram
                     .RegisterTypes(registry =>
                     {
                         registry.RegisterForNavigation<PrismNavigationPage>("NavigationPage");
-                        registry.RegisterForNavigation<ScanPage, ScanViewModel>();
                         registry.RegisterForNavigation<MainPage, MainViewModel>();
-                        registry.RegisterForNavigation<SettingsPage, SettingsViewModel>();
                         registry.RegisterForNavigation<ScoreboardPage, ScoreboardViewModel>();
+                        registry.RegisterForNavigation<ScanPage, ScanViewModel>();
+                        registry.RegisterForNavigation<SettingsPage, SettingsViewModel>();
                         registry.RegisterForNavigation<FullTimerPage, FullTimerViewModel>();
                     })
                     .OnAppStart("NavigationPage/MainPage")

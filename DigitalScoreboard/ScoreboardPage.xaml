@@ -80,7 +80,7 @@
                 </Grid>
             </Grid>
 
-            <Label Text="{Binding AdvertisingName, StringFormat='Discoverable as {0}'}"
+            <Label Text="{Binding ConnectionInfo}"
                    HorizontalOptions="FillAndExpand"
                    HorizontalTextAlignment="Center" />
         </StackLayout>

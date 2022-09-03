@@ -7,6 +7,7 @@ namespace DigitalScoreboard.Infrastructure;
 public interface IScoreboardManager
 {
     IScoreboard? Current { get; }
+    IObservable<IScoreboard?> WhenCurrentChanged(); 
 
     Task Connect(IScoreboard scoreboard);
     Task<AccessState> Create(bool hosted);

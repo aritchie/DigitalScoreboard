@@ -17,10 +17,7 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="infra:IScoreboard">
                     <VerticalStackLayout>
-<!--
-                        <Label Text="{Binding Name}" />
-                        <Label Text="{Binding SignalStrength, StringFormat='Signal: {0}'}" />
--->
+                        <Label Text="{Binding HostName}" />
                         <BoxView HorizontalOptions="FillAndExpand"
                                  HeightRequest="1"
                                  BackgroundColor="Black" />

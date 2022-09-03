@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
+using System.Reactive.Subjects;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Hosting;
 using Shiny.BluetoothLE.Managed;
@@ -10,6 +11,7 @@ namespace DigitalScoreboard.Infrastructure.Impl;
 
 public class ScoreboardManager : IScoreboardManager
 {
+    readonly Subject<IScoreboard?> sbSubj = new();
     readonly ILogger logger;
     readonly AppSettings appSettings;
     readonly IBleManager bleManager;
@@ -40,7 +42,20 @@ public class ScoreboardManager : IScoreboardManager
         this.Current = ble;
     }
 
-    public IScoreboard? Current { get; private set; }
+
+    IScoreboard? current;
+    public IScoreboard? Current
+    {
+        get => this.current;
+        private set
+        {
+            this.current = value;
+            this.sbSubj.OnNext(value);
+        }
+    }
+
+
+    public IObservable<IScoreboard?> WhenCurrentChanged() => this.sbSubj;
     public ObservableCollection<IScoreboard> Scoreboards { get; } = new();
 
 

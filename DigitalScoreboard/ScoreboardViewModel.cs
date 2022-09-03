@@ -71,7 +71,7 @@ public class ScoreboardViewModel : ViewModel
     public ICommand TogglePlayClock { get; }
     public ICommand TogglePeriodClock { get; }
 
-    public string AdvertisingName => this.settings.AdvertisingName;
+    [Reactive] public string ConnectionInfo { get; private set; }
     public int Period { get; private set; }
     public int PlayClock { get; private set; }
     public TimeSpan PeriodClock { get; private set; }
@@ -92,16 +92,6 @@ public class ScoreboardViewModel : ViewModel
         => this.Dialogs.Confirm("Confirm", "Are you sure you wish to exit the scoreboard?", "Yes", "No");
 
 
-    public override void OnNavigatedTo(INavigationParameters parameters)
-    {
-        base.OnNavigatedTo(parameters);
-
-        // TODO: start hosting
-        // TODO: connecting to
-        // TODO: no hosting or connection
-    }
-
-
     public override void OnAppearing()
     {
         base.OnAppearing();
@@ -113,7 +103,27 @@ public class ScoreboardViewModel : ViewModel
 
         this.Game
             .WhenConnectedChanged()
-            .SubOnMainThread(connected => { }) // TODO
+            .SubOnMainThread(connected =>
+            {
+                switch (this.Game.Type)
+                {
+                    case ScoreboardType.Self:
+                        // show nothing
+                        break;
+
+                    case ScoreboardType.BleHost:
+                        this.ConnectionInfo = connected
+                            ? "Client Connected"
+                            : "Connect to " + this.Game.HostName;
+                        break;
+
+                    case ScoreboardType.BleClient:
+                        this.ConnectionInfo = connected
+                            ? "Connected to " + this.Game.HostName
+                            : "Connecting to " + this.Game.HostName;
+                        break;
+                }
+            })
             .DisposedBy(this.DeactivateWith);
 
         this.Game

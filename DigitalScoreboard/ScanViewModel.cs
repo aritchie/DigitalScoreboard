@@ -19,35 +19,55 @@ public class ScanViewModel : ViewModel
         this.Scan = ReactiveCommand.CreateFromTask(async () =>
         {
             var access = await scoreboardManager.StartScan(RxApp.MainThreadScheduler);
-            if (access != AccessState.Available)
+            if (access == AccessState.Available)
+            {
+                this.ActionDescription = "Scanning for Scoreboards";
+            }
+            else
+            {
+                this.Logger.LogWarning("User denied BLE permissions");
                 await this.Dialogs.Alert("Unable to scan for scoreboards due to permission: " + access);
+            }
         });
 
         this.Connect = ReactiveCommand.CreateFromTask<IScoreboard, Unit>(async sb =>
         {
-            //sb.Connect(); // connect and set
-            await this.Navigation.Navigate(nameof(ScoreboardPage));
+            try
+            {
+                this.scoreboardManager.StopScan();
+
+                this.ActionDescription = "Connecting to " + sb.HostName;
+                await this.scoreboardManager.Connect(sb);
+                await this.Navigation.Navigate(nameof(ScoreboardPage));
+            }
+            catch (Exception ex)
+            {
+                await this.Dialogs.Alert("Failed to connect to " + sb.HostName);
+                this.Logger.LogWarning(ex, "Failed to connect to scoreboard");
+
+                this.Scan.Execute(null);
+            }
             return Unit.Default;
         });
     }
 
 
     [Reactive] public string ActionDescription { get; private set; } = "Scanning For Scoreboards";
-    public ObservableCollection<IScoreboard> Scoreboards => null;// this.scoreboardManager.Scoreboards;
+    public ObservableCollection<IScoreboard> Scoreboards => this.scoreboardManager.Scoreboards;
     public ICommand Scan { get; }
     public ICommand Connect { get; }
 
 
-    public override void OnAppearing()
+    public override void OnNavigatedTo(INavigationParameters parameters)
     {
-        base.OnAppearing();
+        base.OnNavigatedTo(parameters);
         this.Scan.Execute(null);
     }
 
 
-    public override void OnDisappearing()
+    public override void OnNavigatedFrom(INavigationParameters parameters)
     {
-        base.OnDisappearing();
+        base.OnNavigatedFrom(parameters);
         this.scoreboardManager.StopScan();
     }
 }

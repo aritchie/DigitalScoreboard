@@ -12,7 +12,7 @@ public interface IBleHostInput
 }
 
 
-public class BleHostScoreboard : AbstractScoreboard, IBleHostInput, IDisposable
+public class BleHostScoreboard : AbstractScoreboard, IBleHostInput
 {
     readonly Subject<bool> connSubj = new();
 
@@ -31,6 +31,7 @@ public class BleHostScoreboard : AbstractScoreboard, IBleHostInput, IDisposable
     }
 
 
+    public override IObservable<bool> WhenConnectedChanged() => this.connSubj.StartWith(this.character != null);
     protected override Task Write(byte[] data) => this.Characteristic!.Notify(data);
 
 
@@ -85,10 +86,5 @@ public class BleHostScoreboard : AbstractScoreboard, IBleHostInput, IDisposable
                 this.DoSetYardsToGo(BitConverter.ToInt16(data, 1));
                 break;
         }
-    }
-
-    public void Dispose()
-    {
-        
     }
 }
