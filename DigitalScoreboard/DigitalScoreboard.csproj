@@ -47,10 +47,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--<PackageReference Include="ZXing.Net.Maui" Version="0.1.0-preview.7" />-->
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
 		<PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
-
 		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0023" />
 		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
