@@ -25,11 +25,8 @@ public class ScanViewModel : ViewModel
 
         this.Connect = ReactiveCommand.CreateFromTask<IScoreboard, Unit>(async sb =>
         {
-            //sb.Connect();
-            //await navigator.Navigate(
-            //    nameof(RefereePage),
-            //    (nameof(RefereeViewModel.Scoreboard), sb)
-            //);
+            //sb.Connect(); // connect and set
+            await this.Navigation.Navigate(nameof(ScoreboardPage));
             return Unit.Default;
         });
     }

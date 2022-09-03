@@ -12,8 +12,9 @@ public abstract class AbstractScoreboard : IScoreboard
     bool periodClockRunning;
 
 
-    protected AbstractScoreboard(RuleSet ruleSet, ScoreboardType type, Team home, Team away)
+    protected AbstractScoreboard(string hostName, RuleSet ruleSet, ScoreboardType type, Team home, Team away)
     {
+        this.HostName = hostName;
         this.Rules = ruleSet;
 
         this.Period = 1;
@@ -39,6 +40,7 @@ public abstract class AbstractScoreboard : IScoreboard
 
     public RuleSet Rules { get; }
 
+    public string HostName { get; }
     public ScoreboardType Type { get; }
     public Team Home { get; protected set; }
     public Team Away { get; protected set; }

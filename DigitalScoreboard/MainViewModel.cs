@@ -28,17 +28,33 @@ public class MainViewModel : ViewModel
 
 		this.NewGame = ReactiveCommand.CreateFromTask(async () =>
 		{
-            if (scoreboardManager.Current != null)
+            var c = scoreboardManager.Current;
+            if (c != null)
             {
-                //	var details = $"QTR: {g.Period} ({g.Period:c}) - {g.HomeTeamName}: {g.HomeTeamScore} / {g.AwayTeamName}: {g.AwayTeamScore}";
-                //	var result = await this.Dialogs.Confirm("Do you wish to resume your current game? " + details, "Resume Game?", "Yes", "No");
-                //	if (!result)
-                //      return;
-                //	await scoreboardManager.EndGame();
+                var details = $"QTR: {c.Period} ({c.PeriodClock:c}) - {c.Home.Name}: {c.Home.Score} / {c.Away.Name}: {c.Away.Score}";
+                var result = await this.Dialogs.Confirm("Do you wish to resume your current game? " + details, "Resume Game?", "Yes", "No");
+                if (!result)
+                    return;
+
+                await scoreboardManager.EndCurrent();
             }
-            await scoreboardManager.Create(true);
-            // TODO: hosted, connect, or self
-            await this.Navigation.Navigate(nameof(ScoreboardPage));
+            var type = await this.Dialogs.ActionSheet("Game Type", null, "Cancel", "Hosted", "Connect", "Self");
+            switch (type)
+            {
+                case "Connect":
+                    await this.Navigation.Navigate(nameof(ScanPage));
+                    break;
+
+                case "Hosted":
+                    await scoreboardManager.Create(true);
+                    await this.Navigation.Navigate(nameof(ScoreboardPage));
+                    break;
+
+                case "Self":
+                    await scoreboardManager.Create(true);
+                    await this.Navigation.Navigate(nameof(ScoreboardPage));
+                    break;
+            }            
 		});
 
 

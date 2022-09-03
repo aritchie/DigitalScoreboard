@@ -10,6 +10,7 @@ public class SelfScoreboard : AbstractScoreboard
         RuleSet rules
     )
     : base(
+        String.Empty,
         rules,
         ScoreboardType.Self,
         new(settings.HomeTeam, 0, rules.MaxTimeouts),

@@ -31,6 +31,15 @@ public class ScoreboardManager : IScoreboardManager
     }
 
 
+    public async Task Connect(IScoreboard scoreboard)
+    {
+        if (scoreboard is not BleClientScoreboard ble)
+            throw new InvalidOperationException("Not a connectable scoreboard");
+
+        await ble.Connect();
+        this.Current = ble;
+    }
+
     public IScoreboard? Current { get; private set; }
     public ObservableCollection<IScoreboard> Scoreboards { get; } = new();
 
@@ -53,6 +62,7 @@ public class ScoreboardManager : IScoreboardManager
                     this.appSettings.AdvertisingName,
                     Constants.GameServiceUuid
                 ));
+                this.Current = new BleHostScoreboard(this.appSettings, this.appSettings);
             }
         }
         return access;
@@ -64,6 +74,11 @@ public class ScoreboardManager : IScoreboardManager
         (this.Current as IDisposable)?.Dispose();
         if (this.Current is IAsyncDisposable ad)
             await ad.DisposeAsync();
+
+        if (this.Current is BleHostScoreboard)
+            this.hostingManager.DetachRegisteredServices();
+
+        this.Current = null;
     }
 
 

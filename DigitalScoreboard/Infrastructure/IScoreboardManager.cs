@@ -7,6 +7,8 @@ namespace DigitalScoreboard.Infrastructure;
 public interface IScoreboardManager
 {
     IScoreboard? Current { get; }
+
+    Task Connect(IScoreboard scoreboard);
     Task<AccessState> Create(bool hosted);
     Task EndCurrent();
 

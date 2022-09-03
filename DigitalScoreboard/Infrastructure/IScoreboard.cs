@@ -28,6 +28,7 @@ public record Team(
 
 public interface IScoreboard
 {
+    string HostName { get; }
     ScoreboardType Type { get; }
     IObservable<bool> WhenConnectedChanged();
 

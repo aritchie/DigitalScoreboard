@@ -5,17 +5,18 @@ using Shiny.BluetoothLE.Managed;
 namespace DigitalScoreboard.Infrastructure.Impl;
 
 
-public class BleClientScoreboard : AbstractScoreboard
+public class BleClientScoreboard : AbstractScoreboard, IDisposable
 {
     readonly IManagedPeripheral peripheral;
 
-    // TODO: rule set needs to be read from the host - Do this as part of connect
+
     public BleClientScoreboard(
         IPeripheral peripheral,
         AppSettings settings,
         RuleSet rules
     )
     : base(
+        peripheral.Name,
         rules,
         ScoreboardType.BleClient,
         new(settings.HomeTeam, 0, rules.MaxTimeouts),
@@ -25,6 +26,12 @@ public class BleClientScoreboard : AbstractScoreboard
         this.peripheral = peripheral.CreateManaged();
     }
 
+    public Task Connect(CancellationToken ct = default)
+        // TODO: pull ruleset BEFORE allowing connected event to fire
+        => this.peripheral.ConnectWait().Timeout(TimeSpan.FromSeconds(20)).ToTask(ct);
+
+    public void Dispose()
+        => this.peripheral.Dispose();
 
     public override IObservable<bool> WhenConnectedChanged()
         => this.peripheral.WhenAnyValue(x => x.Status).Select(x => x == ConnectionState.Connected);

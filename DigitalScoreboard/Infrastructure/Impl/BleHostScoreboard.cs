@@ -12,7 +12,7 @@ public interface IBleHostInput
 }
 
 
-public class BleHostScoreboard : AbstractScoreboard, IBleHostInput
+public class BleHostScoreboard : AbstractScoreboard, IBleHostInput, IDisposable
 {
     readonly Subject<bool> connSubj = new();
 
@@ -21,6 +21,7 @@ public class BleHostScoreboard : AbstractScoreboard, IBleHostInput
         AppSettings settings
     )
     : base(
+        settings.AdvertisingName,
         rules,
         ScoreboardType.BleHost,
         new(settings.HomeTeam, 0, rules.MaxTimeouts),
@@ -84,5 +85,10 @@ public class BleHostScoreboard : AbstractScoreboard, IBleHostInput
                 this.DoSetYardsToGo(BitConverter.ToInt16(data, 1));
                 break;
         }
+    }
+
+    public void Dispose()
+    {
+        
     }
 }
