@@ -72,29 +72,26 @@ public class ScoreboardViewModel : ViewModel
     public ICommand TogglePeriodClock { get; }
 
     [Reactive] public string ConnectionInfo { get; private set; }
-    public int Period { get; private set; }
-    public int PlayClock { get; private set; }
-    public TimeSpan PeriodClock { get; private set; }
-    public int Down { get; private set; }
-    public int YardsToGo { get; private set; }
+    [Reactive] public int Period { get; private set; }
+    [Reactive] public int PlayClock { get; private set; }
+    [Reactive] public TimeSpan PeriodClock { get; private set; }
+    [Reactive] public int Down { get; private set; }
+    [Reactive] public int YardsToGo { get; private set; }
 
-    public string HomeTeamName { get; private set; }
-    public int HomeTeamScore { get; private set; }
-    public bool HomeTeamPossession { get; private set; }
-    public int HomeTeamTimeouts { get; private set; }
+    [Reactive] public string HomeTeamName { get; private set; }
+    [Reactive] public int HomeTeamScore { get; private set; }
+    [Reactive] public bool HomeTeamPossession { get; private set; }
+    [Reactive] public int HomeTeamTimeouts { get; private set; }
 
-    public string AwayTeamName { get; private set; }
-    public int AwayTeamScore { get; private set; }
-    public int AwayTeamTimeouts { get; private set; }
-
-
-    public override Task<bool> CanNavigateAsync(INavigationParameters parameters)
-        => this.Dialogs.Confirm("Confirm", "Are you sure you wish to exit the scoreboard?", "Yes", "No");
+    [Reactive] public string AwayTeamName { get; private set; }
+    [Reactive] public int AwayTeamScore { get; private set; }
+    [Reactive] public int AwayTeamTimeouts { get; private set; }
 
 
-    public override void OnAppearing()
+    public override void OnNavigatedTo(INavigationParameters parameters)
     {
-        base.OnAppearing();
+        base.OnNavigatedTo(parameters);
+        this.SetFromGame();
 
         this.Game
             .WhenEvent()
@@ -139,9 +136,9 @@ public class ScoreboardViewModel : ViewModel
     }
 
 
-    public override void OnDisappearing()
+    public override void OnNavigatedFrom(INavigationParameters parameters)
     {
-        base.OnDisappearing();
+        base.OnNavigatedFrom(parameters);
 
         this.display.KeepScreenOn = false;
     }
@@ -159,8 +156,6 @@ public class ScoreboardViewModel : ViewModel
         this.Down = this.Game.Down;
         this.YardsToGo = this.Game.YardsToGo;
         this.HomeTeamPossession = this.Game.HomePossession;
-
-        this.RaisePropertyChanged();
     }
 
     ICommand SetScore(string question, Func<int, Task> action) => ReactiveCommand.CreateFromTask(async () =>
