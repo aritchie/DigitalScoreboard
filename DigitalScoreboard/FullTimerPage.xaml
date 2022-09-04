@@ -15,8 +15,6 @@
         </VerticalStackLayout.GestureRecognizers>
 
         <local:FillLabel Text="{Binding TimeRemaining}"
-                         Style="{StaticResource BoardLabel}"
-                         TextColor="Yellow"
                          VerticalOptions="FillAndExpand"
                          HorizontalOptions="FillAndExpand" />
     </VerticalStackLayout>
