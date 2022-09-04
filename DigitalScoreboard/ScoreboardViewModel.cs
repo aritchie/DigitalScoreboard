@@ -158,6 +158,7 @@ public class ScoreboardViewModel : ViewModel
         this.HomeTeamPossession = this.Game.HomePossession;
     }
 
+
     ICommand SetScore(string question, Func<int, Task> action) => ReactiveCommand.CreateFromTask(async () =>
     {
         var value = await this.Dialogs.Input(

@@ -14,7 +14,7 @@ public class MainViewModel : ViewModel
 	)
 	: base(services)
 	{
-        this.Current = this.Navigation.NavigateCommand(
+        this.Current = this.Navigation.Command(
             nameof(ScoreboardPage),
             null,
             scoreboardManager
@@ -53,14 +53,14 @@ public class MainViewModel : ViewModel
                 .Select(x => x != null)
         );
 
-		this.Settings = this.Navigation.NavigateCommand(nameof(SettingsPage));
+		this.Settings = this.Navigation.Command(nameof(SettingsPage));
 
-        this.HalfTime = this.Navigation.NavigateCommand(nameof(FullTimerPage), p => p.AddRange(
+        this.HalfTime = this.Navigation.Command(nameof(FullTimerPage), p => p.AddRange(
             ("Type", TimerType.Clock),
             ("Time", appSettings.BreakTimeMins)
         ));
 
-        this.PlayClock = this.Navigation.NavigateCommand(nameof(FullTimerPage), p => p.AddRange(
+        this.PlayClock = this.Navigation.Command(nameof(FullTimerPage), p => p.AddRange(
             ("Type", TimerType.Countdown),
             ("Time", appSettings.PlayClock)
         ));
