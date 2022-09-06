@@ -38,7 +38,6 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        builder.Services.AddSingleton<ScreenOrientation>();
         builder.Services.AddSingleton(DeviceDisplay.Current);
         builder.Services.AddShinyService<AppSettings>();
         builder.Services.AddBluetoothScoreboardServices();

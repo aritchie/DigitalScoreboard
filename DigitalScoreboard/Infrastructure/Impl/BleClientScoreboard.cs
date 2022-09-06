@@ -27,16 +27,21 @@ public class BleClientScoreboard : AbstractScoreboard, IDisposable
         this.peripheral = peripheral.CreateManaged();
     }
 
-    public Task Connect(CancellationToken ct = default)
-        // TODO: pull ruleset BEFORE allowing connected event to fire
-        => this.peripheral.ConnectWait().Timeout(TimeSpan.FromSeconds(20)).ToTask(ct);
+    public async Task Connect(CancellationToken ct = default)
+    {
+        await this.peripheral.ConnectWait().Timeout(TimeSpan.FromSeconds(20)).ToTask(ct);
+
+        this.peripheral
+            .WhenNotificationReceived(Constants.GameServiceUuid, Constants.GameCharacteristicUuid)
+            .WhereNotNull()
+            .Subscribe(x => this.SetFromPacket(x));
+    }
 
     public void Dispose()
         => this.peripheral.Dispose();
 
     public override IObservable<bool> WhenConnectedChanged()
         => this.peripheral.WhenAnyValue(x => x.Status).Select(x => x == ConnectionState.Connected);
-
 
     protected override Task Write(byte[] data) => this.peripheral
         .Write(

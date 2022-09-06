@@ -19,5 +19,8 @@ public static class Constants
         public const byte DecrementTimeout = 0x06;
         public const byte TogglePossession = 0x07;
         public const byte Ytg = 0x08;
+
+        public const byte SyncGame = 0x09;
+        public const byte SyncRules = 0x10;
     }
 }

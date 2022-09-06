@@ -39,7 +39,7 @@ public abstract class AbstractScoreboard : IScoreboard
     }
 
 
-    public RuleSet Rules { get; }
+    protected RuleSet Rules { get; set; }
 
     public string HostName { get; }
     public ScoreboardType Type { get; }
@@ -248,5 +248,52 @@ public abstract class AbstractScoreboard : IScoreboard
     {
         this.playClockRunning = false;
         this.PlayClockSeconds = this.Rules.PlayClock;
+    }
+
+
+    protected void SetFromPacket(byte[] data)
+    {
+        switch (data[0])
+        {
+            case Constants.BleIntents.Score:
+                var ht1 = (data[1] == Constants.BleIntents.HomeTeam);
+                var score = (int)data[2];
+                this.DoSetScore(ht1, score);
+                break;
+
+            case Constants.BleIntents.IncrementDown:
+                this.DoIncrementDown();
+                break;
+
+            case Constants.BleIntents.IncrementPeriod:
+                this.DoIncrementPeriod();
+                break;
+
+            case Constants.BleIntents.TogglePlayClock:
+                this.DoTogglePlayClock();
+                break;
+
+            case Constants.BleIntents.TogglePeriodClock:
+                this.DoTogglePeriodClock();
+                break;
+
+            case Constants.BleIntents.DecrementTimeout:
+                var ht2 = data[1] == Constants.BleIntents.HomeTeam;
+                this.DoUseTimeout(ht2);
+                break;
+
+            case Constants.BleIntents.TogglePossession:
+                this.DoTogglePossession();
+                break;
+
+            case Constants.BleIntents.Ytg:
+                var ytg = (int)data[1];
+                this.DoSetYardsToGo(ytg);
+                break;
+
+            case Constants.BleIntents.Sync:
+                // trim off first byte
+                break;
+        }
     }
 }

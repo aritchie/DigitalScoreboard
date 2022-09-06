@@ -1,56 +1,55 @@
 ﻿using DigitalScoreboard.Infrastructure;
+using Foundation;
+using UIKit;
 
 namespace DigitalScoreboard;
 
 
 public partial class ScoreboardPage : ContentPage
 {
-	readonly ScreenOrientation screenOrientation;
+#if ANDROID
+    readonly AndroidPlatform platform;
 
 
-    public ScoreboardPage(ScreenOrientation screenOrientation)
-	{
-		this.InitializeComponent();
-		this.screenOrientation = screenOrientation;
-	}
+    public ScoreboardPage(AndroidPlatform platform)
+    {
+        this.InitializeComponent();
+        this.platform = platform;
+    }
+#else
+    public ScoreboardPage()
+    {
+        this.InitializeComponent();
+    }
+#endif
 
-
-	protected override void OnAppearing()
-	{
-		base.OnAppearing();
-		this.screenOrientation.LockLandscape();
+    protected override void OnNavigatedTo(NavigatedToEventArgs args)
+    {
+        base.OnNavigatedTo(args);
+#if IOS
+        UIApplication.SharedApplication.SetStatusBarOrientation(UIInterfaceOrientation.LandscapeLeft, false);
+        UIDevice.CurrentDevice.SetValueForKey(
+            NSNumber.FromNInt((int)UIInterfaceOrientation.LandscapeLeft),
+            new NSString("orientation")
+        );
+#elif ANDROID
+        this.platform.CurrentActivity!.RequestedOrientation = Android.Content.PM.ScreenOrientation.Landscape;
+#endif
     }
 
 
-    protected override void OnDisappearing()
-	{
-		base.OnDisappearing();
-		this.screenOrientation.UnlockLandscape();
+    protected override void OnNavigatedFrom(NavigatedFromEventArgs args)
+    {
+        base.OnNavigatedFrom(args);
+
+#if IOS
+        UIApplication.SharedApplication.SetStatusBarOrientation(UIInterfaceOrientation.Unknown, false);
+        UIDevice.CurrentDevice.SetValueForKey(
+            NSNumber.FromNInt((int)UIInterfaceOrientation.Unknown),
+            new NSString("orientation")
+        );
+#elif ANDROID
+        this.platform.CurrentActivity!.RequestedOrientation = Android.Content.PM.ScreenOrientation.Unspecified;
+#endif
     }
 }
-
-//public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow forWindow)
-//{
-//    if (Device.Idiom == TargetIdiom.Phone)
-//    {
-//        {
-//            return UIInterfaceOrientationMask.Landscape;
-//        }
-//    else
-//        {
-//            return UIInterfaceOrientationMask.Portrait;
-//        }
-//    }
-
-//// and on Android -> MainActivity.cs do the same if else in here
-
-//protected override void OnCreate(Bundle savedInstanceState)
-//{
-//    if (Device.Idiom == TargetIdiom.Phone)
-//    {
-//        RequestedOrientation = ScreenOrientation.Landscape;
-//    }
-//    else
-//    {
-//        RequestedOrientation = ScreenOrientation.Portrait;
-//    }

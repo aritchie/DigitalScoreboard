@@ -20,26 +20,15 @@ public class GameBleGattCharacteristic : BleGattCharacteristic
     }
 
 
-    public override Task OnSubscriptionChanged(IPeripheral peripheral, bool subscribed)
+    public override async Task OnSubscriptionChanged(IPeripheral peripheral, bool subscribed)
     {
         var host = (IBleHostInput)this.scoreboardManager.Current!;
 
-        if (this.Characteristic.SubscribedCentrals.Count == 0)
-        {
-            host.Characteristic = null;
-        }
-        else
-        {
-            host.Characteristic = this.Characteristic;
-        }
-        return Task.CompletedTask;
-    }
+        var ch = this.Characteristic.SubscribedCentrals.Count == 0
+            ? null
+            : this.Characteristic;
 
-
-    public override async Task<ReadResult> OnRead(ReadRequest request)
-    {
-        // TODO: passout current game ruleset
-        return ReadResult.Success(new byte[] { 0x01 });
+        await host.SetCharacteristic(ch);
     }
 
 
