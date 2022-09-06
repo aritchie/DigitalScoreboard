@@ -18,5 +18,9 @@ public class SelfScoreboard : AbstractScoreboard
     )
     {
     }
+
+
+    public override IObservable<bool> WhenConnectedChanged() => Observable.Return(true);
+    protected override Task Write(byte[] data) => Task.CompletedTask;
 }
 

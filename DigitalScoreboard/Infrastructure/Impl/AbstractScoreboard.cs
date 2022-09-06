@@ -20,6 +20,7 @@ public abstract class AbstractScoreboard : IScoreboard
 
         this.Period = 1;
         this.Down = 1;
+        this.PlayClockSeconds = ruleSet.PlayClock;
         this.PeriodClock = TimeSpan.FromMinutes(ruleSet.PeriodDurationMins);
         this.YardsToGo = ruleSet.DefaultYardsToGo;
         this.Home = home;
@@ -39,8 +40,10 @@ public abstract class AbstractScoreboard : IScoreboard
     }
 
 
-    protected RuleSet Rules { get; set; }
+    public abstract IObservable<bool> WhenConnectedChanged();
+    protected abstract Task Write(byte[] data);
 
+    protected RuleSet Rules { get; set; }
     public string HostName { get; }
     public ScoreboardType Type { get; }
     public Team Home { get; protected set; }
@@ -102,7 +105,7 @@ public abstract class AbstractScoreboard : IScoreboard
     }
 
 
-    public virtual Task SetScore(bool homeTeam, int score)
+    public Task SetScore(bool homeTeam, int score)
     {
         if (score < 0 || score > 99)
             return Task.CompletedTask;
@@ -138,7 +141,7 @@ public abstract class AbstractScoreboard : IScoreboard
     protected void DoTogglePeriodClock() => this.periodClockRunning = !this.periodClockRunning;
 
 
-    public virtual Task TogglePeriodClock()
+    public Task TogglePeriodClock()
     {
         this.DoTogglePeriodClock();
         return this.Write(new[] { Constants.BleIntents.TogglePeriodClock });
@@ -158,7 +161,7 @@ public abstract class AbstractScoreboard : IScoreboard
     }
 
 
-    public virtual Task TogglePlayClock()
+    public Task TogglePlayClock()
     {
         this.DoTogglePlayClock();
         return this.Write(new[] { Constants.BleIntents.TogglePlayClock });
@@ -173,7 +176,7 @@ public abstract class AbstractScoreboard : IScoreboard
     }
 
 
-    public virtual Task TogglePossession()
+    public Task TogglePossession()
     {
         this.DoTogglePossession();
         return this.Write(new[] { Constants.BleIntents.TogglePossession });
@@ -204,12 +207,8 @@ public abstract class AbstractScoreboard : IScoreboard
         });
     }
 
-
-    public virtual IObservable<bool> WhenConnectedChanged() => Observable.Return(true);
     public IObservable<ScoreboardEvent> WhenEvent() => this.eventSubj;
-
-
-    protected virtual Task Write(byte[] data) => Task.CompletedTask;
+    
 
     protected void SetTeam(bool homeTeam, Team team)
     {
@@ -291,8 +290,32 @@ public abstract class AbstractScoreboard : IScoreboard
                 this.DoSetYardsToGo(ytg);
                 break;
 
-            case Constants.BleIntents.Sync:
-                // trim off first byte
+            case Constants.BleIntents.SyncGame:
+                var sync = SyncGame.FromBytes(data);
+
+                this.Period = sync.Period;
+                this.Down = sync.Down;
+                this.YardsToGo = sync.YardsToGo;
+                this.PlayClockSeconds = sync.PlayClockSeconds;
+                this.HomePossession = sync.HomePossession;
+                this.PeriodClock = TimeSpan.FromSeconds(sync.PeriodClockSecondsRemaining);
+
+                this.Home = new Team(
+                    "Home",
+                    sync.HomeScore,
+                    sync.HomeTimeouts
+                );
+                this.Away = new Team(
+                    "Away",
+                    sync.AwayScore,
+                    sync.AwayTimeouts
+                );
+                this.eventSubj.OnNext(ScoreboardEvent.Sync);
+                // TODO: sync clocks running?
+                break;
+
+            case Constants.BleIntents.SyncRules:
+                this.Rules = RuleSet.SetFromBytes(data);
                 break;
         }
     }

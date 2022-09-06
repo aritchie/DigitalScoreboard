@@ -38,7 +38,7 @@ public class ScanViewModel : ViewModel
 
                 this.ActionDescription = "Connecting to " + sb.HostName;
                 await this.scoreboardManager.Connect(sb);
-                await this.Navigation.Navigate(nameof(ScoreboardPage));
+                await this.Navigation.Navigate($"../{nameof(ScoreboardPage)}");
             }
             catch (Exception ex)
             {

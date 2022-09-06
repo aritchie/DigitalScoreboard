@@ -129,7 +129,12 @@ public class ScoreboardViewModel : ViewModel
 
         this.Game
             .WhenEvent()
-            .SubOnMainThread(_ => this.SetFromGame())
+            .SubOnMainThread(e =>
+            {
+                this.SetFromGame();
+                if (e == ScoreboardEvent.Sync)
+                    this.PeriodClock = this.Game.PeriodClock;
+            })
             .DisposedBy(this.DeactivateWith);
 
         this.Game

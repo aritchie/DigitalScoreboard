@@ -17,7 +17,8 @@ public enum ScoreboardEvent
     Ytg,
     Possession,
     Down,
-    Period
+    Period,
+    Sync
 }
 
 public record Team(
@@ -42,7 +43,7 @@ public interface IScoreboard
     int Period { get; }
     int PlayClockSeconds { get; }
     TimeSpan PeriodClock { get; }
-    
+
     IObservable<ScoreboardEvent> WhenEvent();
 
     Task TogglePossession();
@@ -53,4 +54,15 @@ public interface IScoreboard
     Task SetScore(bool homeTeam, int score);
     Task TogglePeriodClock();
     Task TogglePlayClock();
+
+    // TODO: call when leaving scoreboard if host/self
+    //Task PauseGame();
+
+    // TODO
+    //Task StartPlayClock();
+    //Task ResetPlayClock();
+    //Task StartPlayClock();
+    //Task StopPeriodClock();
+    //bool IsPeriodClockRunning { get; }
+    //bool IsPlayClockRunning { get; }
 }

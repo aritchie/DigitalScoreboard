@@ -41,18 +41,16 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 <img src="settings.png" />
 
 ## TODO
+* Pretty Up
 * Referee Card
     * 1 press button to start play clock, 2nd press to start period clock, 3rd press to reset/stop
-* Move possession indicator to be a mini football beside team name or score
+    * Need to be able sync & tell what state each timer is in
 * Load/Save Rulesets in settings
 * Online Error Log - AppCenter, Firebase, Sentry, etc
-* Setting to auto remember "scoreboard"?
 * Client can tell remote scoreboard to go to fullscreen play clock or timer
 
-
 ## ISSUES
-* Rules & Game sync on client connection
-* Don't navigate back to scanpage once connected to scoreboard, go back to main page
+* Period time remaining is not sync'ing over
 * iOS
     * Lock orientation on scoreboard
 * Stop period timer when leaving scoreboard if hosted or self
