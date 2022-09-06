@@ -38,8 +38,10 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 <img src="settings.png" />
 
 ## TODO
-
+* Auto font size for full screen/scoreboard
 * Stop period timer when leaving scoreboard if hosted or self
+* Referee Card
+    * 1 press button to start play clock, 2nd press to start period clock, 3rd press to reset/stop
 * Move possession indicator to be a mini football beside team name or score
 * Load/Save Rulesets in settings
 * Online Error Log - AppCenter, Firebase, Sentry, etc
