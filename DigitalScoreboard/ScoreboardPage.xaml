@@ -6,6 +6,10 @@
              x:Class="DigitalScoreboard.ScoreboardPage"
              BackgroundColor="Black">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Referee" Command="{Binding ToggleRefereeCard}" />
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Content>
         <StackLayout>
             <Grid RowDefinitions="Auto, Auto, Auto"
@@ -13,7 +17,8 @@
 
                 <local:BoardLabel Title="{Binding HomeTeamName}"
                                   Info="{Binding HomeTeamScore}"
-                                  Command="{Binding SetHomeScore}"
+                                  Command="{Binding SetScore}"
+                                  CommandParameter="home"
                                   Grid.Column="0"
                                   Grid.Row="0" />
 
@@ -24,7 +29,8 @@
 
                 <local:BoardLabel Title="{Binding AwayTeamName}"
                                   Info="{Binding AwayTeamScore}"
-                                  Command="{Binding SetAwayScore}"
+                                  Command="{Binding SetScore}"
+                                  CommandParameter="away"
                                   Grid.Column="2"
                                   Grid.Row="0" />
 
@@ -34,7 +40,8 @@
 
                     <local:BoardLabel Title="T.0"
                                       Info="{Binding HomeTeamTimeouts}"
-                                      Command="{Binding DecrementHomeTimeout}"
+                                      Command="{Binding DecrementTimeout}"
+                                      CommandParameter="home"
                                       Grid.Column="0" />            
 
                     <local:BoardLabel Info="&lt;"
@@ -55,7 +62,8 @@
 
                     <local:BoardLabel Title="T.0"
                                       Info="{Binding AwayTeamTimeouts}"
-                                      Command="{Binding DecrementAwayTimeout}"
+                                      Command="{Binding DecrementTimeout}"
+                                      CommandParameter="away"
                                       Grid.Column="4" />
                 </Grid>
 
@@ -83,6 +91,31 @@
             <Label Text="{Binding ConnectionInfo}"
                    HorizontalOptions="FillAndExpand"
                    HorizontalTextAlignment="Center" />
+
+            <Border IsVisible="{Binding ShowRefereeCard}"
+                    BackgroundColor="LemonChiffon">
+                <Grid RowDefinitions="1*,1*,1*" ColumnDefinitions="1*,1*,1*,1*,1*,1*">
+
+                    <Label Text="Home" Grid.Row="0" Grid.Column="0" />
+                    <Button Text="-1" Command="{Binding AddScore}" CommandParameter="home:-1" Grid.Row="0" Grid.Column="1" />
+                    <Button Text="1" Command="{Binding AddScore}" CommandParameter="home:1" Grid.Row="0" Grid.Column="2" />
+                    <Button Text="2" Command="{Binding AddScore}" CommandParameter="home:2" Grid.Row="0" Grid.Column="3" />
+                    <Button Text="3" Command="{Binding AddScore}" CommandParameter="home:3" Grid.Row="0" Grid.Column="4" />
+                    <Button Text="6" Command="{Binding AddScore}" CommandParameter="home:6" Grid.Row="0" Grid.Column="5" />
+
+                    <Label Text="Away" Grid.Row="1" Grid.Column="0" />
+                    <Button Text="-1" Command="{Binding AddScore}" CommandParameter="away:-1" Grid.Row="1" Grid.Column="1" />
+                    <Button Text="1" Command="{Binding AddScore}" CommandParameter="away:1" Grid.Row="1" Grid.Column="2" />
+                    <Button Text="2" Command="{Binding AddScore}" CommandParameter="away:2" Grid.Row="1" Grid.Column="3" />
+                    <Button Text="3" Command="{Binding AddScore}" CommandParameter="away:3" Grid.Row="1" Grid.Column="4" />
+                    <Button Text="6" Command="{Binding AddScore}" CommandParameter="away:6" Grid.Row="1" Grid.Column="5" />
+
+                    <Button Text="Start All Clocks"
+                            Command="{Binding StartAllClocks}"
+                            Grid.Row="2"
+                            Grid.ColumnSpan="6" />
+                </Grid>
+            </Border>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

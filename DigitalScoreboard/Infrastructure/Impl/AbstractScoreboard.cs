@@ -93,6 +93,9 @@ public abstract class AbstractScoreboard : IScoreboard
 
     protected void DoSetScore(bool homeTeam, int score)
     {
+        if (score < 0 || score > 99)
+            return;
+
         var newTeam = (homeTeam ? this.Home : this.Away) with { Score = score };
         this.SetTeam(homeTeam, newTeam);
         this.eventSubj.OnNext(ScoreboardEvent.Score);
@@ -101,6 +104,9 @@ public abstract class AbstractScoreboard : IScoreboard
 
     public virtual Task SetScore(bool homeTeam, int score)
     {
+        if (score < 0 || score > 99)
+            return Task.CompletedTask;
+
         this.DoSetScore(homeTeam, score);
         return this.Write(new[]
         {

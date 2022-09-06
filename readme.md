@@ -31,12 +31,6 @@ You can also control most settings, pause/resume of clocks, etc by tapping on th
 
 <img src="scoreboard.png" />
 
-## Referee
-
-Uses Shiny.BluetoothLE to connect to the scoreboard host.
-
-<img src="referee.png" />
-
 ## Settings
 
 The settings screen allows you to set all of the scoreboard constraints and others things like team names
@@ -45,14 +39,9 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 
 ## TODO
 
-* Play clock start/resets send command /w settings value to ref - ref runs own timer
-* Period clock start/stop command /w current value to ref - ref runs own timer
+* Stop period timer when leaving scoreboard if hosted or self
 * Move possession indicator to be a mini football beside team name or score
-* Full Screen Label Font on timer screen
 * Load/Save Rulesets in settings
 * Online Error Log - AppCenter, Firebase, Sentry, etc
-* Ball On Yard
-* Remove Referee Screen
-    * You connect to scoreboard or host a scoreboard - you can also just have a scoreboard with no connections
 * Setting to auto remember "scoreboard"?
 * Client can tell remote scoreboard to go to fullscreen play clock or timer

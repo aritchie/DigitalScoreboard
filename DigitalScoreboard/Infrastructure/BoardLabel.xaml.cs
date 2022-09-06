@@ -60,6 +60,19 @@ public partial class BoardLabel : ContentView
     }
 
 
+    public static readonly BindableProperty CommandParameterProperty = BindableProperty.Create(
+        nameof(CommandParameter),
+        typeof(object),
+        typeof(BoardLabel),
+        null
+    );
+    public object CommandParameter
+    {
+        get => this.GetValue(CommandParameterProperty);
+        set => this.SetValue(CommandParameterProperty, value);
+    }
+
+
     protected override void OnPropertyChanged(string? propertyName = null)
     {
         if (propertyName == TitleProperty.PropertyName)
@@ -74,6 +87,10 @@ public partial class BoardLabel : ContentView
         else if (propertyName == CommandProperty.PropertyName)
         {
             grCommand.Command = this.Command;
+        }
+        else if (propertyName == CommandParameterProperty.PropertyName)
+        {
+            grCommand.CommandParameter = this.CommandParameter;
         }
         else if (propertyName == IsInfoFramedProperty.PropertyName)
         {
