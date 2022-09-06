@@ -131,26 +131,29 @@ public class ScoreboardManager : IScoreboardManager
                     {
                         case ManagedScanListAction.Add:
                             this.Scoreboards.Add(new BleClientScoreboard(
+                                sr.LocalName!,
                                 sr.Peripheral,
                                 this.appSettings,
                                 this.appSettings
                             ));
                             break;
 
-                        case ManagedScanListAction.Update:
-                            //var item = this.Scoreboards.FirstOrDefault(x => x.Name.Equals(sr.LocalName)) as ScoreboardImpl;
-                            //if (item != null)
-                            //    item.SignalStrength = sr.Rssi;
-                            break;
+                        //case ManagedScanListAction.Update:
+                        //    //var item = this.Scoreboards.FirstOrDefault(x => x.Name.Equals(sr.LocalName)) as ScoreboardImpl;
+                        //    //if (item != null)
+                        //    //    item.SignalStrength = sr.Rssi;
+                        //    break;
 
                         case ManagedScanListAction.Remove:
-                            //var remove = this.Scoreboards.FirstOrDefault(x => x.Name.Equals(sr.LocalName));
-                            //if (remove != null)
-                            //    this.Scoreboards.Remove(remove);
+                            var remove = this.Scoreboards.FirstOrDefault(x => x.HostName.Equals(sr.LocalName));
+                            if (remove != null)
+                                this.Scoreboards.Remove(remove);
                             break;
                     }
                 })
                 .DisposedBy(this.scanDisposer);
+
+            await scanner.Start();
         }
         return state;
     }

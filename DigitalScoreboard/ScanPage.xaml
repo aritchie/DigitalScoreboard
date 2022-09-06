@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:DigitalScoreboard"
              xmlns:infra="clr-namespace:DigitalScoreboard.Infrastructure"
+             x:Name="thePage"
              x:DataType="local:ScanViewModel"
              x:Class="DigitalScoreboard.ScanPage"
              Title="Scanning for Scoreboards">
@@ -13,7 +14,9 @@
             <Label Text="{Binding ActionDescription}" />
         </HorizontalStackLayout>
 
-        <CollectionView ItemsSource="{Binding Scoreboards}">
+        <CollectionView ItemsSource="{Binding Scoreboards}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedScoreboard}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="infra:IScoreboard">
                     <VerticalStackLayout>

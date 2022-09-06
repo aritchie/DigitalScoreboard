@@ -11,12 +11,13 @@ public class BleClientScoreboard : AbstractScoreboard, IDisposable
 
 
     public BleClientScoreboard(
+        string localName,
         IPeripheral peripheral,
         AppSettings settings,
         RuleSet rules
     )
     : base(
-        peripheral.Name,
+        localName,
         rules,
         ScoreboardType.BleClient,
         new(settings.HomeTeam, 0, rules.MaxTimeouts),

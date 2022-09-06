@@ -30,7 +30,7 @@ public class ScanViewModel : ViewModel
             }
         });
 
-        this.Connect = ReactiveCommand.CreateFromTask<IScoreboard, Unit>(async sb =>
+        this.WhenAnyValueSelected(x => x.SelectedScoreboard, async sb =>
         {
             try
             {
@@ -47,15 +47,14 @@ public class ScanViewModel : ViewModel
 
                 this.Scan.Execute(null);
             }
-            return Unit.Default;
         });
     }
 
 
-    [Reactive] public string ActionDescription { get; private set; } = "Scanning For Scoreboards";
+    [Reactive] public string ActionDescription { get; private set; }
+    [Reactive] public IScoreboard SelectedScoreboard { get; set; } = null!;
     public ObservableCollection<IScoreboard> Scoreboards => this.scoreboardManager.Scoreboards;
     public ICommand Scan { get; }
-    public ICommand Connect { get; }
 
 
     public override void OnNavigatedTo(INavigationParameters parameters)
