@@ -3,9 +3,12 @@
 A football scoreboard that can be controlled through Bluetooth.  Great for little league games.
 
 ## Features
-* Referee "client" screen that allows you to control the scoreboard remotely
-* Customized Team Names
-* Customized Game & Play Clock Timers
+* Customizable settings
+    * Team Names
+    * Game & Play Clock Times
+    * Number of Downs (little leagues often have extra downs)
+    * Timeouts
+    * Default Yards-To-Go (once it is 1st down again)
 * Full Screen Clock for Half Time or Play Clock
 * Screen Properties
     * Current quarter/period
