@@ -3,18 +3,21 @@
 namespace DigitalScoreboard;
 
 
-public class SettingsViewModel : ReactiveObject
+public class SettingsViewModel : ViewModel
 {
-    public SettingsViewModel(AppSettings settings)
+    readonly AppSettings settings;
+    bool isDirty;
+
+
+    public SettingsViewModel(BaseServices services, AppSettings settings) : base(services)
     {
-        this.AdvertisingName = settings.AdvertisingName;
-        this.PlayClock = settings.PlayClock;
-        this.PeriodDuration = settings.PeriodDurationMins;
-        this.Periods = settings.Periods;
-        this.Downs = settings.Downs;
-        this.MaxTimeouts = settings.MaxTimeouts;
-        this.BreakTimeMins = settings.BreakTimeMins;
-        this.DefaultYardsToGo = settings.DefaultYardsToGo;
+        this.settings = settings;
+        this.SetValues();
+
+        this.WhenAnyProperty()
+            .Skip(1)
+            .Subscribe(_ => this.isDirty = true)
+            .DisposedBy(this.DestroyWith);
 
         var valid = this.WhenAny(
             x => x.AdvertisingName,
@@ -29,7 +32,8 @@ public class SettingsViewModel : ReactiveObject
             x => x.DefaultYardsToGo,
             (adn, pc, ht, at, pd, p, downs, to, bt, ytg) =>
             {
-                if (adn.GetValue().Length != 4)
+                var len = adn.GetValue().Length;
+                if (len < 4 || len > 8)
                     return false;
 
                 if (pc.GetValue() < 10 || pc.GetValue() > 120)
@@ -69,17 +73,17 @@ public class SettingsViewModel : ReactiveObject
         this.SwitchTeams = ReactiveCommand.Create(() =>
         {
             var ht = this.HomeTeam;
-            this.HomeTeam = this.AwayTeam;
-            this.AwayTeam = ht;
+            this.HomeTeam = this.AwayTeam ?? "";
+            this.AwayTeam = ht ?? "";
         });
 
         this.Save = ReactiveCommand.Create(
-            () =>
+            async () =>
             {
-                settings.AdvertisingName = this.AdvertisingName;
+                settings.AdvertisingName = this.AdvertisingName!;
                 settings.PlayClock = this.PlayClock;
-                settings.HomeTeam = this.HomeTeam;
-                settings.AwayTeam = this.AwayTeam;
+                settings.HomeTeam = this.HomeTeam!;
+                settings.AwayTeam = this.AwayTeam!;
                 settings.PeriodDurationMins = this.PeriodDuration;
                 settings.Periods = this.Periods;
                 settings.Downs = this.Downs;
@@ -92,21 +96,72 @@ public class SettingsViewModel : ReactiveObject
                 //    settings.CurrentGame.HomeTeamName = this.HomeTeam;
                 //    settings.CurrentGame.AwayTeamName = this.AwayTeam;
                 //}
+                await this.Dialogs.Alert("Settings Saved");
+                this.isDirty = false;
             },
             valid
         );
 
-        // TODO: load skillset
         this.SaveRuleSet = ReactiveCommand.Create(
-            () => settings.SaveCurrentRuleSet(this.RuleSetName!),
-            valid.Select(x => !this.RuleSetName.IsEmpty())
+            async () =>
+            {
+                if (this.RuleSetName.IsEmpty())
+                    await this.Dialogs.Alert("You must enter a rule set name");
+                else
+                {
+                    settings.SaveCurrentRuleSet(this.RuleSetName!);
+                    this.SetValues();
+                    await this.Dialogs.Alert($"Ruleset '{this.RuleSetName}' saved successfully");
+                }
+            },
+            valid
         );
-    }
 
+        this.RestoreDefaultRules = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var result = await this.Dialogs.Confirm("Set default rules", "Confirm", "Yes", "No");
+            if (result)
+            {
+                var def = new RuleSet();
+                settings.PeriodDurationMins = def.PeriodDurationMins;
+                settings.Periods = def.Periods;
+                settings.Downs = def.Downs;
+                settings.MaxTimeouts = def.MaxTimeouts;
+                settings.BreakTimeMins = def.BreakTimeMins;
+                settings.DefaultYardsToGo = def.DefaultYardsToGo;
+
+                this.SetValues();
+                await this.Dialogs.Alert("Default rules restored");
+            }
+        });
+    }
 
     public ICommand Save { get; }
     public ICommand SwitchTeams { get; }
     public ICommand SaveRuleSet { get; }
+    public ICommand RestoreDefaultRules { get; }
+
+    public IList<RuleSetViewModel> SavedRuleSets => this.settings
+        .SavedRules
+        .Select(x => new RuleSetViewModel(
+            x.Key,
+            ReactiveCommand.CreateFromTask(async () =>
+            {
+                var result = await this.Dialogs.Confirm(
+                    $"Do you wish to load '{x.Key}' as your current rules?",
+                    "Confirm",
+                    "Yes",
+                    "No"
+                );
+                if (result)
+                {
+                    this.settings.SetRuleSet(x.Key);
+                    this.RaisePropertyChanged();
+                    await this.Dialogs.Alert($"{x.Key} is now the active ruleset");
+                }
+            })
+        ))
+        .ToList();
 
     [Reactive] public string AdvertisingName { get; set; }
     [Reactive] public string RuleSetName { get; set; }
@@ -120,4 +175,31 @@ public class SettingsViewModel : ReactiveObject
     [Reactive] public string Font { get; set; }
     [Reactive] public string HomeTeam { get; set; }
     [Reactive] public string AwayTeam { get; set; }
+
+
+    public override Task<bool> CanNavigateAsync(INavigationParameters parameters)
+    {
+        if (this.isDirty)
+            return this.Dialogs.Confirm("Changes were made but not saved. Continue back to Main Screen?");
+
+        return base.CanNavigateAsync(parameters);
+    }
+
+
+    void SetValues()
+    {
+        this.HomeTeam = this.settings.HomeTeam;
+        this.AwayTeam = this.settings.AwayTeam;
+        this.AdvertisingName = this.settings.AdvertisingName;
+
+        this.PlayClock = this.settings.PlayClock;
+        this.PeriodDuration = this.settings.PeriodDurationMins;
+        this.Periods = this.settings.Periods;
+        this.Downs = this.settings.Downs;
+        this.MaxTimeouts = this.settings.MaxTimeouts;
+        this.BreakTimeMins = this.settings.BreakTimeMins;
+        this.DefaultYardsToGo = this.settings.DefaultYardsToGo;
+    }
 }
+
+public record RuleSetViewModel(string Name, ICommand Load);

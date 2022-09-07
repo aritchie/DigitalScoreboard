@@ -45,6 +45,7 @@ The settings screen allows you to set all of the scoreboard constraints and othe
 * Referee Card
     * 1 press button to start play clock, 2nd press to start period clock, 3rd press to reset/stop
     * Need to be able sync & tell what state each timer is in
+* View Remote Host Rules
 * Load/Save Rulesets in settings
 * Online Error Log - AppCenter, Firebase, Sentry, etc
 * Client can tell remote scoreboard to go to fullscreen play clock or timer
@@ -55,3 +56,10 @@ The settings screen allows you to set all of the scoreboard constraints and othe
     * Lock orientation on scoreboard
 * Stop period timer when leaving scoreboard if hosted or self
 * Time isn't perfectly in-sync
+* Settings
+    * Settings aren't being saved
+    * Rulesets
+        * Delete
+        * Saving rulesets, what if only team name changes (which isn't part of rule set)
+        * Confusing to save (could piggyback on isDirty check)
+    

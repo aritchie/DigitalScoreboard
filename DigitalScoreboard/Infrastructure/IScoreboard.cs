@@ -32,6 +32,7 @@ public interface IScoreboard
     string HostName { get; }
     ScoreboardType Type { get; }
     IObservable<bool> WhenConnectedChanged();
+    //IObservable<(TimeSpan PeriodClock, int PlayClock)> WhenTick();
 
     Team Home { get; }
     Team Away { get; }

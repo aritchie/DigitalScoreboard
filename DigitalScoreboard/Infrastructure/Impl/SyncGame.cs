@@ -9,7 +9,6 @@ public record SyncGame(
     int Period,
     int Down,
     int YardsToGo,
-    int PlayClockSeconds,
     int PeriodClockSecondsRemaining
 )
 {
@@ -25,7 +24,6 @@ public record SyncGame(
         bytes.Add(Convert.ToByte(scoreboard.Period));
         bytes.Add(Convert.ToByte(scoreboard.Down));
         bytes.Add(Convert.ToByte(scoreboard.YardsToGo));
-        bytes.Add(Convert.ToByte(scoreboard.PlayClockSeconds));
         bytes.AddRange(BitConverter.GetBytes(scoreboard.PeriodClock.TotalSeconds));
         return bytes.ToArray();
     }
@@ -40,8 +38,7 @@ public record SyncGame(
         Convert.ToInt32(bytes[6]),
         Convert.ToInt32(bytes[7]),
         Convert.ToInt32(bytes[8]),
-        Convert.ToInt32(bytes[9]),
-        BitConverter.ToInt32(bytes, 10)
+        BitConverter.ToInt32(bytes, 9)
     );
 }
 

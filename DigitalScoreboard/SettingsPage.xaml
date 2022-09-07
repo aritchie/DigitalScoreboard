@@ -8,62 +8,86 @@
 
     <!--<StackLayout BindableLayout.ItemsSource="">
     </StackLayout>-->
-    <TableView>
-        <TableRoot>
-            <TableSection Title="Rule Set">
-                <EntryCell Label="Name" Text="{Binding RuleSetName}" />
-                <TextCell Text="Save" Command="{Binding SaveRuleSet}" />
-                <TextCell Text="Load" />
-            </TableSection>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Save" Command="{Binding Save}" />
+    </ContentPage.ToolbarItems>
 
-            <TableSection Title="Teams">
-                <EntryCell Label="Home"
-                           Text="{Binding HomeTeam}" />
+    <ScrollView>
+        <VerticalStackLayout>
+            <TableView>
+                <TableRoot>
+                    <TableSection Title="Teams">
+                        <EntryCell Label="Home"
+                                   Text="{Binding HomeTeam}" />
 
-                <EntryCell Label="Away"
-                           Text="{Binding AwayTeam}" />
+                        <EntryCell Label="Away"
+                                   Text="{Binding AwayTeam}" />
 
-                <TextCell Text="Switch"
-                          Command="{Binding SwitchTeams}" />
-            </TableSection>
+                        <TextCell Text="Switch"
+                                  Command="{Binding SwitchTeams}" />
+                    </TableSection>
 
-            <TableSection Title="Game Settings">
+                    <TableSection Title="Game Settings">
 
-                <EntryCell Label="Quarters/Periods"
-                           Text="{Binding Periods}"
-                           Keyboard="Numeric" />
+                        <EntryCell Label="Quarters/Periods"
+                                   Text="{Binding Periods}"
+                                   Keyboard="Numeric" />
 
-                <EntryCell Label="Downs"
-                           Text="{Binding Downs}"
-                           Keyboard="Numeric" />
+                        <EntryCell Label="Downs"
+                                   Text="{Binding Downs}"
+                                   Keyboard="Numeric" />
 
-                <EntryCell Label="Max Timeouts"
-                           Text="{Binding MaxTimeouts}"
-                           Keyboard="Numeric" />
+                        <EntryCell Label="Max Timeouts"
+                                   Text="{Binding MaxTimeouts}"
+                                   Keyboard="Numeric" />
 
-                <EntryCell Label="Default Yards To Go"
-                           Text="{Binding DefaultYardsToGo}"
-                           Keyboard="Numeric" />
-            </TableSection>
+                        <EntryCell Label="Default Yards To Go"
+                                   Text="{Binding DefaultYardsToGo}"
+                                   Keyboard="Numeric" />
+                    </TableSection>
 
-            <TableSection Title="Game Clocks">
-                <EntryCell Label="Quarter Duration (Minutes)"
-                           Text="{Binding PeriodDuration}"
-                           Keyboard="Numeric" />
+                    <TableSection Title="Game Clocks">
+                        <EntryCell Label="Quarter Duration (Minutes)"
+                                   Text="{Binding PeriodDuration}"
+                                   Keyboard="Numeric" />
 
-                <EntryCell Label="Play Clock (Seconds)"
-                           Text="{Binding PlayClock}"
-                           Keyboard="Numeric" />
+                        <EntryCell Label="Play Clock (Seconds)"
+                                   Text="{Binding PlayClock}"
+                                   Keyboard="Numeric" />
 
-                <EntryCell Label="Break Time (Minutes)"
-                           Text="{Binding BreakTimeMins}"
-                           Keyboard="Numeric" />
-            </TableSection>
+                        <EntryCell Label="Break Time (Minutes)"
+                                   Text="{Binding BreakTimeMins}"
+                                   Keyboard="Numeric" />
+                    </TableSection>
 
-            <TableSection>
-                <TextCell Text="Save"
-                          Command="{Binding Save}" />
-            </TableSection>
-        </TableRoot>
-    </TableView>
+                    <TableSection Title="Host">
+                        <EntryCell Label="Advertising Name"
+                                   Text="{Binding AdvertisingName}" />
+                    </TableSection>
+
+                    <TableSection Title="Create Rule Set">
+                        <EntryCell Label="Name" Text="{Binding RuleSetName}" />
+                        <TextCell Text="Save" Command="{Binding SaveRuleSet}" />
+                        <TextCell Text="Restore Default Rules"
+                                  TextColor="Red"
+                                  Command="{Binding RestoreDefaultRules}" />
+                    </TableSection>
+
+                </TableRoot>
+            </TableView>
+       
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding SavedRuleSets}">
+
+                <BindableLayout.EmptyView>
+                    <Label Text="No Saved Rules" />
+                </BindableLayout.EmptyView>
+
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="local:RuleSetViewModel">
+                        <Button Text="{Binding Name}" Command="{Binding Load}" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

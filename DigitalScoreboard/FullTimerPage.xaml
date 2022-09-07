@@ -7,6 +7,18 @@
              BackgroundColor="Black"
              Padding="0">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="InfoLabel" TargetType="local:FillLabel">
+                <Setter Property="FontFamily" Value="electron" />
+                <Setter Property="Text" Value="Yellow" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+                <Setter Property="TextColor" Value="Yellow" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <VerticalStackLayout HorizontalOptions="FillAndExpand"
                          VerticalOptions="FillAndExpand">
 
@@ -15,10 +27,8 @@
         </VerticalStackLayout.GestureRecognizers>
 
         <local:FillLabel Text="{Binding TimeRemaining}"
+                         Style="{StaticResource InfoLabel}"
                          VerticalOptions="FillAndExpand"
                          HorizontalOptions="FillAndExpand" />
     </VerticalStackLayout>
-
-    <!--<local:BoardLabel Info="{Binding TimeRemaining}"
-                      Command="{Binding Toggle}" />-->
 </ContentPage>

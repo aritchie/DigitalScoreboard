@@ -138,6 +138,20 @@ public abstract class AbstractScoreboard : IScoreboard
     }
 
 
+    //Task TickClock()
+    //{
+    //    var list = new List<byte>();
+    //    list.Add(Constants.BleIntents.ClockTick);
+    //    list.AddRange(BitConverter.GetBytes(this.PlayClockSeconds));
+    //    list.AddRange(BitConverter.GetBytes(Convert.ToInt32(this.PeriodClock.TotalSeconds)));
+    //    TODO: fire event for host to update local client as well
+    //    TODO: on characteristic sub notify, parse timers, trigger subject event
+    //    TODO: host must still have a timer to tick and send send tick
+    //    TODO: self scoreboards will just run a timer with bools on what's enable/not
+    //    return this.Write(list.ToArray());
+    //}
+
+
     protected void DoTogglePeriodClock() => this.periodClockRunning = !this.periodClockRunning;
 
 
@@ -290,13 +304,18 @@ public abstract class AbstractScoreboard : IScoreboard
                 this.DoSetYardsToGo(ytg);
                 break;
 
+            case Constants.BleIntents.ClockTick:
+                var periodSecs = BitConverter.ToInt32(data, 1);
+                this.PeriodClock = TimeSpan.FromSeconds(periodSecs);
+                this.PlayClockSeconds = BitConverter.ToInt32(data, 5);
+                break;
+
             case Constants.BleIntents.SyncGame:
                 var sync = SyncGame.FromBytes(data);
 
                 this.Period = sync.Period;
                 this.Down = sync.Down;
                 this.YardsToGo = sync.YardsToGo;
-                this.PlayClockSeconds = sync.PlayClockSeconds;
                 this.HomePossession = sync.HomePossession;
                 this.PeriodClock = TimeSpan.FromSeconds(sync.PeriodClockSecondsRemaining);
 
@@ -311,7 +330,6 @@ public abstract class AbstractScoreboard : IScoreboard
                     sync.AwayTimeouts
                 );
                 this.eventSubj.OnNext(ScoreboardEvent.Sync);
-                // TODO: sync clocks running?
                 break;
 
             case Constants.BleIntents.SyncRules:

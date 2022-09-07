@@ -6,7 +6,6 @@ namespace DigitalScoreboard;
 
 public class MainViewModel : ViewModel
 {
-
 	public MainViewModel(
 		BaseServices services,
 		AppSettings appSettings,
@@ -78,9 +77,9 @@ public class MainViewModel : ViewModel
 
     async Task ConfirmEndGame(IScoreboardManager scoreboardManager)
     {
-        var c = scoreboardManager.Current;
+        var c = scoreboardManager.Current!;
         var details = $"QTR: {c.Period} ({c.PeriodClock:c}) - {c.Home.Name}: {c.Home.Score} / {c.Away.Name}: {c.Away.Score}";
-        var result = await this.Dialogs.Confirm("Do you wish to resume your current game? " + details, "Resume Game?", "Yes", "No");
+        var result = await this.Dialogs.Confirm("Are you sure you want to end current game? " + details, "Resume Game?", "Yes", "No");
         if (!result)
             return;
 

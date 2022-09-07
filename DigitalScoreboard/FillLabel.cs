@@ -22,6 +22,7 @@ public class FillLabel : Label
 
             v.Lines = 0;
             v.LineBreakMode = UIKit.UILineBreakMode.Clip;
+            v.BaselineAdjustment = UIKit.UIBaselineAdjustment.AlignCenters;
             v.AdjustsFontSizeToFitWidth = true;
 #endif
         });
