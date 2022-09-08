@@ -12,7 +12,6 @@
 		<ShinyVersion>3.0.0-alpha-0310</ShinyVersion>
 
 		<ApplicationTitle>Scoreboard</ApplicationTitle>
-
 		<ApplicationId>com.shinysoft.digitalscoreboard</ApplicationId>
 		<ApplicationIdGuid>96336EA4-D002-4D45-8EC9-388D954B35FE</ApplicationIdGuid>
 

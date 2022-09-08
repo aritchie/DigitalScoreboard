@@ -20,7 +20,6 @@ public static class MauiProgram
                 prism => prism
                     .RegisterTypes(registry =>
                     {
-                        registry.RegisterForNavigation<PrismNavigationPage>("NavigationPage");
                         registry.RegisterForNavigation<MainPage, MainViewModel>();
                         registry.RegisterForNavigation<ScoreboardPage, ScoreboardViewModel>();
                         registry.RegisterForNavigation<ScanPage, ScanViewModel>();
@@ -50,6 +49,7 @@ public static class MauiProgram
 #endif
         ));
 
+        builder.ConfigureContainer
 		return builder.Build();
 	}
 }
