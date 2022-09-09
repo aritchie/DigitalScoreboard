@@ -23,11 +23,12 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<!--
-	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">		
+		<MtouchLink>None</MtouchLink>
+		<!--<MtouchLink>SdkOnly</MtouchLink>-->
 	</PropertyGroup>
 
+	<!--
 	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 		<CodesignKey>iPhone Distribution: </CodesignKey>
@@ -36,7 +37,6 @@
 		<TcpPort>58181</TcpPort>
 	</PropertyGroup>
 	-->
-
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 

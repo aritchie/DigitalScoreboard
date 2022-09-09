@@ -10,6 +10,13 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <Style x:Key="InfoLabel" TargetType="local:FillLabel">
+                <Setter Property="FontSize">
+                    <Setter.Value>
+                        <OnIdiom Desktop="300"
+                                 Tablet="300"
+                                 Phone="150" />
+                    </Setter.Value>
+                </Setter>
                 <Setter Property="FontFamily" Value="electron" />
                 <Setter Property="Text" Value="Yellow" />
                 <Setter Property="HorizontalTextAlignment" Value="Center" />

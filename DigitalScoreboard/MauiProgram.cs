@@ -49,7 +49,6 @@ public static class MauiProgram
 #endif
         ));
 
-        builder.ConfigureContainer
 		return builder.Build();
 	}
 }

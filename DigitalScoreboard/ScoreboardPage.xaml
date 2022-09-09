@@ -11,111 +11,113 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <StackLayout>
-            <Grid RowDefinitions="Auto, Auto, Auto"
-                  ColumnDefinitions="1*, 2*, 1*">
+        <ScrollView>
+            <StackLayout>
+                <Grid RowDefinitions="Auto, Auto, Auto"
+                      ColumnDefinitions="1*, 2*, 1*">
 
-                <local:BoardLabel Title="{Binding HomeTeamName}"
-                                  Info="{Binding HomeTeamScore}"
-                                  Command="{Binding SetScore}"
-                                  CommandParameter="home"
-                                  Grid.Column="0"
-                                  Grid.Row="0" />
-
-                <local:BoardLabel Info="{Binding PeriodClock, Converter={StaticResource TimeSpan}}"
-                                  Command="{Binding TogglePeriodClock}"
-                                  Grid.Column="1"
-                                  Grid.Row="0" />
-
-                <local:BoardLabel Title="{Binding AwayTeamName}"
-                                  Info="{Binding AwayTeamScore}"
-                                  Command="{Binding SetScore}"
-                                  CommandParameter="away"
-                                  Grid.Column="2"
-                                  Grid.Row="0" />
-
-                <Grid ColumnDefinitions="1*, 1*, 1*, 1*, 1*"
-                      Grid.ColumnSpan="3"
-                      Grid.Row="1">
-
-                    <local:BoardLabel Title="T.0"
-                                      Info="{Binding HomeTeamTimeouts}"
-                                      Command="{Binding DecrementTimeout}"
+                    <local:BoardLabel Title="{Binding HomeTeamName}"
+                                      Info="{Binding HomeTeamScore}"
+                                      Command="{Binding SetScore}"
                                       CommandParameter="home"
-                                      Grid.Column="0" />            
+                                      Grid.Column="0"
+                                      Grid.Row="0" />
 
-                    <local:BoardLabel Info="&lt;"
-                                      IsVisible="{Binding HomeTeamPossession}"
-                                      IsInfoFramed="False"
-                                      Command="{Binding TogglePossession}"
-                                      Grid.Column="1" />
+                    <local:BoardLabel Info="{Binding PeriodClock, Converter={StaticResource TimeSpan}}"
+                                      Command="{Binding TogglePeriodClock}"
+                                      Grid.Column="1"
+                                      Grid.Row="0" />
 
-                    <local:BoardLabel Info="{Binding PlayClock}"
-                                      Command="{Binding TogglePlayClock}"
-                                      Grid.Column="2" />
-
-                    <local:BoardLabel Info="&gt;"
-                                      IsVisible="{Binding HomeTeamPossession, Converter={StaticResource Not}}"
-                                      IsInfoFramed="False"
-                                      Command="{Binding TogglePossession}"
-                                      Grid.Column="3" />
-
-                    <local:BoardLabel Title="T.0"
-                                      Info="{Binding AwayTeamTimeouts}"
-                                      Command="{Binding DecrementTimeout}"
+                    <local:BoardLabel Title="{Binding AwayTeamName}"
+                                      Info="{Binding AwayTeamScore}"
+                                      Command="{Binding SetScore}"
                                       CommandParameter="away"
-                                      Grid.Column="4" />
+                                      Grid.Column="2"
+                                      Grid.Row="0" />
+
+                    <Grid ColumnDefinitions="1*, 1*, 1*, 1*, 1*"
+                          Grid.ColumnSpan="3"
+                          Grid.Row="1">
+
+                        <local:BoardLabel Title="T.0"
+                                          Info="{Binding HomeTeamTimeouts}"
+                                          Command="{Binding DecrementTimeout}"
+                                          CommandParameter="home"
+                                          Grid.Column="0" />            
+
+                        <local:BoardLabel Info="&lt;"
+                                          IsVisible="{Binding HomeTeamPossession}"
+                                          IsInfoFramed="False"
+                                          Command="{Binding TogglePossession}"
+                                          Grid.Column="1" />
+
+                        <local:BoardLabel Info="{Binding PlayClock}"
+                                          Command="{Binding TogglePlayClock}"
+                                          Grid.Column="2" />
+
+                        <local:BoardLabel Info="&gt;"
+                                          IsVisible="{Binding HomeTeamPossession, Converter={StaticResource Not}}"
+                                          IsInfoFramed="False"
+                                          Command="{Binding TogglePossession}"
+                                          Grid.Column="3" />
+
+                        <local:BoardLabel Title="T.0"
+                                          Info="{Binding AwayTeamTimeouts}"
+                                          Command="{Binding DecrementTimeout}"
+                                          CommandParameter="away"
+                                          Grid.Column="4" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="1*, 1*, 1*"
+                          Grid.ColumnSpan="3"
+                          Grid.Row="2">
+
+                        <local:BoardLabel Title="QTR"
+                                          Info="{Binding Period}"
+                                          Command="{Binding IncrementPeriod}"
+                                          Grid.Column="0" />
+
+                        <local:BoardLabel Title="DOWN"
+                                          Info="{Binding Down}"
+                                          Command="{Binding IncrementDown}"
+                                          Grid.Column="1" />
+
+                        <local:BoardLabel Title="YTG"
+                                          Info="{Binding YardsToGo}"
+                                          Command="{Binding SetYardsToGo}"
+                                          Grid.Column="2" />
+                    </Grid>
                 </Grid>
 
-                <Grid ColumnDefinitions="1*, 1*, 1*"
-                      Grid.ColumnSpan="3"
-                      Grid.Row="2">
+                <Label Text="{Binding ConnectionInfo}"
+                       HorizontalOptions="FillAndExpand"
+                       HorizontalTextAlignment="Center" />
 
-                    <local:BoardLabel Title="QTR"
-                                      Info="{Binding Period}"
-                                      Command="{Binding IncrementPeriod}"
-                                      Grid.Column="0" />
+                <Border IsVisible="{Binding ShowRefereeCard}"
+                        BackgroundColor="LemonChiffon">
+                    <Grid RowDefinitions="1*,1*,1*" ColumnDefinitions="1*,1*,1*,1*,1*,1*">
 
-                    <local:BoardLabel Title="DOWN"
-                                      Info="{Binding Down}"
-                                      Command="{Binding IncrementDown}"
-                                      Grid.Column="1" />
+                        <Label Text="{Binding HomeTeamName}" Grid.Row="0" Grid.Column="0" />
+                        <Button Text="-1" Command="{Binding AddScore}" CommandParameter="home:-1" Grid.Row="0" Grid.Column="1" />
+                        <Button Text="1" Command="{Binding AddScore}" CommandParameter="home:1" Grid.Row="0" Grid.Column="2" />
+                        <Button Text="2" Command="{Binding AddScore}" CommandParameter="home:2" Grid.Row="0" Grid.Column="3" />
+                        <Button Text="3" Command="{Binding AddScore}" CommandParameter="home:3" Grid.Row="0" Grid.Column="4" />
+                        <Button Text="6" Command="{Binding AddScore}" CommandParameter="home:6" Grid.Row="0" Grid.Column="5" />
 
-                    <local:BoardLabel Title="YTG"
-                                      Info="{Binding YardsToGo}"
-                                      Command="{Binding SetYardsToGo}"
-                                      Grid.Column="2" />
-                </Grid>
-            </Grid>
+                        <Label Text="{Binding AwayTeamName}" Grid.Row="1" Grid.Column="0" />
+                        <Button Text="-1" Command="{Binding AddScore}" CommandParameter="away:-1" Grid.Row="1" Grid.Column="1" />
+                        <Button Text="1" Command="{Binding AddScore}" CommandParameter="away:1" Grid.Row="1" Grid.Column="2" />
+                        <Button Text="2" Command="{Binding AddScore}" CommandParameter="away:2" Grid.Row="1" Grid.Column="3" />
+                        <Button Text="3" Command="{Binding AddScore}" CommandParameter="away:3" Grid.Row="1" Grid.Column="4" />
+                        <Button Text="6" Command="{Binding AddScore}" CommandParameter="away:6" Grid.Row="1" Grid.Column="5" />
 
-            <Label Text="{Binding ConnectionInfo}"
-                   HorizontalOptions="FillAndExpand"
-                   HorizontalTextAlignment="Center" />
-
-            <Border IsVisible="{Binding ShowRefereeCard}"
-                    BackgroundColor="LemonChiffon">
-                <Grid RowDefinitions="1*,1*,1*" ColumnDefinitions="1*,1*,1*,1*,1*,1*">
-
-                    <Label Text="Home" Grid.Row="0" Grid.Column="0" />
-                    <Button Text="-1" Command="{Binding AddScore}" CommandParameter="home:-1" Grid.Row="0" Grid.Column="1" />
-                    <Button Text="1" Command="{Binding AddScore}" CommandParameter="home:1" Grid.Row="0" Grid.Column="2" />
-                    <Button Text="2" Command="{Binding AddScore}" CommandParameter="home:2" Grid.Row="0" Grid.Column="3" />
-                    <Button Text="3" Command="{Binding AddScore}" CommandParameter="home:3" Grid.Row="0" Grid.Column="4" />
-                    <Button Text="6" Command="{Binding AddScore}" CommandParameter="home:6" Grid.Row="0" Grid.Column="5" />
-
-                    <Label Text="Away" Grid.Row="1" Grid.Column="0" />
-                    <Button Text="-1" Command="{Binding AddScore}" CommandParameter="away:-1" Grid.Row="1" Grid.Column="1" />
-                    <Button Text="1" Command="{Binding AddScore}" CommandParameter="away:1" Grid.Row="1" Grid.Column="2" />
-                    <Button Text="2" Command="{Binding AddScore}" CommandParameter="away:2" Grid.Row="1" Grid.Column="3" />
-                    <Button Text="3" Command="{Binding AddScore}" CommandParameter="away:3" Grid.Row="1" Grid.Column="4" />
-                    <Button Text="6" Command="{Binding AddScore}" CommandParameter="away:6" Grid.Row="1" Grid.Column="5" />
-
-                    <Button Text="Start All Clocks"
-                            Command="{Binding StartAllClocks}"
-                            Grid.Row="2"
-                            Grid.ColumnSpan="6" />
-                </Grid>
-            </Border>
-        </StackLayout>
+                        <Button Text="Start All Clocks"
+                                Command="{Binding StartAllClocks}"
+                                Grid.Row="2"
+                                Grid.ColumnSpan="6" />
+                    </Grid>
+                </Border>
+            </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

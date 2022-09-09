@@ -8,12 +8,29 @@
     <ContentView.Resources>
         <ResourceDictionary>
             <Style x:Key="TitleLabel" TargetType="Label">
+                <Setter Property="FontSize">
+                    <Setter.Value>
+                        <OnIdiom x:TypeArguments="x:Double"
+                                 Desktop="100"
+                                 Tablet="100"
+                                 Phone="25" />
+                    </Setter.Value>
+                </Setter>
                 <Setter Property="Text" Value="White" />
+                <Setter Property="FontAttributes" Value="Bold" />
                 <Setter Property="HorizontalTextAlignment" Value="Center" />
                 <Setter Property="VerticalTextAlignment" Value="Center" />
             </Style>
 
             <Style x:Key="InfoLabel" TargetType="local:FillLabel">
+                <Setter Property="FontSize">
+                    <Setter.Value>
+                        <OnIdiom x:TypeArguments="x:Double"
+                                 Desktop="150"
+                                 Tablet="150"
+                                 Phone="40" />
+                    </Setter.Value>
+                </Setter>
                 <Setter Property="FontFamily" Value="electron" />
                 <Setter Property="Text" Value="Yellow" />
                 <Setter Property="HorizontalTextAlignment" Value="Center" />
@@ -36,15 +53,15 @@
             </VerticalStackLayout.GestureRecognizers>
 
             <Label x:Name="lblTitle"
-                   Style="{StaticResource TitleLabel}"
-                   IsVisible="false" />
+                    Style="{StaticResource TitleLabel}"
+                    IsVisible="false" />
 
             <Frame x:Name="frInfo"
-                   Style="{StaticResource InfoFrame}">
+                    Style="{StaticResource InfoFrame}">
                 <local:FillLabel x:Name="lblInfo"
-                                 Style="{StaticResource InfoLabel}"
-                                 VerticalOptions="FillAndExpand"
-                                 HorizontalOptions="FillAndExpand" />
+                                    Style="{StaticResource InfoLabel}"
+                                    VerticalOptions="FillAndExpand"
+                                    HorizontalOptions="FillAndExpand" />
             </Frame>
         </VerticalStackLayout>
     </ContentView.Content>
