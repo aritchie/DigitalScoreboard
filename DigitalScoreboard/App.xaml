@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:DigitalScoreboard"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:material="clr-namespace:UraniumUI.Material.Resources;assembly=UraniumUI.Material"
              x:Class="DigitalScoreboard.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -14,6 +15,7 @@
 
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+                <material:StyleResource />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

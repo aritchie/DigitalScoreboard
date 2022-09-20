@@ -10,6 +10,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<ShinyVersion>3.0.0-alpha-0310</ShinyVersion>
+		<UraniumUIVersion>0.10.0</UraniumUIVersion>
 
 		<ApplicationTitle>Scoreboard</ApplicationTitle>
 		<ApplicationId>com.shinysoft.digitalscoreboard</ApplicationId>
@@ -49,9 +50,12 @@
 	<ItemGroup>
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
 		<PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
-		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0024" />
+		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0026" />
 		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
+		<PackageReference Include="EmbedIO" Version="3.4.3" />
+		<PackageReference Include="UraniumUI.Material" Version="$(UraniumUIVersion)" />
+		<PackageReference Include="UraniumUI.Icons.MaterialIcons " Version="$(UraniumUIVersion)" />
 	</ItemGroup>
 </Project>
