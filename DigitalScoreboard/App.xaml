@@ -14,6 +14,8 @@
                 </ResourceDictionary>
 
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <material:ColorResource />
+
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
                 <material:StyleResource />
             </ResourceDictionary.MergedDictionaries>

@@ -8,9 +8,9 @@
                             xmlns:material="clr-namespace:UraniumUI.Material.Attachments;assembly=UraniumUI.Material"
                             BackgroundColor="Black">
 
-    <ContentPage.ToolbarItems>
+    <!--<ContentPage.ToolbarItems>
         <ToolbarItem Text="Referee" Command="{Binding ToggleRefereeCard}" />
-    </ContentPage.ToolbarItems>
+    </ContentPage.ToolbarItems>-->
 
     <ContentPage.Content>
         <VerticalStackLayout>
@@ -97,11 +97,14 @@
     </ContentPage.Content>
 
     <uranium:UraniumContentPage.Attachments>
-         <material:BottomSheetView IsPresented="{Binding ShowRefereeCard}">
-            <!--<material:BottomSheetView.Header>
-                 Bottom Sheet Header here
-            </material:BottomSheetView.Header>-->
-
+         <!--<material:BottomSheetView IsPresented="{Binding ShowRefereeCard}"
+                                   DisablePageWhenOpened="True"
+                                   CloseOnTapOutside="True">
+            <material:BottomSheetView.Header>
+                 <Label Text="Referee Card" />
+            </material:BottomSheetView.Header>
+        -->
+        <material:BackdropView Title="Referee Card">
             <Grid RowDefinitions="1*,1*,1*" ColumnDefinitions="1*,1*,1*,1*,1*,1*">
 
                 <Label Text="{Binding HomeTeamName}" Grid.Row="0" Grid.Column="0" />
@@ -123,8 +126,6 @@
                         Grid.Row="2"
                         Grid.ColumnSpan="6" />
             </Grid>
-        </material:BottomSheetView>
+        </material:BackdropView>
     </uranium:UraniumContentPage.Attachments>
-         
-    
 </uranium:UraniumContentPage>

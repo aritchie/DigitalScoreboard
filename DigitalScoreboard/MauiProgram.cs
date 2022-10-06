@@ -18,16 +18,7 @@ public static class MauiProgram
 			.UseMauiCommunityToolkit()
             .UseShinyFramework(
                 new DryIocContainerExtension(),
-                prism => prism
-                    .RegisterTypes(registry =>
-                    {
-                        registry.RegisterForNavigation<MainPage, MainViewModel>();
-                        registry.RegisterForNavigation<ScoreboardPage, ScoreboardViewModel>();
-                        registry.RegisterForNavigation<ScanPage, ScanViewModel>();
-                        registry.RegisterForNavigation<SettingsPage, SettingsViewModel>();
-                        registry.RegisterForNavigation<FullTimerPage, FullTimerViewModel>();
-                    })
-                    .OnAppStart("NavigationPage/MainPage")
+                prism => prism.OnAppStart("NavigationPage/MainPage")
             )
             .ConfigureMauiHandlers(handlers =>
             {
@@ -37,23 +28,42 @@ public static class MauiProgram
 			{
 				//fonts.AddFont("DS-DIGI.TTF", "Digital");
 				fonts.AddFont("electron.ttf", "electron");
+                fonts.AddMaterialIconFonts();
 			});
 
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        builder.Services.AddSingleton(DeviceDisplay.Current);
-        builder.Services.AddShinyService<AppSettings>();
-        builder.Services.AddBluetoothScoreboardServices();
+        RegisterServices(builder.Services);
+        RegisterViews(builder.Services);
 
-        builder.Services.AddGlobalCommandExceptionHandler(new(
+
+		return builder.Build();
+	}
+
+
+    static void RegisterServices(IServiceCollection s)
+    {
+        s.AddSingleton(DeviceDisplay.Current);
+        s.AddShinyService<AppSettings>();
+        s.AddBluetoothScoreboardServices();
+
+        s.AddGlobalCommandExceptionHandler(new(
 #if DEBUG
             ErrorAlertType.FullError
 #else
             ErrorAlertType.NoLocalize
 #endif
         ));
+    }
 
-		return builder.Build();
-	}
+
+    static void RegisterViews(IServiceCollection s)
+    {
+        s.RegisterForNavigation<MainPage, MainViewModel>();
+        s.RegisterForNavigation<ScoreboardPage, ScoreboardViewModel>();
+        s.RegisterForNavigation<ScanPage, ScanViewModel>();
+        s.RegisterForNavigation<SettingsPage, SettingsViewModel>();
+        s.RegisterForNavigation<FullTimerPage, FullTimerViewModel>();
+    }
 }
