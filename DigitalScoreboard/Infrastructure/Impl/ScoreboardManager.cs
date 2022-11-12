@@ -16,6 +16,7 @@ public class ScoreboardManager : IScoreboardManager
     readonly AppSettings appSettings;
     readonly IBleManager bleManager;
     readonly IBleHostingManager hostingManager;
+    readonly IManagedScan scanner;
     CompositeDisposable? scanDisposer;
 
 
@@ -28,8 +29,41 @@ public class ScoreboardManager : IScoreboardManager
     {
         this.logger = logger;
         this.appSettings = appSettings;
-        this.bleManager = bleManager;
         this.hostingManager = hostingManager;
+        this.bleManager = bleManager;
+        this.scanner = bleManager.CreateManagedScanner();
+
+        this.scanner
+            .WhenScan()
+            .Where(x => x.ScanResult?.LocalName != null)
+            .SubOnMainThread(scan =>
+            {
+                var sr = scan.ScanResult!;
+
+                switch (scan.Action)
+                {
+                    case ManagedScanListAction.Add:
+                        this.Scoreboards.Add(new BleClientScoreboard(
+                            sr.LocalName!,
+                            sr.Peripheral,
+                            this.appSettings,
+                            this.appSettings
+                        ));
+                        break;
+
+                    //case ManagedScanListAction.Update:
+                    //    //var item = this.Scoreboards.FirstOrDefault(x => x.Name.Equals(sr.LocalName)) as ScoreboardImpl;
+                    //    //if (item != null)
+                    //    //    item.SignalStrength = sr.Rssi;
+                    //    break;
+
+                    case ManagedScanListAction.Remove:
+                        var remove = this.Scoreboards.FirstOrDefault(x => x.HostName.Equals(sr.LocalName));
+                        if (remove != null)
+                            this.Scoreboards.Remove(remove);
+                        break;
+                }
+            });
     }
 
 
@@ -99,61 +133,22 @@ public class ScoreboardManager : IScoreboardManager
 
     public async Task<AccessState> StartScan(IScheduler scheduler)
     {
-        if (this.scanDisposer != null)
-            return AccessState.Available;
-
         var state = await this.bleManager.RequestAccess();
         if (state == AccessState.Available)
         {
             // TODO: signal strength
-            this.scanDisposer = new CompositeDisposable();
             this.Scoreboards.Clear();
 
-            var scanner = this.bleManager
-                .CreateManagedScanner(
-                    scheduler,
-                    TimeSpan.FromSeconds(10),
-                    new ScanConfig(
-                        ServiceUuids: Constants.GameServiceUuid
-                    )
-                )
-                .DisposedBy(this.scanDisposer);
+            await scanner.Start(
+                new ScanConfig(
+                    Constants.GameServiceUuid
+                ),
+                null,
+                RxApp.MainThreadScheduler,
+                null,
+                TimeSpan.FromSeconds(10)
 
-            scanner
-                .WhenScan()
-                .Where(x => x.ScanResult?.LocalName != null)
-                .ObserveOn(scheduler)
-                .Subscribe(scan =>
-                {
-                    var sr = scan.ScanResult!;
-
-                    switch (scan.Action)
-                    {
-                        case ManagedScanListAction.Add:
-                            this.Scoreboards.Add(new BleClientScoreboard(
-                                sr.LocalName!,
-                                sr.Peripheral,
-                                this.appSettings,
-                                this.appSettings
-                            ));
-                            break;
-
-                        //case ManagedScanListAction.Update:
-                        //    //var item = this.Scoreboards.FirstOrDefault(x => x.Name.Equals(sr.LocalName)) as ScoreboardImpl;
-                        //    //if (item != null)
-                        //    //    item.SignalStrength = sr.Rssi;
-                        //    break;
-
-                        case ManagedScanListAction.Remove:
-                            var remove = this.Scoreboards.FirstOrDefault(x => x.HostName.Equals(sr.LocalName));
-                            if (remove != null)
-                                this.Scoreboards.Remove(remove);
-                            break;
-                    }
-                })
-                .DisposedBy(this.scanDisposer);
-
-            await scanner.Start();
+            );
         }
         return state;
     }
