@@ -29,26 +29,16 @@
 		<MtouchLink>None</MtouchLink>
 	</PropertyGroup>
 
-	<!--
-	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-		<CodesignKey>iPhone Distribution: </CodesignKey>
-		<CodesignProvision>MyMauiApp</CodesignProvision>
-		<ArchiveOnBuild>true</ArchiveOnBuild>
-		<TcpPort>58181</TcpPort>
-	</PropertyGroup>
-	-->
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
-
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
-
 		<MauiImage Include="Resources\Images\*" />
 		<MauiFont Include="Resources\Fonts\*" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CompiledBindings.MAUI" Version="1.0.13" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="3.0.0" />
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
 		<PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
 		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0040" />
@@ -56,7 +46,5 @@
 		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="EmbedIO" Version="3.5.2" />
-		<PackageReference Include="UraniumUI.Material" Version="$(UraniumUIVersion)" />
-		<PackageReference Include="UraniumUI.Icons.MaterialIcons" Version="$(UraniumUIVersion)" />
 	</ItemGroup>
 </Project>

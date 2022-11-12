@@ -6,8 +6,6 @@
              x:DataType="local:SettingsViewModel"
              Title="Settings">
 
-    <!--<StackLayout BindableLayout.ItemsSource="">
-    </StackLayout>-->
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Save" Command="{Binding Save}" />
     </ContentPage.ToolbarItems>

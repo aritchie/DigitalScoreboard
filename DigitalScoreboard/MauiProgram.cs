@@ -3,7 +3,6 @@ using DigitalScoreboard.Infrastructure;
 using DigitalScoreboard.Infrastructure.Impl;
 using Prism.Controls;
 using Prism.DryIoc;
-using UraniumUI;
 
 namespace DigitalScoreboard;
 
@@ -20,15 +19,9 @@ public static class MauiProgram
                 new DryIocContainerExtension(),
                 prism => prism.OnAppStart("NavigationPage/MainPage")
             )
-            .ConfigureMauiHandlers(handlers =>
-            {
-                handlers.AddUraniumUIHandlers();
-            })
             .ConfigureFonts(fonts =>
 			{
-				//fonts.AddFont("DS-DIGI.TTF", "Digital");
 				fonts.AddFont("electron.ttf", "electron");
-                fonts.AddMaterialIconFonts();
 			});
 
 #if DEBUG

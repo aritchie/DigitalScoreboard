@@ -26,7 +26,6 @@ public class ScoreboardViewModel : ViewModel
         this.display = display;
         this.scoreboardManager = scoreboardManager;
 
-        this.ToggleRefereeCard = ReactiveCommand.Create(() => this.ShowRefereeCard = !this.ShowRefereeCard);
         this.TogglePlayClock = ReactiveCommand.CreateFromTask(() => this.Game.TogglePlayClock());
         this.TogglePeriodClock = ReactiveCommand.CreateFromTask(() => this.Game.TogglePeriodClock());
         this.TogglePossession = ReactiveCommand.CreateFromTask(() => this.Game.TogglePossession());
@@ -101,7 +100,6 @@ public class ScoreboardViewModel : ViewModel
     public ICommand TogglePossession { get; }
     public ICommand TogglePlayClock { get; }
     public ICommand TogglePeriodClock { get; }
-    public ICommand ToggleRefereeCard { get; }
     public ICommand StartAllClocks { get; }
 
     [Reactive] public bool ShowRefereeCard { get; private set; }

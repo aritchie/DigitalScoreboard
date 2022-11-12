@@ -1,16 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-                            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                            xmlns:local="clr-namespace:DigitalScoreboard"
-                            x:DataType="local:ScoreboardViewModel"
-                            x:Class="DigitalScoreboard.ScoreboardPage"
-                            xmlns:uranium="clr-namespace:UraniumUI.Pages;assembly=UraniumUI"
-                            xmlns:material="clr-namespace:UraniumUI.Material.Attachments;assembly=UraniumUI.Material"
-                            BackgroundColor="Black">
-
-    <!--<ContentPage.ToolbarItems>
-        <ToolbarItem Text="Referee" Command="{Binding ToggleRefereeCard}" />
-    </ContentPage.ToolbarItems>-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:DigitalScoreboard"
+             xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:DataType="local:ScoreboardViewModel"
+             x:Class="DigitalScoreboard.ScoreboardPage"
+             BackgroundColor="Black">
 
     <ContentPage.Content>
         <VerticalStackLayout>
@@ -93,39 +88,37 @@
             <Label Text="{Binding ConnectionInfo}"
                     HorizontalOptions="FillAndExpand"
                     HorizontalTextAlignment="Center" />
+
+            <mct:Expander>
+                <mct:Expander.Header>
+                    <Label Text="Referee Card" />
+                </mct:Expander.Header>
+
+                <mct:Expander.Content>
+                    <Grid RowDefinitions="1*,1*,1*" ColumnDefinitions="1*,1*,1*,1*,1*,1*">
+
+                        <Label Text="{Binding HomeTeamName}" Grid.Row="0" Grid.Column="0" />
+                        <Button Text="-1" Command="{Binding AddScore}" CommandParameter="home:-1" Grid.Row="0" Grid.Column="1" />
+                        <Button Text="1" Command="{Binding AddScore}" CommandParameter="home:1" Grid.Row="0" Grid.Column="2" />
+                        <Button Text="2" Command="{Binding AddScore}" CommandParameter="home:2" Grid.Row="0" Grid.Column="3" />
+                        <Button Text="3" Command="{Binding AddScore}" CommandParameter="home:3" Grid.Row="0" Grid.Column="4" />
+                        <Button Text="6" Command="{Binding AddScore}" CommandParameter="home:6" Grid.Row="0" Grid.Column="5" />
+
+                        <Label Text="{Binding AwayTeamName}" Grid.Row="1" Grid.Column="0" />
+                        <Button Text="-1" Command="{Binding AddScore}" CommandParameter="away:-1" Grid.Row="1" Grid.Column="1" />
+                        <Button Text="1" Command="{Binding AddScore}" CommandParameter="away:1" Grid.Row="1" Grid.Column="2" />
+                        <Button Text="2" Command="{Binding AddScore}" CommandParameter="away:2" Grid.Row="1" Grid.Column="3" />
+                        <Button Text="3" Command="{Binding AddScore}" CommandParameter="away:3" Grid.Row="1" Grid.Column="4" />
+                        <Button Text="6" Command="{Binding AddScore}" CommandParameter="away:6" Grid.Row="1" Grid.Column="5" />
+
+                        <Button Text="Start All Clocks"
+                                Command="{Binding StartAllClocks}"
+                                Grid.Row="2"
+                                Grid.ColumnSpan="6" />
+                    </Grid>
+
+                </mct:Expander.Content>
+            </mct:Expander>
         </VerticalStackLayout>
     </ContentPage.Content>
-
-    <uranium:UraniumContentPage.Attachments>
-         <!--<material:BottomSheetView IsPresented="{Binding ShowRefereeCard}"
-                                   DisablePageWhenOpened="True"
-                                   CloseOnTapOutside="True">
-            <material:BottomSheetView.Header>
-                 <Label Text="Referee Card" />
-            </material:BottomSheetView.Header>
-        -->
-        <material:BackdropView Title="Referee Card">
-            <Grid RowDefinitions="1*,1*,1*" ColumnDefinitions="1*,1*,1*,1*,1*,1*">
-
-                <Label Text="{Binding HomeTeamName}" Grid.Row="0" Grid.Column="0" />
-                <Button Text="-1" Command="{Binding AddScore}" CommandParameter="home:-1" Grid.Row="0" Grid.Column="1" />
-                <Button Text="1" Command="{Binding AddScore}" CommandParameter="home:1" Grid.Row="0" Grid.Column="2" />
-                <Button Text="2" Command="{Binding AddScore}" CommandParameter="home:2" Grid.Row="0" Grid.Column="3" />
-                <Button Text="3" Command="{Binding AddScore}" CommandParameter="home:3" Grid.Row="0" Grid.Column="4" />
-                <Button Text="6" Command="{Binding AddScore}" CommandParameter="home:6" Grid.Row="0" Grid.Column="5" />
-
-                <Label Text="{Binding AwayTeamName}" Grid.Row="1" Grid.Column="0" />
-                <Button Text="-1" Command="{Binding AddScore}" CommandParameter="away:-1" Grid.Row="1" Grid.Column="1" />
-                <Button Text="1" Command="{Binding AddScore}" CommandParameter="away:1" Grid.Row="1" Grid.Column="2" />
-                <Button Text="2" Command="{Binding AddScore}" CommandParameter="away:2" Grid.Row="1" Grid.Column="3" />
-                <Button Text="3" Command="{Binding AddScore}" CommandParameter="away:3" Grid.Row="1" Grid.Column="4" />
-                <Button Text="6" Command="{Binding AddScore}" CommandParameter="away:6" Grid.Row="1" Grid.Column="5" />
-
-                <Button Text="Start All Clocks"
-                        Command="{Binding StartAllClocks}"
-                        Grid.Row="2"
-                        Grid.ColumnSpan="6" />
-            </Grid>
-        </material:BackdropView>
-    </uranium:UraniumContentPage.Attachments>
-</uranium:UraniumContentPage>
+</ContentPage>

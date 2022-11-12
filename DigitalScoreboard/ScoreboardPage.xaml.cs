@@ -5,7 +5,7 @@ using UIKit;
 namespace DigitalScoreboard;
 
 
-public partial class ScoreboardPage : UraniumUI.Pages.UraniumContentPage
+public partial class ScoreboardPage : ContentPage
 {
 #if ANDROID
     readonly AndroidPlatform platform;
