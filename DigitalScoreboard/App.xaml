@@ -9,7 +9,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
                     <local:TimeSpanConverter x:Key="TimeSpan" />
-                    <toolkit:InvertedBoolConverter x:Key="Not" /> 
                 </ResourceDictionary>
 
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />

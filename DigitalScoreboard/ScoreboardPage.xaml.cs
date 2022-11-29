@@ -1,6 +1,8 @@
 ﻿using DigitalScoreboard.Infrastructure;
+#if IOS || MACCATALYST
 using Foundation;
 using UIKit;
+#endif
 
 namespace DigitalScoreboard;
 
