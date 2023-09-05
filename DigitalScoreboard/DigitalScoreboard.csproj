@@ -8,7 +8,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<ShinyVersion>3.0.0-alpha-0402</ShinyVersion>
+		<ShinyVersion>3.0.0-beta-0305</ShinyVersion>
 
 		<ApplicationTitle>Scoreboard</ApplicationTitle>
 		<ApplicationId>com.shinysoft.digitalscoreboard</ApplicationId>
@@ -22,11 +22,6 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-		<MtouchLink>None</MtouchLink>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -35,11 +30,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CompiledBindings.MAUI" Version="1.0.13" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="3.0.0" />
+		<PackageReference Include="CompiledBindings.MAUI" Version="1.0.17.3" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="5.3.0" />
 		<PackageReference Include="Prism.DryIoc.Maui" Version="8.1.273-pre" />
-		<PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
-		<PackageReference Include="Shiny.Framework" Version="3.0.0-alpha-0044" />
+		<PackageReference Include="ReactiveUI.Fody" Version="19.4.1" />
+		<PackageReference Include="Shiny.Framework" Version="3.0.0-beta-0010" />
 		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />

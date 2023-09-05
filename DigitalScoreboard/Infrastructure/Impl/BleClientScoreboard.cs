@@ -1,14 +1,12 @@
-﻿using System;
-using Shiny.BluetoothLE;
-using Shiny.BluetoothLE.Managed;
+﻿using Shiny.BluetoothLE;
 
 namespace DigitalScoreboard.Infrastructure.Impl;
 
 
 public class BleClientScoreboard : AbstractScoreboard, IDisposable
 {
-    readonly IManagedPeripheral peripheral;
-
+    readonly IPeripheral peripheral;
+    IDisposable? notifySub;
 
     public BleClientScoreboard(
         string localName,
@@ -24,32 +22,31 @@ public class BleClientScoreboard : AbstractScoreboard, IDisposable
         new(settings.AwayTeam, 0, rules.MaxTimeouts)
     )
     {
-        this.peripheral = peripheral.CreateManaged();
+        this.peripheral = peripheral;
     }
 
     public async Task Connect(CancellationToken ct = default)
     {
-        await this.peripheral.ConnectWait().Timeout(TimeSpan.FromSeconds(20)).ToTask(ct);
+        await this.peripheral.ConnectAsync(null, ct, TimeSpan.FromSeconds(20));
 
-        this.peripheral
-            .WhenNotificationReceived(Constants.GameServiceUuid, Constants.GameCharacteristicUuid)
+        this.notifySub = this.peripheral
+            .NotifyCharacteristic(Constants.GameServiceUuid, Constants.GameCharacteristicUuid)
             .WhereNotNull()
-            .Subscribe(x => this.SetFromPacket(x));
+            .Subscribe(x => this.SetFromPacket(x.Data!));
     }
 
     public void Dispose()
-        => this.peripheral.Dispose();
+        => this.notifySub?.Dispose();
 
     public override IObservable<bool> WhenConnectedChanged()
         => this.peripheral.WhenAnyValue(x => x.Status).Select(x => x == ConnectionState.Connected);
 
     protected override Task Write(byte[] data) => this.peripheral
-        .Write(
+        .WriteCharacteristicAsync(
             Constants.GameServiceUuid,
             Constants.GameCharacteristicUuid,
             data,
             true
-        )
-        .ToTask();
+        );
 }
 

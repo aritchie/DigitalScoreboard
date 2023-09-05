@@ -1,28 +1,21 @@
 ﻿using DigitalScoreboard.Infrastructure;
-using Shiny.BluetoothLE.Hosting;
 
 namespace DigitalScoreboard;
 
 
 public class ScoreboardViewModel : ViewModel
 {
-    readonly ILogger logger;
-    readonly AppSettings settings;
     readonly IDeviceDisplay display;
     readonly IScoreboardManager scoreboardManager;
 
 
     public ScoreboardViewModel(
         BaseServices services,
-        ILogger<ScoreboardViewModel> logger,
         IScoreboardManager scoreboardManager,
-        AppSettings settings,
         IDeviceDisplay display
     )
     : base(services)
     {
-        this.logger = logger;
-        this.settings = settings;
         this.display = display;
         this.scoreboardManager = scoreboardManager;
 
