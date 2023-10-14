@@ -106,6 +106,9 @@ public class ScoreboardManager : IScoreboardManager
             access = await this.hostingManager.RequestAccess();
             if (access == AccessState.Available)
             {
+                if (this.hostingManager.IsRegisteredServicesAttached)
+                    this.hostingManager.DetachRegisteredServices();
+
                 await this.hostingManager.AttachRegisteredServices();
                 await hostingManager.StartAdvertising(new AdvertisementOptions(
                     this.appSettings.AdvertisingName,

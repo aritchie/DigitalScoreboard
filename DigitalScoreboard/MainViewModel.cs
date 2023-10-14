@@ -25,8 +25,19 @@ public class MainViewModel : ViewModel
 		{
             if (scoreboardManager.Current != null)
                 await this.ConfirmEndGame(scoreboardManager);
-            
-            var type = await this.Dialogs.ActionSheet("Game Type", null, "Cancel", "Hosted", "Connect", "Self");
+
+#if MACCATALYST
+            await scoreboardManager.Create(true);
+            await this.Navigation.Navigate(nameof(ScoreboardPage));
+#else
+            var type = await this.Dialogs.ActionSheet(
+                "Game Type",
+                null,
+                "Cancel",
+                "Hosted",
+                "Connect",
+                "Self"
+            );
             switch (type)
             {
                 case "Connect":
@@ -42,8 +53,9 @@ public class MainViewModel : ViewModel
                     await scoreboardManager.Create(false);
                     await this.Navigation.Navigate(nameof(ScoreboardPage));
                     break;
-            }            
-		});
+            }
+        });
+#endif
 
         this.EndGame = ReactiveCommand.CreateFromTask(
             () => this.ConfirmEndGame(scoreboardManager),
