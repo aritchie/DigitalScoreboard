@@ -1,8 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using DigitalScoreboard.Infrastructure;
 using DigitalScoreboard.Infrastructure.Impl;
-using Prism.Controls;
-using Prism.DryIoc;
 
 namespace DigitalScoreboard;
 

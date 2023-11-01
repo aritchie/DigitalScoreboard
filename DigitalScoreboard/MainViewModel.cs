@@ -54,8 +54,8 @@ public class MainViewModel : ViewModel
                     await this.Navigation.Navigate(nameof(ScoreboardPage));
                     break;
             }
-        });
 #endif
+        });
 
         this.EndGame = ReactiveCommand.CreateFromTask(
             () => this.ConfirmEndGame(scoreboardManager),
