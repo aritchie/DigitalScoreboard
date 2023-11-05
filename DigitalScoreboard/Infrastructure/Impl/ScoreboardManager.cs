@@ -106,10 +106,10 @@ public class ScoreboardManager : IScoreboardManager
             access = await this.hostingManager.RequestAccess();
             if (access == AccessState.Available)
             {
-                if (this.hostingManager.IsRegisteredServicesAttached)
-                    this.hostingManager.DetachRegisteredServices();
-
                 await this.hostingManager.AttachRegisteredServices();
+                if (this.hostingManager.IsAdvertising)
+                    this.hostingManager.StopAdvertising();
+
                 await hostingManager.StartAdvertising(new AdvertisementOptions(
                     this.appSettings.AdvertisingName,
                     Constants.GameServiceUuid
@@ -128,7 +128,10 @@ public class ScoreboardManager : IScoreboardManager
             await ad.DisposeAsync();
 
         if (this.Current is BleHostScoreboard)
+        {
             this.hostingManager.DetachRegisteredServices();
+            this.hostingManager.StopAdvertising();
+        }
 
         this.Current = null;
     }
