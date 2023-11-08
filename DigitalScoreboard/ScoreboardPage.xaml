@@ -54,14 +54,14 @@
                     <local:BoardLabel Info="&gt;"
                                       IsVisible="{Binding HomeTeamPossession, Converter={StaticResource Not}}"
                                       IsInfoFramed="False"
-                                        Command="{Binding TogglePossession}"
-                                        Grid.Column="3" />
+                                      Command="{Binding TogglePossession}"
+                                      Grid.Column="3" />
 
                     <local:BoardLabel Title="T.0"
-                                        Info="{Binding AwayTeamTimeouts}"
-                                        Command="{Binding DecrementTimeout}"
-                                        CommandParameter="away"
-                                        Grid.Column="4" />
+                                      Info="{Binding AwayTeamTimeouts}"
+                                      Command="{Binding DecrementTimeout}"
+                                      CommandParameter="away"
+                                      Grid.Column="4" />
                 </Grid>
 
                 <Grid ColumnDefinitions="1*, 1*, 1*"

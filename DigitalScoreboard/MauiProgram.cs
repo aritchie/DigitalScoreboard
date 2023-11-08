@@ -15,7 +15,14 @@ public static class MauiProgram
 			.UseMauiCommunityToolkit()
             .UseShinyFramework(
                 new DryIocContainerExtension(),
-                prism => prism.OnAppStart("NavigationPage/MainPage")
+                prism => prism.OnAppStart("NavigationPage/MainPage"),
+                new(
+                    #if DEBUG
+                    ErrorAlertType.FullError
+                    #else
+                    ErrorAlertType.NoLocalize
+                    #endif
+                )
             )
             .ConfigureFonts(fonts =>
 			{
@@ -29,7 +36,6 @@ public static class MauiProgram
         RegisterServices(builder.Services);
         RegisterViews(builder.Services);
 
-
 		return builder.Build();
 	}
 
@@ -39,14 +45,6 @@ public static class MauiProgram
         s.AddSingleton(DeviceDisplay.Current);
         s.AddShinyService<AppSettings>();
         s.AddBluetoothScoreboardServices();
-
-        s.AddGlobalCommandExceptionHandler(new(
-#if DEBUG
-            ErrorAlertType.FullError
-#else
-            ErrorAlertType.NoLocalize
-#endif
-        ));
     }
 
 

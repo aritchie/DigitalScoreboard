@@ -153,7 +153,6 @@ public class ScoreboardManager : IScoreboardManager
                 RxApp.MainThreadScheduler,
                 null,
                 TimeSpan.FromSeconds(10)
-
             );
         }
         return state;

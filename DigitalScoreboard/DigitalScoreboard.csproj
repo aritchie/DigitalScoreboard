@@ -17,8 +17,8 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<MauiVersion>8.0.0-rc.2.9511</MauiVersion>
-		<ShinyVersion>3.1.1</ShinyVersion>
+		<MauiVersion>8.0.0-rc.2.9530</MauiVersion>
+		<ShinyVersion>3.1.2</ShinyVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -32,7 +32,7 @@
 		<PackageReference Include="CommunityToolkit.Maui" Version="6.1.0" />
 		<PackageReference Include="Prism.DryIoc.Maui" Version="9.0.271-pre" />
 		<PackageReference Include="ReactiveUI.Fody" Version="19.5.1" />
-		<PackageReference Include="Shiny.Framework" Version="4.0.0-beta-0006" />
+		<PackageReference Include="Shiny.Framework" Version="4.0.0-beta-0011" />
 		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" Condition="'$(Configuration)' == 'Debug'" />
