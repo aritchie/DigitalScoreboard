@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>$(TargetFrameworks);net8.0-ios</TargetFrameworks>
-		<!--<TargetFrameworks>$(TargetFrameworks);net8.0-maccatalyst</TargetFrameworks>-->
+		<!--<TargetFrameworks>$(TargetFrameworks);net8.0-ios</TargetFrameworks>-->
+		<TargetFrameworks>$(TargetFrameworks);net8.0-maccatalyst</TargetFrameworks>
 		<!--<TargetFrameworks>$(TargetFrameworks);net8.0-android</TargetFrameworks>-->
 		<OutputType>Exe</OutputType>
-		<UseMaui>true</UseMaui>
 		<RootNamespace>DigitalScoreboard</RootNamespace>
 		<SingleProject>true</SingleProject>
+		<UseMaui>true</UseMaui>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		
@@ -17,8 +17,7 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<MauiVersion>8.0.0-rc.2.9530</MauiVersion>
-		<ShinyVersion>3.1.2</ShinyVersion>
+		<ShinyVersion>3.2.0</ShinyVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -29,18 +28,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="6.1.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="7.0.0" />
 		<PackageReference Include="Prism.DryIoc.Maui" Version="9.0.271-pre" />
 		<PackageReference Include="ReactiveUI.Fody" Version="19.5.1" />
-		<PackageReference Include="Shiny.Framework" Version="4.0.0-beta-0011" />
+		<PackageReference Include="Shiny.Framework" Version="4.0.0" />
 		<PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
 		<PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" Condition="'$(Configuration)' == 'Debug'" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" Condition="'$(Configuration)' == 'Debug'" />
 		<!--<PackageReference Include="EmbedIO" Version="3.5.2" />-->
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.3" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.3" />
     </ItemGroup>
 </Project>
